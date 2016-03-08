@@ -12,7 +12,7 @@ library(mvtnorm)
 
 n_i <- 4
 m <- 500
-nsims <- 250
+nsims <- 100
 totalobs <- n_i * m * nsims
 
 
@@ -37,13 +37,13 @@ group_assign <- function(n, n_i)
 
 fA <- function(n, A, groups)
 {
-  unlist(tapply(A, groups, function(x) {rep(sum(x), length(x))} ) )
+  unlist(tapply(A, groups, function(x) {(sum(x) - x)/length(x)} ) )
 }
 
-fAn <- function(n, A, groups)
-{
-  unlist(tapply(A, groups, function(x) {rep(sum(x)/length(x), length(x))} ) )
-}
+# fAn <- function(n, A, groups)
+# {
+#   unlist(tapply(A, groups, function(x) {rep((sum(x) - x)/length(x), length(x))} ) )
+# }
 
 rnorm_group <- function(n, mean, sd, groups)
 {
@@ -84,15 +84,15 @@ D <- D +
      groups = group) + 
   node('A',
        distr = 'rbern',
-       prob  = plogis(-Z1 - 2*Z2 - 1.25 * Z3 - 0.1 * Z4 + b)) +
+       prob  = plogis(-Z1 + 2*Z2 - 1.25*Z3 - 0.1*Z4 + b)) +
   node('fA',
        distr = 'fA',
        A = A, 
        groups = group) + 
-  node('fAn',
-       distr = 'fAn',
-       A = A, 
-       groups = group) + 
+#   node('fAn',
+#        distr = 'fAn',
+#        A = A, 
+#        groups = group) + 
   node('epsilon',
        distr  = 'rnorm_group',
        mean   = 0,
@@ -100,7 +100,7 @@ D <- D +
        groups = group) + 
   node('Y',
        distr  = 'rconst',
-       const  = 2 - Z1 - 2.7 * Z2 + 3 * Z3 - Z4  + 0.5 * A + 6 * fAn + A * Z1 + 8 * fA * Z2 )
+       const  = 2 - Z1 - 2.7*Z2 + 3*Z3 - Z4  + 0.5*A + 6*fA + A*Z1 + 8*fA*Z2 )
 
 D <- set.DAG(D)
 
@@ -108,5 +108,3 @@ D <- set.DAG(D)
 
 DRsims <- simobs(D, n = totalobs)
 DRsims$simID <- sort(rep(1:nsims, n_i * m))
-
-
