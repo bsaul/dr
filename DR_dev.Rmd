@@ -1,0 +1,192 @@
+---
+title: "Coding DR estimator"
+output: pdf_document
+---
+
+```{r filehead, echo = FALSE}
+#   Title: Doubly Robust Estimator with Interference
+#  Author: B. Saul
+#    Date: 2016-03-01
+# Purpose: code the DR estimator in Liu et al
+```
+
+```{r libraries, echo=TRUE, message=FALSE, warning=FALSE}
+library(inferference)
+library(dplyr)
+library(geepack)
+library(magrittr)
+#library(plyr)
+```
+
+To test the Doubly Robust (DR) estimator, I will use the `vaccinesim` data in the package `inferference`. This data has 250 groups, based on the simulations in Perez-Heydrich (2014).
+
+Let $p_{ij}= p_{ij}(A_i) = \sum_{k \neq j} A_{ik} /(n_i - 1)$ the proportion treated in group $i$, excluding the $j$th person.
+
+```{r, echo=TRUE}
+vaccinesim <- vaccinesim %>%
+  mutate(id = row_number()) %>%
+  group_by(group) %>%
+  # compute p_ij for each subject
+  mutate(pA = (sum(A) - A)/(n() - 1)) %>%
+  ungroup()
+```
+
+For the outcome model:
+\[
+\mu_{ij} = logit^{-1}(\beta_0 + \beta_1 A_{ij} + \beta_2 p_{ij} + \beta_3 A_{ij} p_{ij} + \beta_4 X_{1ij} + \beta_5 X_{2ij})
+\]
+
+$\beta$ will be estimated using GEE using an independence working correlation.
+
+```{r outcome_model, echo=TRUE}
+m_outcome <- geepack::geeglm(y ~ A*pA + X1 + X2, data = vaccinesim,
+                             id = id, family = binomial)
+```
+
+For the ipw model:
+\[
+h_{ij} = logit^{-1}(\gamma_1 + \gamma_2 X_{1ij} + \gamma_3 X_{ij} + b_i)
+\]
+
+\[
+f(A_i | X_i, \gamma) = \int \prod_{j} h_{ij}^{A_{ij}} (1 - h_{ij} )^{(1 - A_{ij})} df_{b_i}
+\]
+
+$\gamma$ is estimated from logistic-normal random effects model.
+
+```{r ipw_model, echo = TRUE}
+alphas <- c(.2, .3, .4, .5, .6, .7)
+
+ipw_pieces <- interference(formula = y | A | B ~ X1 + X2 + (1|group) | group,
+                     data = as.data.frame(vaccinesim), 
+                     allocations = alphas,
+                     method = 'simple')
+```
+
+
+Let $W_{i} = \frac{\pi(A_i, \alpha_k)}{f(A_i| X_i; \hat{\gamma})}$
+
+Compute the first term of DR estimator:
+\[
+[Y_{ij}(A_i) - \mu_{ij}(A_i, X_i, \hat{\beta}) ] W_i
+\]
+
+```{r term1, echo=TRUE}
+## First term ####
+dr_term1 <- function(data, alpha, ipw_part, outcome_model)
+{
+  # Get the weights from the interference object
+  weights <- ipw_part$weights[ , as.character(alpha)]
+  weights <- data.frame(group = as.integer(names(weights)), w = weights)
+  
+  data %>%   
+    # Compute mu_ij for each subject
+    mutate_(muA = ~predict(outcome_model, type = 'response')) %>%
+    # Add group IPW weights to the data
+    left_join(weights, by = 'group') %>%
+    # Compute term 1
+    mutate_(term1 = ~ (y - muA) * w )
+}
+```
+
+Compute the second term of DR estimator:
+\[
+\sum_{a_i} \mu_{ij}(a_i, X_i, \hat{\beta}) \pi(a_i; \alpha_k)
+\]
+
+```{r term2, echo=TRUE}
+## Second term ####
+dr_term2 <- function(data, alpha, outcome_model)
+{
+  data %>%
+    select(-pA) %>%
+    # this needs to be done by group. plyr splits the data frame by group
+    # then applies a function to each piece
+    {plyr::dlply(., plyr::.(group), function(x){
+      x %>%
+        # Generate all possible sum(a_i) for each subject
+        merge(expand.grid(sum_a = 0:(n_distinct(.$id) - 1)), all = T)  %>%
+        group_by_(~id) %>%
+        # Compute pi and p_ij for each sum(a_i)
+        mutate_(pA = ~ sum_a/(n() - 1),
+                pi = ~ choose(n() - 1, sum_a) * alpha^sum_a * (1 - alpha)^(n() - 1 - sum_a)) %>%
+        ungroup() %>%
+        # Compute mu_ij for each a_i per subject
+        # For some reason predict() is throwing error with geeglm model
+        #mutate_(mu_ij = ~predict(outcome_model, newdata = ., type = 'response')) %>%
+        mutate_(mu =~ as.numeric(
+          plogis(model.matrix(outcome_model$formula, .) %*% coef(outcome_model) ) ) ) %>%
+        # Sum by individual to compute term2
+        group_by_(~id) %>%
+        summarize_(term2 = ~sum(mu * pi)) 
+    })} %>%
+  # Put the split data back together
+  bind_rows()
+}
+
+```
+
+Putting term 1 and term 2 together:
+
+\[
+\hat{Y}_{ij}(\alpha_k) = [Y_{ij}(A_i) - \mu_{ij}(A_i, X_i, \hat{\beta}) ] W_i + \sum_{a_i} \mu_{ij}(a_i, X_i, \hat{\beta}) \pi(a_i; \alpha_k)
+\]
+
+Then average by group:
+\[
+\hat{Y}_{i}(\alpha_k) = \sum_j \hat{Y}_{ij}(\alpha_k)/n_i
+\]
+
+Then average across groups:
+\[
+\hat{Y}(\alpha_k) = \sum_i \hat{Y}_{i}(\alpha_k)/m
+\]
+
+```{r DR, echo = TRUE}
+## All together now ####
+dr <- function(data, alpha, ipw_part, outcome_model)
+{
+  dr_term1(data, alpha, ipw_part, outcome_model) %>%
+    left_join(dr_term2(data, alpha, outcome_model), by = 'id') %>%
+    mutate_(Y_hat_ij = ~term1 + term2) %>%
+    group_by_(~group) %>%
+    summarise_(Y_hat_i = ~mean(Y_hat_ij)) %>%
+    summarise_(Y_hat = ~mean(Y_hat_i) )
+}
+```
+Compute $\hat{Y}_{DR}(\alpha)$ for 6 different $\alpha$ levels: .2, .3, .4, .5, .6, .7.
+
+```{r DR_estimate, echo=TRUE}
+lapply(alphas, function(alpha) dr(vaccinesim, alpha, ipw_pieces, m_outcome)) %>%
+  bind_rows()
+```
+
+How do these compare to $\hat{Y}_{IPW}(\alpha)$?
+
+```{r IPW_estimate, echo=TRUE}
+ipw_pieces$estimates %>%
+  filter(effect_type == 'outcome', marginal == TRUE) %>%
+  select(alpha1, estimate)
+```
+
+Why does the DR estimator return negative values?
+
+\begin{align*}
+\frac{(Y_{ij}(A_i) - \mu_{ij}(A_i) )}{f} \pi(A_i) + \sum_{a_i} \mu_{ij}(a_i) \pi(a_i) \\
+\frac{(Y_{ij}(A_i) - \mu_{ij}(A_i) )}{f} \pi(A_i) + \mu_{ij}(A_i) + \sum_{a_i \neq A_i} \mu_{ij}(a_i) \pi(a_i) \\
+\frac{(Y_{ij}(A_i) - \mu_{ij}(A_i) )}{f} \pi(A_i) + \mu_{ij}(A_i)\pi(A_i) + \sum_{a_i \neq A_i} \mu_{ij}(a_i) \pi(a_i) \\
+\left\{ \frac{(Y_{ij}(A_i) - \mu_{ij}(A_i) )}{f} + \mu_{ij}(A_i) \right \}\pi(A_i) + \sum_{a_i \neq A_i} \mu_{ij}(a_i) \pi(a_i) \\
+\left\{ \frac{Y_{ij}(A_i) - \mu_{ij}(A_i) + f \mu_{ij}(A_i))}{f}  \right \}\pi(A_i) + \sum_{a_i \neq A_i} \mu_{ij}(a_i) \pi(a_i) \\
+\left\{ \frac{Y_{ij}(A_i) + \mu_{ij}(A_i)(f - 1)}{f} \right \}\pi(A_i) + \sum_{a_i \neq A_i} \mu_{ij}(a_i) \pi(a_i) \\
+\end{align*}
+
+Since $f - 1 \leq 0$, $\mu_{ij}(A_i) \in (0, 1)$, and $Y_{ij} \in \{0, 1\}$,
+
+\[
+Y_{ij}(A_i) + \mu_{ij}(A_i)(f - 1) 
+\begin{cases}
+< 0 & \text{if } Y = 0 \\
+> 0 & \text{if } Y = 1
+\end{cases}
+\]
+
