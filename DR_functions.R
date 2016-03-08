@@ -31,7 +31,8 @@ dr_ipw <- function(formula_outcome,
 #   ee <- cbind(ee_outcome, ee_ipw)
   
   ## DR
-  mu <- predict(model_outcome, type = 'response')
+  #mu <- predict(model_outcome, type = 'response')
+  mu <- model.matrix(model_outcome) %*% coef(model_outcome)
   w <- apply(model_ipw$weights, 2, function(row) {matrix(rep(row, each = 4))})
   
   w_mu <- apply(w, 2, function(col) col * mu)
@@ -54,18 +55,18 @@ dr_term2 <- function(alpha, outcome_model, data)
     {plyr::dlply(., plyr::.(group), function(x){
       x %>%
         # Generate all possible sum(a_i) for each subject
-        merge(expand.grid(sum_a = 0:(n_distinct(.$id) - 1)), all = T)  %>%
+        merge(expand.grid(sum_a = 0:(n_distinct(.$ID) - 1)), all = T)  %>%
         group_by_(~ID) %>%
         # Compute pi and p_ij for each sum(a_i)
-        mutate_(fA = ~ sum_a,
-                fAn = ~ sum_a/n(),
+        mutate_(A =~ 1,
+                fA = ~ (sum_a - 1)/n(),
+                # fAn = ~ sum_a/n(),
                 pi = ~ choose(n() - 1, sum_a) * alpha^sum_a * (1 - alpha)^(n() - 1 - sum_a)) %>%
         ungroup() %>%
         # Compute mu_ij for each a_i per subject
         # For some reason predict() is throwing error with geeglm model
         #mutate_(mu_ij = ~predict(outcome_model, newdata = ., type = 'response')) %>%
-        mutate_(mu =~ as.numeric(
-          model.matrix(outcome_model$formula, .) %*% coef(outcome_model) )  ) %>%
+        mutate_(mu =~ as.numeric(model.matrix(outcome_model$formula, .) %*% coef(outcome_model) )  ) %>%
         # Sum by individual to compute term2
         group_by_(~ID) %>%
         summarize_(term2 = ~sum(mu * pi)) 
@@ -90,7 +91,7 @@ dr_ipw_estimate <- function(obj)
     alphak <- as.numeric(dimnames(obj$w)[[2]])[k]
     hold[k] <- obj$outcome$data %>%
       mutate_(mu =~ as.numeric(obj$mu) ) %>%
-      mutate_(term1 =~ as.numeric((A == 1) * (Y - mu) * obj$w[ , k]/alphak) ) %>%
+      mutate_(term1 =~ as.numeric( ((A == 1) * (Y - mu)) * obj$w[ , k]/alphak) ) %>%
       left_join(term2, by = 'ID') %>%
       mutate_(Yhat_ij = ~term1 + term2) %>%
       group_by_(~group) %>%
