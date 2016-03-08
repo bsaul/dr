@@ -59,7 +59,7 @@ dr_term2 <- function(alpha, outcome_model, data)
         group_by_(~ID) %>%
         # Compute pi and p_ij for each sum(a_i)
         mutate_(A =~ 1,
-                fA = ~ (sum_a - 1)/n(),
+                fA = ~ sum_a/n(),
                 # fAn = ~ sum_a/n(),
                 pi = ~ choose(n() - 1, sum_a) * alpha^sum_a * (1 - alpha)^(n() - 1 - sum_a)) %>%
         ungroup() %>%
