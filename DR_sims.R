@@ -12,8 +12,9 @@ library(mvtnorm)
 
 n_i <- 4
 m <- 500
-nsims <- 100
+nsims <- 1000
 totalobs <- n_i * m * nsims
+seed <- 42
 
 
 #### Functions ####
@@ -22,10 +23,6 @@ group_assign <- function(n, n_i)
 {
   ni <- n_i[1]
   m <- n/ni
-#   if(abs(m - round(m)) > .Machine$double.eps^0.5) {
-#     stop('n must be a multiple of n_i')
-#   }
-
   out <- numeric(n)
   for(i in 0:(m-1)){
     start <- i*ni + 1
@@ -70,7 +67,7 @@ D <- D +
        const = exp(Z1/2) ) + 
   node('X2', 
        distr = "rconst", 
-       const = Z2/(1 + exp(Z2)) + 10) +
+       const = Z2/(1 + exp(Z1)) + 10) +
   node('X3',
        distr = "rconst",
        const = ((Z1*Z3)/25 + 0.6)^3 ) + 
@@ -89,10 +86,6 @@ D <- D +
        distr = 'fA',
        A = A, 
        groups = group) + 
-#   node('fAn',
-#        distr = 'fAn',
-#        A = A, 
-#        groups = group) + 
   node('epsilon',
        distr  = 'rnorm_group',
        mean   = 0,
@@ -106,5 +99,5 @@ D <- set.DAG(D)
 
 #### Simulate Data ####
 
-DRsims <- simobs(D, n = totalobs)
+DRsims <- simobs(D, n = totalobs, rndseed = seed)
 DRsims$simID <- sort(rep(1:nsims, n_i * m))
