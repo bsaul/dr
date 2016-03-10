@@ -105,5 +105,22 @@ dr_ipw_estimate <- function(obj)
   bind_rows(ipw_estimates, dr_estimates)
 }
 
-
-
+dr_results <- function(sims, formula_outcome, formula_interference)
+{
+  sims %>% 
+     filter(simID <= 100) %>%
+    {plyr::dlply(., plyr::.(simID), .progress = 'text', function(sim){
+      this_sim <- dr_ipw(formula_outcome = formula_outcome,
+                         formula_interference = formula_interference,
+                         method_outcome  = geepack::geeglm,
+                         method_opts_outcome = list(id = quote(group), family = gaussian),
+                         method_opts_interference = list(allocations = alphas,
+                                                         method = 'simple', 
+                                                         runSilent = T),
+                         dr_term2_function = dr_term2,
+                         data = sim)
+      dr_ipw_estimate(this_sim) %>%
+        mutate_(simID = ~ sim$simID[1])
+    })} %>%
+      bind_rows()
+}
