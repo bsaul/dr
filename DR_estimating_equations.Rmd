@@ -1,0 +1,30 @@
+---
+output: pdf_document
+---
+
+Let $\theta = \{ \beta, \gamma\}$, i.e. the parameters in the outcome and propensity models, respectively. Let $\xi$ be the population parameter we're trying to estimate.
+
+\[
+\psi_{i, a, \alpha}(Y_i, A_i, X_i, \theta, \xi) = \sum_{j = 1}^{n_i} \left\{ \frac{g(Y_{ij}, X_{ij}, A_i, \alpha)}{f(A_i, \gamma)} + \sum_{a_i} \mu_{ij}(a_i, \beta) \pi(a_i, \alpha) \right\} - \xi
+\]
+
+where:
+
+\[
+g(Y_{ij}, X_{ij}, A_i, \alpha) = [I(A_{ij} = a)(Y_{ij} - \mu_{ij})] \pi(A_i, \alpha)
+\]
+
+For variance estimation, I will need to find the vector $\frac{d \psi_{i, a, \alpha}}{d \theta}$. But I compute $\frac{d \psi_{i, a, \alpha}}{d \gamma}\frac{\pi(A_i, \alpha)}{f(A_i, \gamma)}$ in the inferference package already. 
+Since the 2nd term of the DR estimator does not depend on $\gamma$, I can take what I have, $\frac{d \psi_{i, a, \alpha}}{d \gamma}\frac{\pi(A_i, \alpha)}{f(A_i, \gamma}\left(\sum_{ij} Y_{ij}I(A_{ij} = a)\right)$, and subtract $\frac{d \psi_{i, a, \alpha}}{d \gamma}\frac{\pi(A_i, \alpha)}{f(A_i, \gamma)}\left(\sum_{ij}I(A_{ij} = a) \mu_{ij} \right)$ to get $\frac{d \psi_{i, a, \alpha}}{d \gamma}$.
+
+What about the derivative w.r.t $\beta$? For a linear outcome model ($\mu = X\beta$), I think $\frac{d \psi_{i, a, \alpha}}{d \beta}$ is straightforward:
+\begin{align*}
+\frac{d \psi_{i, a, \alpha}}{d \beta_k} &= \frac{d}{d\beta_k} \left\{ \sum_{ij} \left[ I(A_{ij} = a) (Y_{ij} - X_{ij}\beta) \frac{\pi(A_{i(-j)}, \alpha)}{f(A_i, \gamma)} + \sum_{a_{i(-j)}} (X_{ij} \beta) \pi(a_{i(-j)}, \alpha) \right]\right\} \\
+&= \sum_{ij} \left[  - I(A_{ij} = a)X_{ijk} \frac{\pi(A_{i(-j)}, \alpha)}{f(A_i, \gamma)} + \sum_{a_{i(-j)}}  X_{ijk} \pi(a_{i(-j)}, \alpha) \right]\\
+&= \sum_{ij} \left[  X_{ijk} \left( \sum_{a_{i(-j)}} \pi(a_{i(-j)}, \alpha) - \frac{I(A_{ij} = a)\pi(A_{i(-j)}, \alpha)}{f(A_i, \gamma)} \right) \right]\\
+&=  \sum_{ij} \left[  X_{ijk} \left(1 - \frac{I(A_{ij} = a)\pi(A_{i(-j)}, \alpha)}{f(A_i, \gamma)}\right)   \right]\\
+\end{align*}
+
+Does my algebra look correct?
+
+Once I have $\frac{\partial \psi_{i, a, \alpha}}{d \theta} = \left(\frac{\partial \psi_{i, a, \alpha}}{\partial \gamma} \frac{\partial \psi_{i, a, \alpha}}{\partial \beta} \right)$, then I have the $U_{21}$ submatrix from Caro's appendix. I have all the other pieces for variance estimation.
