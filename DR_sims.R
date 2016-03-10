@@ -12,7 +12,7 @@ library(mvtnorm)
 
 n_i <- 4
 m <- 500
-nsims <- 1000
+nsims <- 500
 totalobs <- n_i * m * nsims
 seed <- 42
 
@@ -101,3 +101,4 @@ D <- set.DAG(D)
 
 DRsims <- simobs(D, n = totalobs, rndseed = seed)
 DRsims$simID <- sort(rep(1:nsims, n_i * m))
+save.image()
