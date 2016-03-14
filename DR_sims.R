@@ -12,7 +12,8 @@ library(mvtnorm)
 
 n_i <- 4
 m <- 500
-nsims <- 500
+# nsims <- 500
+nsims <- 200
 totalobs <- n_i * m * nsims
 seed <- 42
 
@@ -24,6 +25,8 @@ group_assign <- function(n, n_i)
   ni <- n_i[1]
   m <- n/ni
   out <- numeric(n)
+
+
   for(i in 0:(m-1)){
     start <- i*ni + 1
     end   <- i*ni + ni 
@@ -36,11 +39,6 @@ fA <- function(n, A, groups)
 {
   unlist(tapply(A, groups, function(x) {(sum(x) - x)/length(x)} ) )
 }
-
-# fAn <- function(n, A, groups)
-# {
-#   unlist(tapply(A, groups, function(x) {rep((sum(x) - x)/length(x), length(x))} ) )
-# }
 
 rnorm_group <- function(n, mean, sd, groups)
 {
@@ -81,7 +79,7 @@ D <- D +
      groups = group) + 
   node('A',
        distr = 'rbern',
-       prob  = plogis(-Z1 + 2*Z2 - 1.25*Z3 - 0.1*Z4 + b)) +
+       prob  = plogis(-Z1 + 2*Z2 - 1.25*Z3 - 0.1*Z4 + 0)) + # removed random effect
   node('fA',
        distr = 'fA',
        A = A, 
