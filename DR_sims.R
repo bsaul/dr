@@ -12,10 +12,9 @@ library(mvtnorm)
 
 n_i <- 4
 m <- 500
-# nsims <- 500
-nsims <- 200
+nsims <- 500
 totalobs <- n_i * m * nsims
-seed <- 42
+seed <- 12
 
 
 #### Functions ####
@@ -23,15 +22,9 @@ seed <- 42
 group_assign <- function(n, n_i)
 {
   ni <- n_i[1]
-  m <- n/ni
-  out <- numeric(n)
+  m <- ceiling(n/ni)
+  out <- rep(1:m, each = ni)[1:n]
 
-
-  for(i in 0:(m-1)){
-    start <- i*ni + 1
-    end   <- i*ni + ni 
-    out[start:end] <- i + 1
-  }
   return(out)
 }
 
@@ -43,11 +36,10 @@ fA <- function(n, A, groups)
 rnorm_group <- function(n, mean, sd, groups)
 {
   m <- length(unique(groups))
+  g <- as.numeric(table(groups))
   hold <- rnorm(m, mean = mean, sd = sd)
-  out <- numeric(n)
-  for(i in 1:n){
-    out[which(groups == i)] <- hold[i]
-  }
+  
+  out <- rep(hold, times = g)
   return(out)
 }
 
@@ -56,7 +48,7 @@ D <- DAG.empty()
 D <- D + 
   node('group', 
        distr = 'group_assign', 
-       n_i = 4) + 
+       n_i = .(n_i) ) + 
   node(c("Z1","Z2","Z3","Z4"), 
        distr = "rmvnorm", 
        mean = c(0,0,0,0)) + 
@@ -77,26 +69,31 @@ D <- D +
      mean   = 0,
      sd     = 1,
      groups = group) + 
-  node('A',
-       distr = 'rbern',
-       prob  = plogis(-Z1 + 2*Z2 - 1.25*Z3 - 0.1*Z4 + 0)) + # removed random effect
+#   But anyways, it is very close to what in my table 1, so I think my coefficient is 
+# > coef_pi.true
+# [1]  0.50 -1.00  0.50 -0.25 -0.10  
+    node('A',
+         distr = 'rbern',
+         prob  = plogis(0.5 - Z1 + 0.5*Z2 - 0.25*Z3 - 0.1*Z4 + b)) + 
   node('fA',
        distr = 'fA',
        A = A, 
        groups = group) + 
-  node('epsilon',
-       distr  = 'rnorm_group',
+  node('e',
+       distr  = 'rnorm',
        mean   = 0,
-       sd     = 1,
-       groups = group) + 
+       sd     = 1)  + 
   node('Y',
        distr  = 'rconst',
-       const  = 2 - Z1 - 2.7*Z2 + 3*Z3 - Z4  + 0.5*A + 6*fA + A*Z1 + 8*fA*Z2 )
+       const  = 2 - 1.5 * Z1 - 2.7 * Z2 + 3 * Z3 - Z4  + 0.5 * A + 6 * fA + A*Z1 + 8 * fA * Z2 + e)
 
 D <- set.DAG(D)
 
 #### Simulate Data ####
 
-DRsims <- simobs(D, n = totalobs, rndseed = seed)
+DRsims <- simobs(D, n = totalobs, rndseed = seed) 
 DRsims$simID <- sort(rep(1:nsims, n_i * m))
+
+assign(paste0('sims_', nsims, 'x_', 'm', m, '_n', n_i), DRsims)
+rm(DRsims, n_i, m, totalobs, seed, fA, group_assign, rnorm_group, nsims, D)
 save.image()
