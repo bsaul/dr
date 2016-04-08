@@ -42,7 +42,12 @@ dr_ipw <- function(formula_outcome,
     dr_term2_function(alpha, outcome_model = model_outcome, data = data) 
   })
   
-  out <- list(outcome = model_outcome, ipw = model_ipw, mu = mu, w = w, w_mu = w_mu, term2 = term2)
+  out <- list(outcome = model_outcome, 
+              ipw = model_ipw, 
+              mu = mu, 
+              w = w, 
+              w_mu = w_mu, 
+              term2 = term2)
   return(out)
 }
 
@@ -77,19 +82,29 @@ dr_term2 <- function(alpha, outcome_model, data)
 
 dr_ipw_estimate <- function(obj)
 {
+
   ## IPW
   ipw_estimates <- obj$ipw$estimates %>%
     filter(effect_type == 'outcome', trt1 == 1) %>%
     select(alpha1, trt1, estimate, std.error, conf.low, conf.high) %>%
-    mutate(type = 'ipw')
+    mutate(method = 'ipw')
   
   ## DR
-  
-  hold <- numeric(ncol(obj$w))
+  dr_results <- numeric(ncol(obj$w))
+  outcome_results <- numeric(ncol(obj$w))
   for(k in 1:ncol(obj$w)){
     term2 <- obj$term2[[k]]
     alphak <- as.numeric(dimnames(obj$w)[[2]])[k]
-    hold[k] <- obj$outcome$data %>%
+    
+    outcome_results[k] <- obj$outcome$data %>%
+      left_join(term2, by = 'ID') %>%
+      mutate_(Yhat_ij = ~ term2) %>%
+      group_by_(~group) %>%
+      summarise_(Yhat_i = ~mean(Yhat_ij)) %>%
+      summarise_(Yhat = ~mean(Yhat_i) ) %>%
+      as.numeric()
+
+    dr_results[k] <- obj$outcome$data %>%
       mutate_(mu =~ as.numeric(obj$mu) ) %>%
       mutate_(term1 =~ as.numeric( ((A == 1) * (Y - mu)) * obj$w[ , k]/alphak) ) %>%
       left_join(term2, by = 'ID') %>%
@@ -100,16 +115,20 @@ dr_ipw_estimate <- function(obj)
       as.numeric()
   }
   dr_estimates <- data.frame(alpha1 = as.numeric(dimnames(obj$w)[[2]]),
-                             trt1 = 1, estimate = hold, type = 'dr')
+                             trt1 = 1, estimate = dr_results, method = 'dr')
   
-  bind_rows(ipw_estimates, dr_estimates)
+  outcome_estimates <- data.frame(alpha1 = as.numeric(dimnames(obj$w)[[2]]),
+                                  trt1 = 1, estimate = outcome_results, 
+                                  method = 'outcome')
+  
+  bind_rows(ipw_estimates, dr_estimates, outcome_estimates)
 }
 
 dr_results <- function(sims, formula_outcome, formula_interference)
 {
   sims %>% 
-     filter(simID <= 100) %>%
-    {plyr::dlply(., plyr::.(simID), .progress = 'text', function(sim){
+    {plyr::dlply(., plyr::.(simID), .progress = 'text', .parallel = TRUE,
+                 function(sim){
       this_sim <- dr_ipw(formula_outcome = formula_outcome,
                          formula_interference = formula_interference,
                          method_outcome  = geepack::geeglm,
