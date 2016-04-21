@@ -25,12 +25,13 @@ dr_ipw <- function(formula_outcome,
   model_ipw <- do.call(inferference::interference, args = model_args_ipw)
 
   ## M-estimation
-#   ee_outcome <- estfun(model_outcome)
-#   ee_ipw <- model_ipw$scores
-#   # Stack EEs
-#   ee <- cbind(ee_outcome, ee_ipw)
-  
-  ## DR
+  models <- list(model_outcome, model_ipw$models$propensity_model)
+  ee_all <- estfun_stacker(models)
+  ee_outcome <- estfun(model_outcome)
+  bread_outcome <- bread(model_outcome)
+  bread_all <- make_bread(models, grad_method = 'Richardson')
+
+    ## DR
   #mu <- predict(model_outcome, type = 'response')
   mu <- model.matrix(model_outcome) %*% coef(model_outcome)
   w <- apply(model_ipw$weights, 2, function(row) {matrix(rep(row, each = 4))})
@@ -47,7 +48,11 @@ dr_ipw <- function(formula_outcome,
               mu = mu, 
               w = w, 
               w_mu = w_mu, 
-              term2 = term2)
+              term2 = term2,
+              ee_all = ee_all,
+              ee_outcome = ee_outcome,
+              bread_all = bread_all,
+              bread_outcome = bread_outcome )
   return(out)
 }
 
@@ -114,20 +119,32 @@ dr_ipw_estimate <- function(obj)
       summarise_(Yhat = ~mean(Yhat_i) ) %>%
       as.numeric()
   }
-  dr_estimates <- data.frame(alpha1 = as.numeric(dimnames(obj$w)[[2]]),
-                             trt1 = 1, estimate = dr_results, method = 'dr')
   
+  ## Outcome ##
   outcome_estimates <- data.frame(alpha1 = as.numeric(dimnames(obj$w)[[2]]),
                                   trt1 = 1, estimate = outcome_results, 
                                   method = 'outcome')
   
+  n <- nrow(ee_outcome)
+  ee_outcome <- cbind(obj$ee_outcome, outcome_estimates - mean(outcome_estimates))
+  
+  V_outcome <- crossprod(ee_outcome)/n
+  U_outcome <- 
+  
+  ### DR variance ###
+  dr_estimates <- data.frame(alpha1 = as.numeric(dimnames(obj$w)[[2]]),
+                             trt1 = 1, estimate = dr_results, method = 'dr')
+  
+
+  
   bind_rows(ipw_estimates, dr_estimates, outcome_estimates)
 }
 
-dr_results <- function(sims, formula_outcome, formula_interference)
+dr_results <- function(sims, formula_outcome, formula_interference, 
+                       progress = 'none', parallel = FALSE)
 {
   sims %>% 
-    {plyr::dlply(., plyr::.(simID), .progress = 'text', .parallel = TRUE,
+    {plyr::dlply(., plyr::.(simID), .progress = progress, .parallel = parallel,
                  function(sim){
       this_sim <- dr_ipw(formula_outcome = formula_outcome,
                          formula_interference = formula_interference,
@@ -135,11 +152,17 @@ dr_results <- function(sims, formula_outcome, formula_interference)
                          method_opts_outcome = list(id = quote(group), family = gaussian),
                          method_opts_interference = list(allocations = alphas,
                                                          method = 'simple', 
-                                                         runSilent = T),
+                                                         runSilent = F),
                          dr_term2_function = dr_term2,
                          data = sim)
-      dr_ipw_estimate(this_sim) %>%
-        mutate_(simID = ~ sim$simID[1])
-    })} %>%
-      bind_rows()
+    })} 
+}
+
+summarize_results <- function(results_list)
+{
+  lapply(results_list, function(x){
+    dr_ipw_estimate(x) %>%
+      mutate_(simID = ~ sim$simID[1]) 
+  } ) %>%
+    bind_rows()
 }
