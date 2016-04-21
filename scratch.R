@@ -1,3 +1,18 @@
+
+
+
+x <- tru_tru[[1]]$ipw$weightd[ , , 1] 
+
+y <- tapply(fitted(tru_tru[[1]]$outcome), tru_tru[[1]]$outcome$geese$id, sum)
+
+z1 <- tru_tru[[1]]$ipw$Upart$marginal_outcomes$groups[ , , 1]
+
+z2 <- apply(x, 2, function(col) col * y)
+
+z1 - z2
+#------------------------------------------------------------------------------#
+#### OLD ####
+#------------------------------------------------------------------------------#
 library(inferference)
 library(doMC)
 registerDoMC(4)
