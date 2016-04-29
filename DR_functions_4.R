@@ -76,30 +76,27 @@ expand_grid_n <- function(n1, n2)
   lookup <- paste(n1, n2, sep = '_')
   if(!exists(lookup, envir = grids)){
     grids[[lookup]] <- expand.grid(ID = 1:n1, sum_a = 0:n2, 
-                                   A = 0:1)
+                                   A = 0:1) %>%
+      mutate_(fA = ~ sum_a / n1) 
   }
   return(grids[[lookup]])
 }
 
 
-# microbenchmark::microbenchmark(
-#   expand_grid_n(100),
-#   expand.grid(ID = 1:100, sum_a = 0:100, A = 0:1))
+#  microbenchmark::microbenchmark(
+#    expand_grid_n(100),
+#    expand.grid(ID = 1:100, sum_a = 0:100, A = 0:1))
 
 expand_outcome_frame <- function(X_outcome, rhs_formula_outcome){
   f <- function(theta){
     n <- nrow(X_outcome)
     X_outcome %>%
       mutate_(ID = ~ row_number()) %>%
-      # Remove all treatment variables so that model.matrix correctly generates
-      # interactions
-      select(-contains('A')) %>%
+      # Remove treatment variables so that they are updated 
+      select(-A, -fA) %>%
       # Generate the relevant values of A and 
       # all possible sum(a_i) for each subject
-      full_join(expand_grid_n2(n, n - 1), by = "ID") %>%
-      # group_by_(~ID, ~A) %>%
-      # Compute fA and for each sum(a_i) a
-      mutate_(fA = ~ sum_a / n) %>%
+      full_join(expand_grid_n(n, n - 1), by = "ID") %>%
       # Compute fitted values
       mutate_(fits = ~ as.numeric(model.matrix(rhs_formula_outcome, data = .) %*% theta ) ) 
   }
@@ -137,7 +134,7 @@ make_ipw_estimator <- function(Y, A, X_treatment, ...){
 
 make_otc_estimator <- function(X_outcome, rhs_formula_outcome, ...){
   
-  X_expanded <- expand_outcome_frame2(X_outcome, rhs_formula_outcome)
+  X_expanded <- expand_outcome_frame(X_outcome, rhs_formula_outcome)
   
     function(theta, alpha, a = NULL){
       n <- nrow(X_outcome) - {if(is.null(a)) 0 else 1}
@@ -168,11 +165,11 @@ make_dr_term1 <- function(X){
   memoise::memoise(f)
 }
 
-make_dbr_estimator <- function(Y, A, X_outcome, X_treatment, formula_outcome){
+make_dbr_estimator <- function(Y, A, X_outcome, X_treatment, rhs_formula_outcome){
   w <- weight_estimator(A = A, X = X_treatment)
   pi_t <- pi_term(A = A)
   dr_term1 <- make_dr_term1(X_outcome)
-  dr_term2 <- make_outcome_estimator(X_outcome, formula_outcome = formula_outcome)
+  dr_term2 <- make_otc_estimator(X_outcome, rhs_formula_outcome = rhs_formula_outcome)
   
   q_treatment <- ncol(X_treatment) + 1
 
@@ -262,11 +259,11 @@ estimation <- function(treatment_formula,
     
     estimators <- list(make_ipw_estimator(Y = Y, A = A, X_treatment = X_t),
                        make_otc_estimator(X_outcome = X_o, 
-                                         formula_outcome = form_rhs_o),
+                                         rhs_formula_outcome = form_rhs_o),
                        make_dbr_estimator(Y = Y, A = A, 
-                                                  X_outcome = X_o, 
-                                                  X_treatment = X_t, 
-                                                  formula_outcome = form_rhs_o))
+                                          X_outcome = X_o, 
+                                          X_treatment = X_t, 
+                                          rhs_formula_outcome = form_rhs_o))
     data_frame(estimator_type = c('ipw', 'otc', 'dbr'),
                estimator = estimators)
   }) %>% bind_rows() 
@@ -277,9 +274,22 @@ estimation <- function(treatment_formula,
   #### Evaluate group-level estimators ####
   
   frame %<>%
-    group_by(estimator_type) %>%
     rowwise() %>%
-    mutate(estimate = evaluate_df_function(estimator, theta = theta, alpha = alpha, a = a))
+    mutate(estimate = evaluate_df_function(estimator, theta = theta, alpha = alpha, a = a),
+           psi_func = list(evaluate_df_function(psi, estimator)) ) %>%
+    ungroup() %>%
+    group_by(estimator_type, alpha, a) %>%
+    mutate(target_estimate = mean(estimate),
+           psi_val  = estimate - target_estimate) %>%
+    ungroup() %>%
+    rowwise() %>%
+    mutate(psi_prime_val = list(evaluate_df_function(numDeriv::grad, 
+                                                     func = psi_func, 
+                                                     x = c(theta, target_estimate), 
+                                                     alpha = alpha,
+                                                     a = 1, 
+                                                     method = 'simple')) )
+          
 
   #### Evaluate population targets ####
   
