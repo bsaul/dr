@@ -71,21 +71,12 @@ pi_term <- function(A){
 
 grids <- new.env()
 
-expand_grid_n <- function(n)
+expand_grid_n <- function(n1, n2)
 {
-  lookup <-as.character(n)
-  if(!exists(lookup, envir = grids)){
-    grids[[lookup]] <- expand.grid(ID = 1:n, sum_a = 0:n, A = 0:1)
-  }
-  return(grids[[lookup]])
-}
-
-expand_grid_n2 <- function(n1, n2, a)
-{
-  lookup <- paste(n1, n2, a, sep = '_')
+  lookup <- paste(n1, n2, sep = '_')
   if(!exists(lookup, envir = grids)){
     grids[[lookup]] <- expand.grid(ID = 1:n1, sum_a = 0:n2, 
-                                   A = {if(is.null(a)) 0:1 else a })
+                                   A = 0:1)
   }
   return(grids[[lookup]])
 }
@@ -95,23 +86,26 @@ expand_grid_n2 <- function(n1, n2, a)
 #   expand_grid_n(100),
 #   expand.grid(ID = 1:100, sum_a = 0:100, A = 0:1))
 
-expand_outcome_frame <- function(X_outcome, formula_outcome){
-  new_grid <- expand_grid_n(nrow(X_outcome))
+expand_outcome_frame <- function(X_outcome, rhs_formula_outcome){
   f <- function(theta){
-    X_expanded <- X_outcome %>%
-      mutate(ID = row_number()) %>%
-      select(-A) %>%
-      full_join(new_grid, by = 'ID')  
-    
-    new_frame <- get_design_frame(formula_outcome, X_expanded) 
-    fit_func <- make_dr_term1(new_frame)
-
-    X_expanded <- X_expanded %>%
-      ungroup() %>%
-      mutate_(fitted_value = ~fit_func(theta))
+    n <- nrow(X_outcome)
+    X_outcome %>%
+      mutate_(ID = ~ row_number()) %>%
+      # Remove all treatment variables so that model.matrix correctly generates
+      # interactions
+      select(-contains('A')) %>%
+      # Generate the relevant values of A and 
+      # all possible sum(a_i) for each subject
+      full_join(expand_grid_n2(n, n - 1), by = "ID") %>%
+      # group_by_(~ID, ~A) %>%
+      # Compute fA and for each sum(a_i) a
+      mutate_(fA = ~ sum_a / n) %>%
+      # Compute fitted values
+      mutate_(fits = ~ as.numeric(model.matrix(rhs_formula_outcome, data = .) %*% theta ) ) 
   }
- memoise::memoise(f)
+  memoise::memoise(f)
 }
+
 
 #------------------------------------------------------------------------------#
 #### IPW Estimator ####
@@ -142,33 +136,24 @@ make_ipw_estimator <- function(Y, A, X_treatment, ...){
 #------------------------------------------------------------------------------#
 
 make_otc_estimator <- function(X_outcome, rhs_formula_outcome, ...){
-  function(theta, alpha, a = NULL){
-    n1 <- nrow(X_outcome) 
-    n2 <- n1 - {if(is.null(a)) 0 else 1}
-    
-    X_outcome %>%
-      mutate(ID = row_number()) %>%
-      # Remove all treatment variables so that model.matrix correctly generates
-      # interactions
-      select(-contains('A')) %>%
-      # Generate the relevant values of A and 
-      # all possible sum(a_i) for each subject
-      full_join(expand_grid_n2(n1, n1 - 1, a), by = "ID") %>%
-      # group_by_(~ID, ~A) %>%
-      # Compute fA and pi for each sum(a_i) a
-      mutate_(fA = ~ sum_a / n1,
-              pi_value = ~ dbinom(sum_a, n2, prob = alpha) ) %>%
-      ungroup() %>%
-      # Compute fitted values
-      mutate_(fits = ~ as.numeric(model.matrix(rhs_formula_outcome, data = .) %*% theta ) ) %>%
-      # Sum by individual to compute term2
-      group_by_(~A, ~ID) %>%
-      summarize_(estimate = ~sum(fits * pi_value)) %>%
-      group_by_(~A) %>%
-      summarize_(estimate = ~mean(term2)) %>%
-      summarize_(estimate = ~mean(term2)) %>%
-      as.numeric()
-  }
+  
+  X_expanded <- expand_outcome_frame2(X_outcome, rhs_formula_outcome)
+  
+    function(theta, alpha, a = NULL){
+      n <- nrow(X_outcome) - {if(is.null(a)) 0 else 1}
+      a <- if(is.null(a)) 0:1 else a
+      
+      X_expanded(theta) %>%
+        filter_(~ A %in% a) %>%
+        mutate_(pi_value = ~ dbinom(sum_a, n, prob = alpha)) %>%
+        # Sum by individual to compute term2
+        group_by_(~A, ~ID) %>%
+        summarize_(estimate = ~sum(fits * pi_value)) %>%
+        group_by_(~A) %>%
+        summarize_(estimate = ~mean(estimate)) %>%
+        summarize_(estimate = ~mean(estimate)) %>%
+        as.numeric()
+    }
 }
 
 #------------------------------------------------------------------------------#
