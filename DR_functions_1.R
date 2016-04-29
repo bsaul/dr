@@ -26,10 +26,10 @@ dr_ipw <- function(formula_outcome,
 
   ## M-estimation
   models <- list(model_outcome, model_ipw$models$propensity_model)
-  ee_all <- estfun_stacker(models)
-  ee_outcome <- estfun(model_outcome)
-  bread_outcome <- bread(model_outcome)
-  bread_all <- make_bread(models, grad_method = 'Richardson')
+#   ee_all <- estfun_stacker(models)
+#   ee_outcome <- estfun(model_outcome)
+#   bread_outcome <- bread(model_outcome)
+#   bread_all <- make_bread(models, grad_method = 'Richardson')
 
     ## DR
   #mu <- predict(model_outcome, type = 'response')
@@ -48,11 +48,12 @@ dr_ipw <- function(formula_outcome,
               mu = mu, 
               w = w, 
               w_mu = w_mu, 
-              term2 = term2,
-              ee_all = ee_all,
-              ee_outcome = ee_outcome,
-              bread_all = bread_all,
-              bread_outcome = bread_outcome )
+              term2 = term2
+              # ee_all = ee_all,
+              # ee_outcome = ee_outcome,
+              # bread_all = bread_all,
+              # bread_outcome = bread_outcome 
+              )
   return(out)
 }
 
@@ -125,11 +126,11 @@ dr_ipw_estimate <- function(obj)
                                   trt1 = 1, estimate = outcome_results, 
                                   method = 'outcome')
   
-  n <- nrow(ee_outcome)
-  ee_outcome <- cbind(obj$ee_outcome, outcome_estimates - mean(outcome_estimates))
-  
-  V_outcome <- crossprod(ee_outcome)/n
-  U_outcome <- 
+#   n <- nrow(ee_outcome)
+#   ee_outcome <- cbind(obj$ee_outcome, outcome_estimates - mean(outcome_estimates))
+#   
+#   V_outcome <- crossprod(ee_outcome)/n
+#   U_outcome <- 
   
   ### DR variance ###
   dr_estimates <- data.frame(alpha1 = as.numeric(dimnames(obj$w)[[2]]),
@@ -154,15 +155,18 @@ dr_results <- function(sims, formula_outcome, formula_interference,
                                                          method = 'simple', 
                                                          runSilent = F),
                          dr_term2_function = dr_term2,
-                         data = sim)
-    })} 
-}
-
-summarize_results <- function(results_list)
-{
-  lapply(results_list, function(x){
-    dr_ipw_estimate(x) %>%
-      mutate_(simID = ~ sim$simID[1]) 
-  } ) %>%
+                         data = sim) %>%
+        dr_ipw_estimate() %>%
+        mutate_(simID = ~ sim$simID[1]) 
+    })}  %>%
     bind_rows()
 }
+
+# summarize_results <- function(results_list)
+# {
+#   lapply(results_list, function(x){
+#     dr_ipw_estimate(x) %>%
+#       mutate_(simID = ~ sim$simID[1]) 
+#   } ) %>%
+#     bind_rows()
+# }
