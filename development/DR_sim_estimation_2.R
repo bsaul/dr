@@ -6,6 +6,7 @@
 #------------------------------------------------------------------------------#
 
 library(inferference)
+library(lme4)
 library(dplyr)
 library(geepack)
 library(magrittr)
@@ -13,21 +14,23 @@ library(sandwich)
 library(sandwichShop)
 library(doMC)
 registerDoMC(4)
-source(file = 'DR_functions.R')
+# source(file = 'DR_functions.R')
 
-DRsims <- sims_500x_m500_n4
+DRsims <- sims_500x_m500_n4 %>%
+  filter(simID <3)
+
 alphas <- c(0.1, 0.5, 0.9)
 
 tru_outcome <- Y ~ Z1 + Z2 + Z3 + Z4 + A + fA + A*Z1 + fA*Z2
-tru_propen  <- Y | A ~ -1 + Z1 + Z2 + Z3 + Z4 + (1|group) | group
+tru_propen  <- A ~ -1 + Z1 + Z2 + Z3 + Z4 + (1|group) 
 mis_outcome <- Y ~ X1 + X2 + X3 + X4 + A + fA + A*X1 + fA*X2
-mis_propen  <- Y | A ~ -1 + X1 + X2 + X3 + X4 + (1|group) | group  
+mis_propen  <- A ~ -1 + X1 + X2 + X3 + X4 + (1|group)
 
 # Outcome_Propensity
-tru_tru <- dr_results(DRsims, tru_outcome, tru_propen)
-mis_tru <- dr_results(DRsims, mis_outcome, tru_propen)
-tru_mis <- dr_results(DRsims, tru_outcome, mis_propen)
-mis_mis <- dr_results(DRsims, mis_outcome, mis_propen)
+system.time({tru_tru <- simestimation_all(sims = DRsims, tru_propen, tru_outcome)})
+mis_tru <- simestimation_all(sims = DRsims, tru_propen, mis_outcome)
+tru_mis <- simestimation_all(sims = DRsims, mis_propen, tru_outcome)
+mis_mis <- simestimation_all(sims = DRsims, mis_propen, mis_outcome)
 
 ## True values
 truth <- data.frame(alpha1 = alphas, truth = 2+0.5*1+6*(alphas*3/4))
@@ -68,4 +71,3 @@ results <- rbind(r1, r2, r3, r4) %>%
   arrange(type)
 
 save.image()
-  
