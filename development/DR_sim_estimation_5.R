@@ -15,8 +15,6 @@ library(sandwichShop)
 library(doMC)
 registerDoMC(4)
 
-# source(file = 'DR_functions_5.R')
-
 alphas <- c(0.1, 0.5, 0.9)
 
 tru_outcome <- Y ~ Z1 + Z2 + Z3 + Z4 + A + fA + A*Z1 + fA*Z2
@@ -24,7 +22,7 @@ tru_treatment  <- A ~ Z1 + Z2 + Z3 + Z4 + (1|group)
 mis_outcome <- Y ~ X1 + X2 + X3 + X4 + A + fA + A*X1 + fA*X2
 mis_treatment  <- A ~ X1 + X2 + X3 + X4 + (1|group)
 
-DRsims <- sims_500x_m500_n4  %>%  filter(simID < 3)
+# DRsims <- DRsims %>% filter(simID == 1) # for testing
 
 target_a <- 1
 
@@ -34,13 +32,24 @@ truth <- data.frame(alpha = alphas, a = target_a, truth = 2+0.5*target_a+6*(alph
 # add a comment to each results file
 # temp <- estimate_sims(DRsims, tru_treatment, tru_outcome)
 
-tru_tru <- estimate_sims(DRsims, tru_treatment, tru_outcome) %>%
+tru_tru <- estimate_sims(DRsims, tru_treatment, tru_outcome, parallel = TRUE) %>%
   left_join(truth, by = c('alpha', 'a')) %>%
   mutate(conf.low  = estimate - 1.96 * std.error,
          conf.high = estimate + 1.96 * std.error, 
          bias      = estimate - truth,
          covered   = truth > conf.low & truth < conf.high * 1)
 
-save(tru_tru, file = paste0('results/tru_tru_', Sys.Date(), '.rda'))
+save(tru_tru, file = paste0('results/', experimentID, '_', Sys.Date(), '.rda'))
 
 
+#### Results ####
+
+r1 <- tru_tru %>%
+  group_by(estimator_type, alpha) %>%
+  summarise(mean   = mean(estimate),
+            bias   = mean(bias),
+            coverage = mean(covered),
+            ase    = mean(std.error),
+            ese    = sd (estimate)) %>%
+  mutate(mu = 'True',
+         pi = 'True') 
