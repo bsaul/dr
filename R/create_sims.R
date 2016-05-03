@@ -12,10 +12,9 @@ library(mvtnorm)
 
 n_i <- 4
 m <- 500
-nsims <- 500
+nsims <- 1000
 totalobs <- n_i * m * nsims
-seed <- 12
-
+seed <- 198
 
 #### Functions ####
 
@@ -94,6 +93,8 @@ D <- set.DAG(D)
 DRsims <- simobs(D, n = totalobs, rndseed = seed) 
 DRsims$simID <- sort(rep(1:nsims, n_i * m))
 
-assign(paste0('sims_', nsims, 'x_', 'm', m, '_n', n_i), DRsims)
-rm(DRsims, n_i, m, totalobs, seed, fA, group_assign, rnorm_group, nsims, D)
-save.image()
+name <- paste0('sims_', nsims, 'x_', 'm', m, '_n', n_i, '_s', seed, '_', experimentID)
+assign(name, DRsims)
+save(list = name, file = paste0('data/', name, '.rda'))
+
+rm(n_i, name, m, totalobs, seed, fA, group_assign, rnorm_group, nsims, D)
