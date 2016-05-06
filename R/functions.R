@@ -113,23 +113,6 @@ weight_estimator <- function(A, X)
   memoise::memoise(f)
 }
 
-# weight_functions <- new.env()
-# 
-# weight_estimator <- function(A, X)
-# {
-#   X <- as.matrix(X)
-#   lookup <- digest::sha1(list(A, X), digits = 5)
-#   if(!exists(lookup, envir = weight_functions)){
-#     f <- function(theta){
-#       1/integrate(integrand, lower = -Inf, upper = Inf,
-#                   theta = theta, response = A, xmatrix = X)$value
-#     }
-#     # f <- memoise::memoise(f)
-#  
-#     weight_functions[[lookup]] <- f
-#   }
-#   return(weight_functions[[lookup]])
-# }
 
 make_ipw_estimator <- function(Y, A, X_treatment, ...){
   w <- weight_estimator(A = A, X = X_treatment)
@@ -182,33 +165,38 @@ make_otc_estimator <- function(X_outcome, rhs_formula_outcome, ...){
   }
 }
 
-
-make_otc_U21_estimator <- function(A, 
-                                   X_outcome, 
-                                   X_treatment, 
+make_otc_U21_estimator <- function(X_outcome, 
                                    rhs_formula_outcome,
-                                   theta_t,
                                    theta_o)
 {
-  w <- weight_estimator(A = A, X = X_treatment)
-  ws <- w(theta_t)
-  pi_t <- pi_term(A = A)
-  dr_term1 <- make_dr_term1(X_outcome)(theta_o)
-  n <- nrow(X_outcome)
   function(alpha, a = NULL){
-    pi_t1 <- pi_t(alpha) / {if(!is.null(a)) dbinom(a, 1, alpha) else 1}
-    Ia <- if(is.null(a)) 1 else (A == a) * 1
-    # U21 corresponding to  outcome parameters
-    xmat <- model.matrix(rhs_formula_outcome, data = X_outcome)
-    tt <- 1 - (Ia * pi_t1 * ws)
-    
-    U21_o <- apply(xmat, 2, function(col) {
-      sum(col * tt)/n
-    })
-    
-    return(U21_o)
+      f <- make_otc_estimator(X_outcome, rhs_formula_outcome)
+      numDeriv::grad(f, x = theta_o, method = 'simple', alpha = alpha, a = a)
   }
 }
+
+
+# make_otc_U21_estimator <- function(A, 
+#                                    X_outcome, 
+#                                    rhs_formula_outcome,
+#                                    theta_o)
+# {
+#   pi_t <- pi_term(A = A)
+#   dr_term1 <- make_dr_term1(X_outcome)(theta_o)
+#   n <- nrow(X_outcome)
+#   function(alpha, a = NULL){
+#     pi_t1 <- pi_t(alpha) / {if(!is.null(a)) dbinom(a, 1, alpha) else 1}
+#     Ia <- if(is.null(a)) 1 else (A == a) * 1
+#     # U21 corresponding to  outcome parameters
+#     xmat <- model.matrix(rhs_formula_outcome, data = X_outcome)
+#     
+#     U21_o <- apply(xmat, 2, function(col) {
+#       sum(col)/n
+#     })
+#     
+#     return(U21_o)
+#   }
+# }
 
 #------------------------------------------------------------------------------#
 #### Doubly Robust Estimator ####
@@ -355,11 +343,9 @@ estimation <- function(treatment_formula,
                                           X_treatment = X_t, 
                                           rhs_formula_outcome = form_rhs_o))
     U21_funcs <- list(make_ipw_U21_estimator(Y = Y, A = A, X_treatment = X_t, theta_t = theta_t),
-                      make_otc_U21_estimator(A = A, 
+                      make_otc_U21_estimator(
                                              X_outcome = X_o, 
-                                             X_treatment = X_t, 
                                              rhs_formula_outcome = form_rhs_o,
-                                             theta_t = theta_t,
                                              theta_o = theta_o),
                       make_dbr_U21_estimator(Y = Y, A = A, 
                                              X_outcome = X_o, 
