@@ -2,10 +2,48 @@
 output: pdf_document
 ---
 
+## Outcome
+
+Let:
+\[
+\mu_{ij} = E[Y_{ij}| X_{ij}, A_i] = \beta_0 + \beta_1 Z_{1ij} + \beta_2 Z_{2ij} + \beta_3 Z_{3ij} + \beta_4 Z_{4ij} + \beta_5 A_{ij} + \beta_6 \sum_{j \neq j} A_{ij}/n_i + \beta_8 A_{ij} Z_{1ij} + \beta_8 Z_{2ij} \sum_{j \neq j} A_{ij}/n_i 
+\]
+
+Group-level outcome estimator is:
+\[
+\mu_i(a, \alpha) = \sum_j \sum_{a_{i(-j)}} \mu_{ij}(a, a_{i(-j)}, X_{ij}, \beta) \prod_{k \neq j} \alpha^{a_{ik}} ( 1 - \alpha )^{1 - a_{ik}} / n_i
+\]
+
+Taking the derivative wrt $\beta_p$, for coeffients that do not involve $a$ (e.g.):
+
+\begin{align*}
+\frac{\partial \mu_i(a, \alpha)}{\partial \beta_2} &= \sum_j \sum_{a_{i(-j)}} Z_{1ij} \prod_{k \neq j} \alpha^{a_{ik}} ( 1 - \alpha )^{1 - a_{ik}} / n_i \\
+& = \sum_j  Z_{1ij}/ n_i
+\end{align*}
+
+Taking the derivative wrt $\beta_p$, for coeffients that do involve $a$ (e.g.):
+
+\begin{align*}
+\frac{\partial \mu_i(a, \alpha)}{\partial \beta_5} =&\sum_j \sum_{a_{i(-j)}} a \prod_{k \neq j} \alpha^{a_{ik}} ( 1 - \alpha )^{1 - a_{ik}}/ n_i \\
+& = \sum_j  a / n_i = a
+\end{align*}
+
+or a more complicated one: 
+
+\begin{align*}
+\frac{\partial \mu_i(a, \alpha)}{\partial \beta_6} = &\sum_j \sum_{a_{i(-j)}} \left( \sum_{j \neq j} a_{ij}/n_i \right)   \prod_{k \neq j} \alpha^{a_{ik}} ( 1 - \alpha )^{1 - a_{ik}} / n_i \\
+\end{align*}
+does this simplify nicely?
+
+
+\newpage
+
+## DR
+
 Let $\theta = \{ \beta, \gamma\}$, i.e. the parameters in the outcome and propensity models, respectively. Let $\xi$ be the population parameter we're trying to estimate.
 
 \[
-\psi_{i, a, \alpha}(Y_i, A_i, X_i, \theta, \xi) = \sum_{j = 1}^{n_i} \left\{ \frac{g(Y_{ij}, X_{ij}, A_i, \alpha)}{f(A_i, \gamma)} + \sum_{a_i} \mu_{ij}(a_i, \beta) \pi(a_i, \alpha) \right\} - \xi
+\psi_{i, a, \alpha}(Y_i, A_i, X_i, \theta, \xi) = \sum_{j = 1}^{n_i} \left\{ \frac{g(Y_{ij}, X_{ij}, A_i, \alpha)}{f(A_i, \gamma)} + \sum_{a_i} \mu_{ij}(a_i, \beta) \pi(a_i, \alpha) \right\}/ n_i - \xi
 \]
 
 where:
@@ -19,11 +57,22 @@ Since the 2nd term of the DR estimator does not depend on $\gamma$, I can take w
 
 What about the derivative w.r.t $\beta$? For a linear outcome model ($\mu = X\beta$), I think $\frac{d \psi_{i, a, \alpha}}{d \beta}$ is straightforward:
 \begin{align*}
-\frac{d \psi_{i, a, \alpha}}{d \beta_k} &= \frac{d}{d\beta_k} \left\{ \sum_{ij} \left[ I(A_{ij} = a) (Y_{ij} - X_{ij}\beta) \frac{\pi(A_{i(-j)}, \alpha)}{f(A_i, \gamma)} + \sum_{a_{i(-j)}} (X_{ij} \beta) \pi(a_{i(-j)}, \alpha) \right]\right\} \\
-&= \sum_{ij} \left[  - I(A_{ij} = a)X_{ijk} \frac{\pi(A_{i(-j)}, \alpha)}{f(A_i, \gamma)} + \sum_{a_{i(-j)}}  X_{ijk} \pi(a_{i(-j)}, \alpha) \right]\\
-&= \sum_{ij} \left[  X_{ijk} \left( \sum_{a_{i(-j)}} \pi(a_{i(-j)}, \alpha) - \frac{I(A_{ij} = a)\pi(A_{i(-j)}, \alpha)}{f(A_i, \gamma)} \right) \right]\\
-&=  \sum_{ij} \left[  X_{ijk} \left(1 - \frac{I(A_{ij} = a)\pi(A_{i(-j)}, \alpha)}{f(A_i, \gamma)}\right)   \right]\\
+\frac{d \psi_{i, a, \alpha}}{d \beta_k} &= \frac{d}{d\beta_k} \left\{ \sum_{j} \left[ I(A_{ij} = a) (Y_{ij} - X_{ij}\beta) \frac{\pi(A_{i(-j)}, \alpha)}{f(A_i, \gamma)} + \sum_{a_{i(-j)}} (X_{ij} \beta) \pi(a_{i(-j)}, \alpha) \right]\right\}/n_i \\
+&= \sum_{j} \left[  - I(A_{ij} = a)X_{ijk} \frac{\pi(A_{i(-j)}, \alpha)}{f(A_i, \gamma)} + \sum_{a_{i(-j)}}  X_{ijk} \pi(a_{i(-j)}, \alpha) \right]/ n_i \\
 \end{align*}
+
+When $\beta_k$ is not a coefficient for $A/a$, this is:
+\begin{align*}
+&= \sum_{j} \left[  X_{ijk} \left( \sum_{a_{i(-j)}} \pi(a_{i(-j)}, \alpha) - \frac{I(A_{ij} = a)\pi(A_{i(-j)}, \alpha)}{f(A_i, \gamma)} \right) \right] / n_i \\
+&=  \sum_{j} \left[  X_{ijk} \left(1 - \frac{I(A_{ij} = a)\pi(A_{i(-j)}, \alpha)}{f(A_i, \gamma)}\right)   \right] / n_i \\
+\end{align*}
+
+When $\beta_k$ is coefficient for  $A/a$, this is:
+\begin{align*}
+&= \sum_{j} \left[ \left( \sum_{a_{i(-j)}} a \pi(a_{i(-j)}, \alpha) - A_{ij} \frac{I(A_{ij} = a)\pi(A_{i(-j)}, \alpha)}{f(A_i, \gamma)} \right) \right] / n_i \\
+&=  \sum_{j} \left[  a - A_{ij} \frac{I(A_{ij} = a)\pi(A_{i(-j)}, \alpha)}{f(A_i, \gamma)}  \right] / n_i \\
+\end{align*}
+
 
 Does my algebra look correct?
 
