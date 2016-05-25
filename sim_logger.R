@@ -6,8 +6,8 @@
 #------------------------------------------------------------------------------#
 
 ts <- Sys.time()
-estimation_file <- 'DR_sim_estimation_5'
-experimentID <- 'X001'
+# estimation_file <- 'DR_sim_estimation_6'
+experimentID <- 'X002'
 
 simdir <- 'logs/'
 filename <- paste0(ts, '_', experimentID, '.log')
@@ -27,7 +27,7 @@ source('R/create_sims.R', echo = T, max.deparse.length = 5000)
 source('R/functions.R', echo = T, max.deparse.length = 5000)
 
 # Run esimtations
-source('development/DR_sim_estimation_5.R', echo = T, max.deparse.length = 5000)
+source('development/DR_sim_estimation_6.R', echo = T, max.deparse.length = 5000)
 
 timestamp(prefix = "##------ End: ")
 
