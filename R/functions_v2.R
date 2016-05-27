@@ -453,7 +453,8 @@ estimation <- function(treatment_formula,
   })
           
 #   return(results)
-  results
+  # results
+  frame
 }
 
 # #------------------------------------------------------------------------------#
