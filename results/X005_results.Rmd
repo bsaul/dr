@@ -1,0 +1,22 @@
+---
+output: html_document
+---
+
+
+```{r, echo = F, message=FALSE, warning=FALSE}
+library(dplyr)
+load(file = 'X005_2016-06-14.rda')
+r1 <- tru_tru %>%
+  group_by(estimator_type, alpha) %>%
+  summarise(mean   = mean(estimate),
+            bias   = mean(bias),
+            coverage = mean(covered),
+            ase    = mean(std.error),
+            ese    = sd (estimate)) %>%
+  mutate(mu = 'tru',
+         pi = 'tru') 
+
+r1 %>% knitr::kable()
+```
+
+This was done on only 20 sims to see if the SE were being computed. They appear be, so the next sims will attempt to determine the SE are being computed correctly for the misspecified models (like X002). 
