@@ -10,10 +10,10 @@ library(dplyr)
 library(sandwich)
 library(sandwichShop)
 # Load necessary functions
-source('R/functions_v2.R', echo = T, max.deparse.length = 5000)
-
-# alphas <- c(.3, .45)
-alphas <- seq(.3, .6, by = .01)
+# source('R/functions_v2.R', echo = T, max.deparse.length = 5000)
+source('R/functions_v4.R', echo = T, max.deparse.length = 5000)
+alphas <- c(.3, .45)
+# alphas <- seq(.3, .6, by = .01)
 
 
 # choleradt <- vaccinesim %>%
@@ -32,8 +32,9 @@ load( pipe( 'ssh saulb@diamond.bios.unc.edu "cat /home/groups/projects/mhudgens/
 
 choleradt <- analysis_c %>%
   group_by(group) %>%
-  mutate(fA = mean(A)) %>%
-  filter(n() < 1074)
+  mutate(fA = mean(A)) 
+# %>%
+  # filter(n() < 1074)
 
 results <- estimation(treatment_formula = A ~ age + rivkm + (1|group), 
                       outcome_formula = y_obs ~ A + fA + A*fA + age + rivkm,
@@ -44,8 +45,8 @@ results <- estimation(treatment_formula = A ~ age + rivkm + (1|group),
                       target_a = 0) 
 
 results %>%
-  filter(estimator_type == 'dbr') %>%
-  arrange(estimate)
+  filter(estimator_type == 'ipw') %>%
+  arrange(-n_i)
 
 results %>%
   filter(alpha == 0.3)
