@@ -48,9 +48,21 @@ D <- D +
   node('group', 
        distr = 'group_assign', 
        n_i = .(n_i) ) + 
-  node(c("Z1","Z2","Z3","Z4"), 
-       distr = "rmvnorm", 
-       mean = c(0,0,0,0)) + 
+  node('Z1',
+       distr = 'rnorm',
+       mean = 0, sd = 1) + 
+  node('Z2',
+       distr = 'rnorm',
+       mean = 0, sd = 1) + 
+  node('Z3',
+       distr = 'rnorm',
+       mean = 0, sd = 1) + 
+  node('Z4',
+       distr = 'rnorm',
+       mean = 0, sd = 1) + 
+  # node(c("Z1","Z2","Z3","Z4"), 
+  #      distr = "rmvnorm", 
+  #      mean = c(0,0,0,0)) + 
   node('X1', 
        distr = "rconst", 
        const = exp(Z1/2) ) + 
