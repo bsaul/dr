@@ -60,7 +60,9 @@ evaluate_df_function <- function(f, ...){
 # integrand <- function(b, response, xmatrix, theta){
 #   lp <- outer(xmatrix %*% theta[-length(theta)], b, '+')
 #   h  <- apply(lp, 3, function(x) dbinom(response, 1, plogis(x) ) )
+#   print(h)
 #   hh <- apply(h, 2, prod)
+#   print(hh)
 #   hh * dnorm(b, mean = 0, sd = theta[length(theta)])
 # }
 
@@ -69,7 +71,10 @@ integrand2 <- function(b, response, xmatrix, theta, alpha){
   lp <- outer(xmatrix %*% theta[-length(theta)], b, '+')
   plp <- plogis(lp)
   h  <- apply(plp, 3, function(x) response * log(x/alpha) + (1 - response) * log((1 - x)/(1 - alpha)))
+  # h  <- apply(plp, 3, function(x) response * log(x) + (1 - response) * log(1 - x))
+  # print(h)
   hh <- apply(h, 2, function(x) exp(sum(x)))
+  # print(hh)
   hh * dnorm(b, mean = 0, sd = theta[length(theta)])
 }
 
@@ -494,8 +499,8 @@ estimation <- function(treatment_formula,
   })
           
 #   return(results)
-  results
-  # frame
+  # results
+  frame
 }
 
 #------------------------------------------------------------------------------#
