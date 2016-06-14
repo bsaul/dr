@@ -126,7 +126,8 @@ weight_estimator2 <- function(A, X, lower = -5, upper = 5)
     1/integrate(integrand2, lower = lower, upper = upper,
                 theta = theta, alpha = alpha, response = A, xmatrix = X)$value
   }
-  memoise::memoise(f)
+  f
+  # memoise::memoise(f)
 }
 
 
@@ -488,13 +489,13 @@ estimation <- function(treatment_formula,
 #     std.error <- as.numeric(sqrt(var.est))
     std.error <- NA
     df_out <- data_frame(estimate = x$target[1], 
-                         std.error = std.error)
+                         std.error = NA)
     return(df_out)
   })
           
 #   return(results)
-  # results
-  frame
+  results
+  # frame
 }
 
 #------------------------------------------------------------------------------#
@@ -514,7 +515,7 @@ estimate_sims <- function(sims,
                         this_data =  x,
                         allocations = alphas, 
                         target_a = 1))
-    print(m)
+    # print(m)
     if(is(m,  'try-error')){
       data_frame(error = 'error')
     } else{

@@ -1,0 +1,21 @@
+---
+output: html_document
+---
+
+
+```{r, echo = F, message=FALSE, warning=FALSE}
+library(dplyr)
+load(file = 'X003_2016-06-14.rda')
+r1 <- tru_tru %>%
+  group_by(estimator_type, alpha) %>%
+  summarise(mean   = mean(estimate),
+            bias   = mean(bias),
+            coverage = mean(covered),
+            ase    = mean(std.error),
+            ese    = sd (estimate)) %>%
+  mutate(mu = 'mis',
+         pi = 'mis') 
+
+r1 %>% knitr::kable()
+```
+
