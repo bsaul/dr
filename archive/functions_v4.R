@@ -131,7 +131,8 @@ weight_estimator2 <- function(A, X, lower = -Inf, upper = Inf)
   X <- as.matrix(X)
   f <- function(theta, alpha){
     w <- try(integrate(integrand2, lower = lower, upper = upper,
-                theta = theta, alpha = alpha, response = A, xmatrix = X))
+                theta = theta, alpha = alpha, response = A, xmatrix = X),
+             silent = TRUE)
     if(is(w, 'try-error')){
       NA
     } else {

@@ -9,8 +9,14 @@ library(dplyr)
 library(magrittr)
 library(simcausal) 
 
-#### Functions ####
+#### Settings ####
+n_i <- 4
+m <- 500
+nsims <- 200
+totalobs <- n_i * m * nsims
+seed <- 198
 
+#### Functions ####
 group_assign <- function(n, n_i)
 {
   ni <- n_i[1]
@@ -91,7 +97,6 @@ D <- D +
 D <- set.DAG(D)
 
 #### Simulate Data ####
-
 DRsims <- simobs(D, n = totalobs, rndseed = seed) 
 DRsims$simID <- sort(rep(1:nsims, n_i * m))
 

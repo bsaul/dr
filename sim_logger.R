@@ -7,7 +7,14 @@
 
 ts <- Sys.time()
 # estimation_file <- 'DR_sim_estimation_6'
-experimentID <- 'X006'
+
+experimentID <- 'X007'
+n_i <- 4
+m <- 500
+nsims <- 200
+totalobs <- n_i * m * nsims
+seed <- 198
+
 
 simdir <- 'logs/'
 filename <- paste0(ts, '_', experimentID, '.log')

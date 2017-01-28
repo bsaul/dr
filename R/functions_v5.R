@@ -53,6 +53,14 @@ evaluate_df_function <- function(f, ...){
   f(...)
 }
 
+model_warnings <- function(object){
+  if(class(object) %in% 'merMod'){
+    paste(object@optinfo$conv$lme4$messages, collapse = ' ')
+  } else {
+    paste(warnings(objects), collapse = ' ')
+  }
+}
+
 #------------------------------------------------------------------------------#
 #### Internals ####
 # functions used in estimators
@@ -132,7 +140,8 @@ weight_estimator2 <- function(A, X, lower = -Inf, upper = Inf)
   X <- as.matrix(X)
   f <- function(theta, alpha){
     w <- try(integrate(integrand2, lower = lower, upper = upper,
-                theta = theta, alpha = alpha, response = A, xmatrix = X))
+                theta = theta, alpha = alpha, response = A, xmatrix = X),
+             silent = TRUE)
     if(is(w, 'try-error')){
       NA
     } else {
@@ -382,6 +391,10 @@ estimation <- function(treatment_formula,
   
   print('making models')
   models <- sandwichShop::make_models(model_args = model_args, data = this_data)
+  
+  treatment_warnings <- model_warnings(models$model_treatment)
+  outcome_warnings   <- model_warnings(models$model_outcome)
+  
   print('models made')
   
   #### Grab nuisance parameter estimates ####
@@ -498,7 +511,9 @@ estimation <- function(treatment_formula,
     std.error <- as.numeric(sqrt(var.est))
     # std.error <- NA
     df_out <- data_frame(estimate = x$target[1], 
-                         std.error = std.error)
+                         std.error = std.error,
+                         treatment_warnings = treatment_warnings,
+                         outcome_warnings   = outcome_warnings)
     return(df_out)
   })
           
