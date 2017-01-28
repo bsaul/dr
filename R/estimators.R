@@ -31,7 +31,7 @@ weight_estimator <- function(A, X, lower = -Inf, upper = Inf)
 
 
 make_ipw_estimator <- function(Y, A, X_treatment, ...){
-  w <- weight_estimator2(A = A, X = X_treatment, ...)
+  w <- weight_estimator(A = A, X = X_treatment, ...)
   pi_t <- pi_term(A = A)
   
   function(theta, alpha, a = NULL){
