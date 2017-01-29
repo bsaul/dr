@@ -1,27 +1,27 @@
-#------------------------------------------------------------------------------#
-#' Get the formula from a model object
-#' @export
-#------------------------------------------------------------------------------#
-get_fixed_formula <- function(model_object){
-  formula(model_object, fixed.only = TRUE)[-2]
-}
-
-#------------------------------------------------------------------------------#
-#' Get a matrix of fixed effects from a model object
-#' @export
-#------------------------------------------------------------------------------#
-get_design_frame <- function(rhs_formula, data){
-  as.data.frame(model.matrix(rhs_formula, data))
-}
-
-#------------------------------------------------------------------------------#
-#' Get a vector of responses from a model object
-#' @export
-#------------------------------------------------------------------------------#
-
-get_response <- function(formula, data){
-  model.response(model.frame(formula, data = data))
-}
+#' #------------------------------------------------------------------------------#
+#' #' Get the formula from a model object
+#' #' @export
+#' #------------------------------------------------------------------------------#
+#' get_fixed_formula <- function(model_object){
+#'   formula(model_object, fixed.only = TRUE)[-2]
+#' }
+#' 
+#' #------------------------------------------------------------------------------#
+#' #' Get a matrix of fixed effects from a model object
+#' #' @export
+#' #------------------------------------------------------------------------------#
+#' get_design_frame <- function(rhs_formula, data){
+#'   as.data.frame(model.matrix(rhs_formula, data))
+#' }
+#' 
+#' #------------------------------------------------------------------------------#
+#' #' Get a vector of responses from a model object
+#' #' @export
+#' #------------------------------------------------------------------------------#
+#' 
+#' get_response <- function(formula, data){
+#'   model.response(model.frame(formula, data = data))
+#' }
 
 #------------------------------------------------------------------------------#
 #' Converts a matrix to a list
