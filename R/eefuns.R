@@ -1,16 +1,13 @@
-#### IPW eefun ####
-
 #------------------------------------------------------------------------------#
-#' IPW estimator
+#' Estimating equations for IPW, OTC, and DBR estimators
 #' @export
 #------------------------------------------------------------------------------#
-ipw_eefun <- function(data, t_model, o_model){
+lan_eefun <- function(data, t_model, o_model){
   
   Y <- geex::get_response(formula(o_model), data = data)
   A <- geex::get_response(formula(t_model), data = data)
   X_t <- geex::get_design_matrix(geex::get_fixed_formula(t_model), data = data)
   X_o <- as.data.frame(geex::get_design_matrix(geex::get_fixed_formula(o_model), data = data))
-  print(X_o)
   X_o_ex <- expand_outcome_frame(X_o, geex::get_fixed_formula(o_model))
   inv_link_o <- family(o_model)$linkinv
   rhs_o <- geex::get_fixed_formula(o_model)
