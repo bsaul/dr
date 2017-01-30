@@ -1,41 +1,50 @@
 ## 
 library(inferference)
+library(geex)
+##### 
 
 vaccinesim
 
-theta_t <- unlist(lme4::getME(models$model_treatment, c('beta', 'theta')))
-Y   <- get_response(form_o, group_data)
-A   <- get_response(form_t, group_data)
-X_t <- get_design_frame(form_rhs_t, group_data)
-X_o <- get_design_frame(form_rhs_o, group_data)
+mm <- interference(Y | A ~ X1 + (1|group) | group,
+                   allocations = c(.3, .6),
+                   data = vaccinesim)
+pmodel <- mm$models$propensity_model
+omodel <- glm(Y ~ X1, data = vaccinesim)
+theta_t <- unlist(lme4::getME(pmodel, c('beta', 'theta')))
 
-make_ipw_estimator(Y = Y, A = A, X_treatment = X_t)
 
-ipw_eefun <- function(data, t_model, o_model){
-  
-  Y <- get_response(o_model)
-  A <- get_response(t_model)
-  X <- get_design_frame(get_fixed_formula(t_model), data = data)
-  
-  ip_fun    <- weight_estimator(A = A, X = X)
-  score_fun <- make_ee(t_model)
-  
-  function(theta, alpha1, alpha2, a1, a2){
-    p <- length(theta) - 2
-    
-    scores <- score_fun(theta[1:p])
-    
-    ipw1 <- ip_fun(theta = theta[1:p], alpha = alpha1)
-    ipw2 <- ip_fun(theta = theta[1:p], alpha = alpha2)
-    
-    Ia1 <- if(is.null(a1)) 1 else (A == a) * 1
-    Ia2 <- if(is.null(a2)) 1 else (A == a) * 1
-    
-    ce1 <- mean(Y * Ia1) * ipw1 / {if(!is.null(a1)) dbinom(a1, 1, alpha1) else 1}
-    ce2 <- mean(Y * Ia2) * ipw2 / {if(!is.null(a2)) dbinom(a2, 1, alpha2) else 1}
+mylist <-  append(list(eeFUN = ipw_eefun, splitdt = split(vaccinesim, vaccinesim$group)), 
+                  list(ee_args = list(alpha1 = .3, alpha2 = .6, a1 = 0, a2 = 0)))
 
-    c(scores, 
-      ce1 - theta[p + 1],
-      ce2 - theta[p + 2])
-  }
-}
+str(mylist)
+ff <- ipw_eefun(mylist$splitdt[[1]], t_model = pmodel, o_model = omodel)
+ff(theta = c(theta_t, .5, .5), alpha1 = .5, alpha2 = .5, a1 = 0, a2 = 1)
+
+
+mats <- compute_matrices(mylist,  
+                 theta   = c(theta_t, .5, .5),
+                 numDeriv_options = list(method = 'simple'),
+                 t_model = pmodel,
+                 o_model = omodel)
+
+sig <- compute_sigma(mats$A, mats$B)
+
+sqrt(diag(sig))
+
+summary(pmodel)
+
+ptm <- proc.time()
+test <- geex::estimate_equations(
+  eeFUN   = ipw_eefun,
+  data    = vaccinesim,
+  units   = 'group',
+  roots   = c(theta_t, .5, .5),
+  numDeriv_options = list(method = 'simple'),
+  t_model = pmodel,
+  o_model = omodel,
+  ee_args = list(alpha1 = .3, alpha2 = .6, a1 = 0, a2 = 0)
+)
+proc.time() - ptm
+
+test$parameters
+sqrt(diag(test$vcov))
