@@ -73,10 +73,10 @@ estimation <- function(treatment_formula,
   print('forming frame')
   #### Create data_frame of estimator functions ####
   frame <- lapply(split_data, function(group_data) {
-    Y   <- get_response(form_o, group_data)
-    A   <- get_response(form_t, group_data)
-    X_t <- get_design_frame(form_rhs_t, group_data)
-    X_o <- get_design_frame(form_rhs_o, group_data)
+    Y   <- geex::get_response(form_o, group_data)
+    A   <- geex::get_response(form_t, group_data)
+    X_t <- geex::get_design_frame(form_rhs_t, group_data)
+    X_o <- geex::get_design_frame(form_rhs_o, group_data)
     
     estimators <- list(make_ipw_estimator(Y = Y, A = A, X_treatment = X_t),
                        make_otc_estimator(X_outcome = X_o, 
