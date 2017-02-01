@@ -11,14 +11,15 @@ weight_estimator <- function(A, X, lower = -Inf, upper = Inf)
 {
   X <- as.matrix(X)
   f <- function(theta, alpha){
-    w <- try(integrate(integrand, lower = lower, upper = upper,
-                       theta = theta, alpha = alpha, response = A, xmatrix = X),
-             silent = TRUE)
-    if(is(w, 'try-error')){
-      NA
-    } else {
-      1/w$value
-    }
+    vapply(alpha, function(x){
+      w <- try(integrate(integrand, lower = lower, upper = upper,
+                         theta = theta, alpha = x, response = A, xmatrix = X),
+               silent = TRUE)
+      if(is(w, 'try-error')){
+        NA
+      } else {
+        1/w$value
+      } }, numeric(1))
   }
   f
   # memoise::memoise(f)
