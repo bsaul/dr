@@ -21,61 +21,81 @@ lan_eefun <- function(data, t_model, o_model){
   n_ <- nrow(X_o)  
   score_fun_o <- geex::make_eefun(o_model, data = data)
   
+  ## components for DBR estimator
+  dr_term1_fun <- make_dr_term1(X_o, inv_link = inv_link_o)
+  
   ## indices
   p_t <- ncol(X_t) + 1
   p_o <- ncol(X_o)
+  p   <- p_t + p_o
   index_t <- 1:p_t
   index_o <- (p_t + 1):(p_t + p_o)
-  p  <- p_t + p_o
-  
-  function(theta, alpha1, alpha2, a1, a2){
+
+  function(theta, alpha){
     
     ### IPW estimator ###
     scores_t <- score_fun_t(theta[index_t])
     
-    ipw1 <- ip_fun(theta = theta[index_t], alpha = alpha1)
-    ipw2 <- ip_fun(theta = theta[index_t], alpha = alpha2)
-    
-    Ia1 <- if(is.null(a1)) 1 else (A == a1) * 1
-    Ia2 <- if(is.null(a2)) 1 else (A == a2) * 1
-   
-    ipw_ce1 <- mean(Y * Ia1) * ipw1 / {if(!is.null(a1)) dbinom(a1, 1, alpha1) else 1}
-    ipw_ce2 <- mean(Y * Ia2) * ipw2 / {if(!is.null(a2)) dbinom(a2, 1, alpha2) else 1}
+    ipw <- ip_fun(theta = theta[index_t], alpha = alpha)
+    ipw_ce0 <- mean(Y * (A == 0)) * ipw / dbinom(0, 1, alpha)
+    ipw_ce1 <- mean(Y * (A == 1)) * ipw / dbinom(1, 1, alpha)
+    ipw_ce  <- mean(Y) * ipw 
     
     ### OTC estimator ###
     scores_o <- score_fun_o(theta[index_o])
     
-    nn1_o <- n_ - {if(is.null(a1)) 0 else 1}
-    nn2_o <- n_ - {if(is.null(a2)) 0 else 1}
-    a1_o <- if(is.null(a1)) 0:1 else a1
-    a2_o <- if(is.null(a2)) 0:1 else a2
+    fitted <- as.numeric(
+      inv_link_o(model.matrix(rhs_o, data = X_o_ex) %*% theta[index_o] ))
     
-    x1 <- X_o_ex %>%
-      filter_(~ A %in% a1_o) %>%
-      mutate_(pi_value1 = ~ dbinom(sum_a, nn1_o, prob = alpha1),
-              fitted   = ~ as.numeric(inv_link_o(model.matrix(rhs_o, data = .) %*% theta[index_o] )),
-              estimate = ~ fitted * pi_value1) 
+    pi_term_a <- vapply(alpha, function(x) {dbinom(X_o_ex$sum_a, n_ - 1, x)}, 
+                        numeric(nrow(X_o_ex)))
+    pi_term   <- vapply(alpha, function(x) {dbinom(X_o_ex$sum_a, n_    , x)}, 
+                        numeric(nrow(X_o_ex)))
     
-    x2 <- X_o_ex %>%
-      filter_(~ A %in% a2_o) %>%
-      mutate_(pi_value2 = ~ dbinom(sum_a, nn1_o, prob = alpha2),
-              fitted   = ~ as.numeric(inv_link_o(model.matrix(rhs_o, data = .) %*% theta[index_o] )),
-              estimate = ~ fitted * pi_value2) 
+    estimates_a <- apply(pi_term_a, 2, function(col) col * fitted)
+    estimates   <- apply(pi_term,   2, function(col) col * fitted)
     
-    otc_ce1 <- 
-      sum(tapply(tapply(x1$estimate, paste(x1$A, x1$ID), sum), 
-               rep(a1_o, each = n_), sum)) / n_
+    part1_a <- apply(estimates_a, 2, function(col) { 
+      tapply(col, paste(X_o_ex$A, X_o_ex$ID), sum) 
+    }) 
+    part1   <- apply(estimates_a, 2, function(col) { 
+      tapply(col, paste(X_o_ex$ID), sum) 
+    }) 
+
+    otc_ce_a <- apply(part1_a , 2, function(col) {
+      tapply(col, rep(0:1, each = n_), sum)} ) / n_
     
-    otc_ce2 <- 
-      sum(tapply(tapply(x2$estimate, paste(x2$A, x2$ID), sum), 
-                 rep(a2_o, each = n_), sum)) / n_
+    otc_ce0 <- otc_ce_a[1, ]
+    otc_ce1 <- otc_ce_a[2, ]
+    otc_ce <- apply(part1, 2, mean)
+    
+    ## DBR estimator ###
+    fY <- dr_term1_fun(theta[index_o])
+    Ybar0 <- mean((A == 0) * (Y - fY ) )
+    Ybar1 <- mean((A == 1) * (Y - fY ) )
+    Ybar  <- mean(Y - fY )
+
+    term1_0 <- Ybar0 * ipw / dbinom(0, 1, alpha)
+    term1_1 <- Ybar1 * ipw / dbinom(1, 1, alpha)
+    term1   <- Ybar * ipw 
+
+    dbr_ce0 <- term1_0 + otc_ce0
+    dbr_ce1 <- term1_1 + otc_ce1
+    dbr_ce  <- term1 + otc_ce
+    
+    nalpha <- length(alpha)
     
     ### Estimating Equations ###
     c(scores_t, 
       scores_o,
-      ipw_ce1 - theta[p + 1],
-      ipw_ce2 - theta[p + 2],
-      otc_ce1 - theta[p + 3],
-      otc_ce2 - theta[p + 4])
+      ipw_ce0 - theta[p + 1 + (0 * nalpha)],
+      ipw_ce1 - theta[p + 1 + (1 * nalpha)],
+      ipw_ce  - theta[p + 1 + (2 * nalpha)],
+      otc_ce0 - theta[p + 1 + (3 * nalpha)],
+      otc_ce1 - theta[p + 1 + (4 * nalpha)],
+      otc_ce  - theta[p + 1 + (5 * nalpha)],
+      dbr_ce0 - theta[p + 1 + (6 * nalpha)],
+      dbr_ce1 - theta[p + 1 + (7 * nalpha)],
+      dbr_ce  - theta[p + 1 + (8 * nalpha)])
   }
 }
