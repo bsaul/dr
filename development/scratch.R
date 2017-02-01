@@ -20,32 +20,47 @@ omodel <- geepack::geeglm(Y ~ A + fA + X1, data = vaccinesim,
 theta_t <- unlist(lme4::getME(pmodel, c('beta', 'theta')))
 theta_o <- coef(omodel)
 
-mylist <-  append(list(eeFUN = lan_eefun, 
-                       splitdt = split(vaccinesim, vaccinesim$group)), 
-                  list(ee_args = list(alpha1 = .3, alpha2 = .6, a1 = 0, a2 = 0)))
+mylist <-  append(list(eeFUN = lan_eefun,
+                       splitdt = split(vaccinesim, vaccinesim$group)),
+                  list(ee_args = list(alpha = c(.5))))
 
 ff <- lan_eefun(mylist$splitdt[[1]], t_model = pmodel, o_model = omodel)
-ff(theta = c(theta_t, theta_o, .5, .5, .5, .5), alpha1 = .5, alpha2 = .5, a1 = 0, a2 = 1)
+ff(theta = c(theta_t, theta_o, rep(.5, 9)), alpha = c(.5))
+# 
+# mats <- compute_matrices(mylist,  
+#                  theta   = c(theta_t, .5, .5),
+#                  numDeriv_options = list(method = 'simple'),
+#                  t_model = pmodel,
+#                  o_model = omodel)
+# 
+# sig <- compute_sigma(mats$A, mats$B)
+wf <- weight_estimator(A = mylist$splitdt[[1]]$A, 
+                 X = get_design_matrix(get_fixed_formula(pmodel), mylist$splitdt[[1]]))
+wf(theta_t, c(.5, .6, .7))
 
-mats <- compute_matrices(mylist,  
-                 theta   = c(theta_t, .5, .5),
-                 numDeriv_options = list(method = 'simple'),
-                 t_model = pmodel,
-                 o_model = omodel)
+test <- geex::eeroot(
+  geex_list   = mylist,
+  start   = c(theta_t, theta_o, rep(.5, 9)),
+  t_model = pmodel,
+  o_model = omodel)
 
-sig <- compute_sigma(mats$A, mats$B)
-
+test_matrices <- geex::compute_matrices(
+  geex_list   = mylist,
+  theta   = test$root,
+  numDeriv_options = list(method = 'simple'),
+  t_model = pmodel,
+  o_model = omodel)
 
 ptm <- proc.time()
 test <- geex::estimate_equations(
   eeFUN   = lan_eefun,
   data    = vaccinesim,
   units   = 'group',
-  roots   = c(theta_t, theta_o, .5, .5, .5, .5),
+  roots   = c(theta_t, theta_o, rep(.5, 9)),
   numDeriv_options = list(method = 'simple'),
   t_model = pmodel,
   o_model = omodel,
-  ee_args = list(alpha1 = .3, alpha2 = .6, a1 = 0, a2 = 0)
+  ee_args = list(alpha = .5)
 )
 proc.time() - ptm
 
