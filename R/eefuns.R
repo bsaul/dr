@@ -58,16 +58,18 @@ lan_eefun <- function(data, t_model, o_model){
     part1_a <- apply(estimates_a, 2, function(col) { 
       tapply(col, paste(X_o_ex$A, X_o_ex$ID), sum) 
     }) 
-    part1   <- apply(estimates_a, 2, function(col) { 
-      tapply(col, paste(X_o_ex$ID), sum) 
+    
+    part1   <- apply(estimates, 2, function(col) { 
+      x <- tapply(col, paste(X_o_ex$ID, X_o_ex$A), sum) 
+      tapply(x, rep(unique(X_o_ex$ID), each = 2), mean)
     }) 
-
+    
     otc_ce_a <- apply(part1_a , 2, function(col) {
       tapply(col, rep(0:1, each = n_), sum)} ) / n_
     
     otc_ce0 <- otc_ce_a[1, ]
     otc_ce1 <- otc_ce_a[2, ]
-    otc_ce <- apply(part1, 2, mean)
+    otc_ce  <- apply(part1, 2, mean)
     
     ## DBR estimator ###
     fY <- dr_term1_fun(theta[index_o])
