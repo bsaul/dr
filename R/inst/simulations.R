@@ -19,8 +19,6 @@ estimates <- plyr::llply(simdt$sims[1], .parallel = FALSE, function(x){
      group_by_(~group) %>% 
      mutate_(fA = ~ mean(A))
   
-   x_splt <- split(x, x$group)
-   
   ## Component models
   tmodel <- lme4::glmer(B ~ X1 + X2 + (1|group), data = x, 
                         family = binomial(link = 'logit') )
@@ -32,21 +30,24 @@ estimates <- plyr::llply(simdt$sims[1], .parallel = FALSE, function(x){
   theta_t <- unlist(lme4::getME(tmodel, c('beta', 'theta')))
   theta_o <- coef(omodel)
   
+  temp <- list(eeFUN = dr_eefun, splitdt = split(x, x$group))
+  
   ## Estimate parameters for each allocation
+  
   lapply(allocations, function(allocation){
-    temp_list <- append(list(eeFUN = dr_eefun, splitdt = x_splt),
-                        list(ee_args = list(alpha = allocation)))
+    temp <- append(temp, list(ee_args = list(alpha = allocation)))
 
     # Point estimates
-    target <- lapply(temp_list$splitdt, function(x){
-      est <- dr_estimators(x, t_model = tmodel, o_model = omodel)
+    target <- lapply(temp$splitdt, function(gdt){
+      est <- dr_estimators(gdt, t_model = tmodel, o_model = omodel)
       est(c(theta_t, theta_o), alpha = allocation)
     }) %>% 
       list_matrix() %>% 
       apply(., 2, mean)
     
+    print(target)
     # vcov estimate
-    mats <- compute_matrices(temp_list,
+    mats <- compute_matrices(temp,
                              theta   = c(theta_t, theta_o, target),
                              numDeriv_options = list(method = 'simple'),
                              t_model = tmodel,
