@@ -22,13 +22,12 @@ dr_eefun <- function(data, t_model, o_model){
   function(theta, alpha){
     
     index_target <- (p + 1):(length(theta))
-    
     ### Non-target parameters ###
     scores_t <- score_fun_t(theta[index_t])
     scores_o <- score_fun_o(theta[index_o])
     
     ### Target parameters ###
-    target <- estimators(theta[index_target], alpha = alpha)
+    target <- estimators(theta, alpha = alpha)
 
     ### Estimating Equations ###
     c(scores_t, 

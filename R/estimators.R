@@ -28,6 +28,7 @@ dr_estimators <- function(data, t_model, o_model){
   index_o <- (p_t + 1):(p_t + p_o)
   
   function(theta, alpha){
+
     ### IPW estimator ###
     ipw <- ip_fun(theta = theta[index_t], alpha = alpha)
     ipw_ce0 <- mean(Y * (A == 0)) * ipw / dbinom(0, 1, alpha)
