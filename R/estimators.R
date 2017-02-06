@@ -114,3 +114,16 @@ weight_estimator <- function(A, X, lower = -Inf, upper = Inf, randomization = 1)
   # memoise::memoise(f)
 }
 
+
+#------------------------------------------------------------------------------#
+#' Makes the first term in the DR estimator
+#' @export
+#------------------------------------------------------------------------------#
+
+make_dr_term1 <- function(X, inv_link){
+  X <- as.matrix(X)
+  f <- function(theta){
+    inv_link(X %*% theta)
+  }
+  memoise::memoise(f)
+}
