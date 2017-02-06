@@ -7,13 +7,14 @@
 #------------------------------------------------------------------------------#
 
 
-weight_estimator <- function(A, X, lower = -Inf, upper = Inf)
+weight_estimator <- function(A, X, lower = -Inf, upper = Inf, randomization = 1)
 {
   X <- as.matrix(X)
   f <- function(theta, alpha){
     vapply(alpha, function(x){
       w <- try(integrate(integrand, lower = lower, upper = upper,
-                         theta = theta, alpha = x, response = A, xmatrix = X),
+                         theta = theta, alpha = x, response = A, xmatrix = X, 
+                         randomization = randomization),
                silent = TRUE)
       if(is(w, 'try-error')){
         NA

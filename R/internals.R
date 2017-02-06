@@ -3,9 +3,9 @@
 #' @export
 #------------------------------------------------------------------------------#
 
-integrand <- function(b, response, xmatrix, theta, alpha){
+integrand <- function(b, response, xmatrix, theta, alpha, randomization = 1){
   lp  <- outer(xmatrix %*% theta[-length(theta)], b, '+')
-  plp <- plogis(lp)
+  plp <- randomization * plogis(lp)
   h   <- apply(plp, 3, function(x) ifelse(response == 1, log(x/alpha), log((1 - x)/(1 - alpha))))
   hh  <- apply(h, 2, function(x) exp(sum(x)))
   hh * dnorm(b, mean = 0, sd = theta[length(theta)])
