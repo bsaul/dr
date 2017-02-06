@@ -2,23 +2,63 @@
 #' Estimating equations for IPW, OTC, and DBR estimators
 #' @export
 #------------------------------------------------------------------------------#
+
+dr_eefun <- function(data, t_model, o_model){
+  
+  score_fun_t <- geex::make_eefun(t_model, data = data, 
+                                  numderiv_opts = list(method = 'simple'))
+  score_fun_o <- geex::make_eefun(o_model, data = data)
+  estimators <- dr_estimators(data = data, t_model = t_model, o_model = o_model)
+  
+  ## indices
+  X_t <- geex::get_design_matrix(geex::get_fixed_formula(t_model), data = data)
+  X_o <- geex::get_design_matrix(geex::get_fixed_formula(o_model), data = data)
+  p_t <- ncol(X_t) + 1
+  p_o <- ncol(X_o)
+  p   <- p_t + p_o
+  index_t <- 1:p_t
+  index_o <- (p_t + 1):(p_t + p_o)
+  
+  function(theta, alpha){
+    
+    index_target <- (p + 1):(length(theta))
+    
+    ### Non-target parameters ###
+    scores_t <- score_fun_t(theta[index_t])
+    scores_o <- score_fun_o(theta[index_o])
+    
+    ### Target parameters ###
+    target <- estimators(theta[index_target], alpha = alpha)
+
+    ### Estimating Equations ###
+    c(scores_t, 
+      scores_o,
+      target - theta[index_target])
+  }
+}
+
+
+#------------------------------------------------------------------------------#
+#' Estimating equations for IPW, OTC, and DBR estimators
+#' @export
+#------------------------------------------------------------------------------#
 lan_eefun <- function(data, t_model, o_model){
   
-  Y <- geex::get_response(formula(o_model), data = data)
-  A <- geex::get_response(formula(t_model), data = data)
-  X_t <- geex::get_design_matrix(geex::get_fixed_formula(t_model), data = data)
-  X_o <- as.data.frame(geex::get_design_matrix(geex::get_fixed_formula(o_model), data = data))
+  Y      <- geex::get_response(formula(o_model), data = data)
+  A      <- geex::get_response(A ~ 1, data = data)
+  X_t    <- geex::get_design_matrix(geex::get_fixed_formula(t_model), data = data)
+  X_o    <- as.data.frame(geex::get_design_matrix(geex::get_fixed_formula(o_model), data = data))
   X_o_ex <- expand_outcome_frame(X_o, geex::get_fixed_formula(o_model))
   inv_link_o <- family(o_model)$linkinv
   rhs_o <- geex::get_fixed_formula(o_model)
+  n_ <- nrow(X_o)  
   
   ## components for IPW estimator
-  ip_fun    <- weight_estimator(A = A, X = X_t)
+  ip_fun      <- weight_estimator(A = A, X = X_t, randomization = 2/3)
   score_fun_t <- geex::make_eefun(t_model, data = data, 
                                   numderiv_opts = list(method = 'simple'))
   
   ## components for OTC estimator
-  n_ <- nrow(X_o)  
   score_fun_o <- geex::make_eefun(o_model, data = data)
   
   ## components for DBR estimator
@@ -33,16 +73,34 @@ lan_eefun <- function(data, t_model, o_model){
 
   function(theta, alpha){
     
-    ### IPW estimator ###
+    ### Non-target parameters ###
     scores_t <- score_fun_t(theta[index_t])
+    scores_o <- score_fun_o(theta[index_o])
     
+    ### IPW estimator ###
     ipw <- ip_fun(theta = theta[index_t], alpha = alpha)
     ipw_ce0 <- mean(Y * (A == 0)) * ipw / dbinom(0, 1, alpha)
     ipw_ce1 <- mean(Y * (A == 1)) * ipw / dbinom(1, 1, alpha)
     ipw_ce  <- mean(Y) * ipw 
     
     ### OTC estimator ###
-    scores_o <- score_fun_o(theta[index_o])
+
+    
+    # temp <- X_o_ex %>%
+    #   mutate_(
+    #     fit      = ~ as.numeric(
+    #       inv_link_o(model.matrix(rhs_o, data = .) %*% theta[index_o] )),
+    #     pi.value = ~ dbinom(sum_a, n_ - 1, prob = alpha),
+    #     val      = ~ fit * pi.value) %>%
+    #   group_by_(~ID, ~A) %>%
+    #   summarise_(val = ~ sum(val))
+    # 
+    # print(temp)
+    # 
+    # temp %>%
+    #   group_by_(~A) %>%
+    #   summarise_(val = ~ sum(val)/(n_ - 1)) %>%
+    #   print()
     
     fitted <- as.numeric(
       inv_link_o(model.matrix(rhs_o, data = X_o_ex) %*% theta[index_o] ))
@@ -59,6 +117,8 @@ lan_eefun <- function(data, t_model, o_model){
       tapply(col, paste(X_o_ex$A, X_o_ex$ID), sum) 
     }) 
     
+    # print(part1_a)
+    
     part1   <- apply(estimates, 2, function(col) { 
       x <- tapply(col, paste(X_o_ex$ID, X_o_ex$A), sum) 
       tapply(x, rep(unique(X_o_ex$ID), each = 2), mean)
@@ -66,6 +126,8 @@ lan_eefun <- function(data, t_model, o_model){
     
     otc_ce_a <- apply(part1_a , 2, function(col) {
       tapply(col, rep(0:1, each = n_), sum)} ) / n_
+    
+    # print(otc_ce_a)
     
     otc_ce0 <- otc_ce_a[1, ]
     otc_ce1 <- otc_ce_a[2, ]
@@ -90,14 +152,14 @@ lan_eefun <- function(data, t_model, o_model){
     ### Estimating Equations ###
     c(scores_t, 
       scores_o,
-      ipw_ce0 - theta[p + 1 + (0 * nalpha)],
-      ipw_ce1 - theta[p + 1 + (1 * nalpha)],
-      ipw_ce  - theta[p + 1 + (2 * nalpha)],
-      otc_ce0 - theta[p + 1 + (3 * nalpha)],
-      otc_ce1 - theta[p + 1 + (4 * nalpha)],
-      otc_ce  - theta[p + 1 + (5 * nalpha)],
-      dbr_ce0 - theta[p + 1 + (6 * nalpha)],
-      dbr_ce1 - theta[p + 1 + (7 * nalpha)],
-      dbr_ce  - theta[p + 1 + (8 * nalpha)])
+      ipw_ce0 = ipw_ce0 - theta[p + 1 + (0 * nalpha)],
+      ipw_ce1 = ipw_ce1 - theta[p + 1 + (1 * nalpha)],
+      ipw_ce  = ipw_ce  - theta[p + 1 + (2 * nalpha)],
+      otc_ce0 = otc_ce0 - theta[p + 1 + (3 * nalpha)],
+      otc_ce1 = otc_ce1 - theta[p + 1 + (4 * nalpha)],
+      otc_ce  = otc_ce  - theta[p + 1 + (5 * nalpha)],
+      dbr_ce0 = dbr_ce0 - theta[p + 1 + (6 * nalpha)],
+      dbr_ce1 = dbr_ce1 - theta[p + 1 + (7 * nalpha)],
+      dbr_ce  = dbr_ce  - theta[p + 1 + (8 * nalpha)])
   }
 }
