@@ -8,7 +8,12 @@
 library(dplyr)
 library(magrittr)
 library(simcausal) 
-
+n_i <- 10
+m <- 300
+nsims <- 250
+totalobs <- n_i * m * nsims
+seed <- 198
+experimentID <- 'X010'
 #### Functions ####
 
 group_assign <- function(n, n_i)
