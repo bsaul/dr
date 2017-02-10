@@ -4,7 +4,7 @@
 \alias{dr_estimators}
 \title{Makes IPW, OTC, and DBR estimators for group-level data}
 \usage{
-dr_estimators(data, t_model, o_model)
+dr_estimators(data, t_model, o_model, randomization)
 }
 \description{
 Makes IPW, OTC, and DBR estimators for group-level data
