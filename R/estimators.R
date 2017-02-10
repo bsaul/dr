@@ -3,7 +3,7 @@
 #' @export
 #------------------------------------------------------------------------------#
 
-dr_estimators <- function(data, t_model, o_model){
+dr_estimators <- function(data, t_model, o_model, randomization){
   
   Y      <- geex::get_response(formula(o_model), data = data)
   A      <- geex::get_response(A ~ 1, data = data)
@@ -13,9 +13,8 @@ dr_estimators <- function(data, t_model, o_model){
   inv_link_o <- family(o_model)$linkinv
   rhs_o <- geex::get_fixed_formula(o_model)
   n_ <- nrow(X_o)  
-  
   ## components for IPW estimator
-  ip_fun    <- weight_estimator(A = A, X = X_t, randomization = 2/3)
+  ip_fun    <- weight_estimator(A = A, X = X_t, randomization = randomization)
   
   ## components for DBR estimator
   dr_term1_fun <- make_dr_term1(X_o, inv_link = inv_link_o)
