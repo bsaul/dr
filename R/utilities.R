@@ -82,3 +82,23 @@ model_warnings <- function(object){
     paste(warnings(objects), collapse = ' ')
   }
 }
+
+#------------------------------------------------------------------------------#
+#' Creates a list of models from model_args
+#' @export
+#------------------------------------------------------------------------------#
+make_models <- function(model_args, data)
+{
+  out <- lapply(model_args, function(x){
+    method <- match.fun(x$method)
+    if(is.null(x$user)) x$user <- FALSE
+    
+    if(x$user == TRUE){
+      NULL # For now
+    } else {
+      args <- append(x$options, list(formula = x$formula, data = data) )
+      do.call(method, args = args)
+    }
+  })
+ out
+}
