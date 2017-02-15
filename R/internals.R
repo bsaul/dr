@@ -51,8 +51,8 @@ expand_outcome_frame <- function(X_outcome, rhs_formula_outcome){
   X_outcome %>%
     mutate_(ID = ~ row_number()) %>%
     # Remove treatment variables so that they are updated
-    select(-A, -fA, -`A:fA`) %>%
-    # select(-A, -fA) %>%
+    # select(-A, -fA, -`A:fA`) %>%
+    select(-A, -fA) %>%
     # Generate the relevant values of A and
     # all possible sum(a_i) for each subject
     full_join(expand_grid_n(n, n - 1), by = "ID")
