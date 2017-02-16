@@ -8,8 +8,9 @@ library(dplyr)
 library(dr)
 library(doMC)
 registerDoMC(4)
+source('development/experiments/ex11/ex11_funs.R')
 
-# Generate scenarios
+## Generate scenarios ##
 scenarios <- data_frame(
   sid = 1:12,
   gamma = rep(list(c(0.1, 0.2, 0),
@@ -24,14 +25,18 @@ scenarios <- data_frame(
               each = 4)
 )
 
-# Oracle 
+## Oracle ## 
 oracle <- expand.grid(
   sid    = 1:12,
   alpha = c(0.1, 0.5, 0.9), 
   a     = c(0, 1, NA)) %>%
-  mutate(truth = 3 + I(sid > 4) * a * 2 + I(sid > 8) * alpha * 1)
+  mutate(truth = 3 + I(sid > 4) * a * 2 + I(sid > 8) * alpha * 1) %>%
+  mutate(truth = ifelse(!is.na(a), truth,
+                        3 + I(sid > 4) * 1 + I(sid > 8) * alpha * 1))
+  
+# to do: add truth for marginal means
 
-# Component model arguments
+## Component model arguments ##
 margs <- list(
   tmodel = 
     list(method = lme4::glmer,
@@ -45,7 +50,7 @@ margs <- list(
            id      = quote(group)))
   )
 
-# Generate simulations
+## Generate simulations ##
 simulations <- Map(gen_sims, 
     gamma = scenarios$gamma, 
     theta = scenarios$theta,
@@ -54,19 +59,28 @@ simulations <- Map(gen_sims,
     ni    = 20,
     nsims = 250)
 
-# 
+## Compute estimates ##
 estimates <- lapply(seq_along(simulations), function(k) {
   est_sims(
     simulations[[k]], 
     allocations = c(0.1, 0.5, 0.9), 
     model_args = margs) %>%
     mutate(sid = k)
-}) %>% bind_rows()
-
-results <- estimates %>% group_by(sid, method, a, alpha) %>%
+}) %>% bind_rows() 
+  
+estimates <- estimates %>% 
+  group_by(sid, method, a, alpha) %>%
   left_join(oracle, by = c('sid', 'a', 'alpha')) %>%
-  mutate(bias      = estimate - truth) %>%
-  summarise(mean_est  = mean(estimate),
-            mean_bias = mean(bias),
+  mutate(bias      = estimate - truth,
+         failed    = is.na(estimate) | is.infinite(estimate))
+
+## Compute results ## 
+results <- estimates  %>%
+  summarise(mean_est  = mean(estimate * !failed, na.rm = TRUE),
+            mean_bias = mean(bias * !failed, na.rm = TRUE),
+            failures  = sum(failed),
             ese       = sd(estimate))
+
+save(estimates, scenarios, oracle, results, 
+     file = 'development/experiments/ex11/ex11_results.rda')
 
