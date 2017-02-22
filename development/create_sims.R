@@ -8,9 +8,9 @@
 library(dplyr)
 library(magrittr)
 library(simcausal) 
-n_i <- 10
+n_i <- 20
 m <- 300
-nsims <- 250
+nsims <- 2
 totalobs <- n_i * m * nsims
 seed <- 198
 experimentID <- 'X010'
