@@ -3,7 +3,10 @@
 #' @export
 #------------------------------------------------------------------------------#
 
-integrand <- function(b, response, xmatrix, theta, alpha, randomization = 1){
+integrand <- function(b, response, xmatrix, theta, alpha = NULL, randomization = 1){
+  if(is.null(alpha)){
+    alpha <- response # so that alpha does not affect anything when NULL
+  }
   lp  <- outer(xmatrix %*% theta[-length(theta)], b, '+')
   plp <- randomization * plogis(lp)
   h   <- apply(plp, 3, function(x) ifelse(response == 1, log(x/alpha), log((1 - x)/(1 - alpha))))
