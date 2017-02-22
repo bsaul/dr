@@ -1,0 +1,258 @@
+---
+output: pdf_document
+classoption: portrait
+---
+\pagenumbering{gobble}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+
+library(dplyr)
+library(ggplot2)
+library(ggbeeswarm)
+library(grid)
+library(gridExtra)
+```
+
+
+```{r data}
+load(file = 'ex12_results.rda')
+```
+
+The bias from IPW (i.e. `inferference`), outcome, and doubly robust estimators of Liu et al was assessed for the following data generating scenarios. $n_i = 20$ for $m = 300$ groups. The simulation was run on 300 datasets.
+
+Treatment was simulated from:
+\[
+A_{ij} \sim Bern(\mbox{logit}^{-1}(\gamma_0 + \gamma_1 Z_{1ij} + \gamma_2 Z_{2ij} + b_i))
+\]
+
+where $Z_{1ij} \sim N(0, 1)$, $Z_{2ij} \sim Bern(0.5)$, and $b_i \sim N(0, \theta^2)$.
+
+The outcome was simulated from:
+
+\[
+Y_{ij} \sim N(\beta_0 + \beta_1 A_{ij} + \beta_2 f(A_i) + \beta_3 Z_{1ij} + \beta_4 Z_{2ij}, 1)
+\]
+
+where $f(A_i)$ is the proportion of subjects treated in group $i$.
+
+```{r}
+knitr::kable(scenarios, caption = 'Parameter scenarios',
+             col.names = c('Scenario', '$\\gamma$', '$\\theta$', '$\\beta$'))
+```
+
+\newpage
+
+```{r, fig.height=6, fig.cap="Showing mean bias for the simulations on the -log10 scale, so to the right is less bias, left is more. The dotted line corresponds with 0.01. Vertical facets are scenarios. Horizontal facets are target estimands."}
+results %>%
+  filter(!is.na(a), model_spec == 'tcor_ocor') %>%
+  mutate(target = paste0('Y(', a, ',', alpha, ')'),
+         val    = paste0(round(mean_bias, 3), ' (', round(ese, 3), ')'),
+         logbias = -log10(abs(mean_bias))) %>%
+  ggplot(
+    data = .,
+    aes(x = -log10(abs(mean_bias)),
+        y = method, 
+        shape = method,
+        color = method)
+  ) + 
+  geom_vline(xintercept = 2, linetype = 'dotted') + 
+  geom_point() + 
+  scale_y_discrete(name = '') + 
+  scale_x_continuous(name = expression('mean(log'[10]*'(|bias|))')) + 
+  scale_color_brewer(palette = 'Set1', guide = FALSE) + 
+  scale_shape(guide = FALSE) + 
+  facet_grid(sid ~ target) + 
+  theme(
+    axis.text.x = element_text(size = 7),
+    axis.text.y = element_text(size = 7)
+  )
+  # ungroup() %>%
+  # select(sid, method, target, val) %>%
+  # tidyr::spread(target, value = val) %>%
+  # knitr::kable()
+```
+
+\newpage
+
+```{r gen_data_fun}
+gen_data <- function(m, ni, gamma, theta, beta){
+  n <- m * ni
+  data_frame(
+    group = rep(1:m, each = ni),
+    Z1  = rnorm(n, sd = 1),
+    Z2  = rbinom(n, size = 1, prob = .5),
+    b   = rep(rnorm(m, sd = theta), each = ni),
+    p   = as.numeric(plogis(cbind(1, Z1, Z2) %*% gamma + b)),
+    A   = rbinom(n, size = 1, prob = p),
+    fA  = rep(tapply(A, group, mean), each = ni),
+    Y   = as.numeric(cbind(1, A, fA, Z1, Z2) %*% beta)
+  )
+}
+```
+
+```{r make_plot_fun}
+# Make plot to examine bias for a scenario
+make_bias_plot <- function(.sid){
+  plot_dt <- estimates %>% filter(sid == .sid, model_spec == 'tcor_ocor', !is.na(a))
+  
+  failures <- plot_dt %>% group_by(method, alpha, a) %>% 
+    summarise(failed = sum(failed)) %>%
+    mutate(fail_label = ifelse(failed == 0, '', as.character(failed)))
+
+  ggplot(
+    data = plot_dt,
+    aes(x = factor(alpha), y = log10(abs(bias)))) +
+    # geom_boxplot(outlier.size = 0.5) +
+    geom_violin(scale = 'width') + 
+    # geom_text(
+    #   data = failures,
+    #   aes(x = factor(alpha), y = 2, label = fail_label),
+    #   inherit.aes = FALSE
+    # ) +
+    scale_y_continuous(
+      name = expression('log'[10]*'(|bias|)')
+     
+    ) +
+    coord_cartesian(
+      ylim = c(-6, 3)
+    ) + 
+    scale_x_discrete(
+      name = expression(alpha)
+    ) + 
+  facet_grid(a ~ method)
+}
+
+# Make plots to demonstrate example of scenario
+make_example_plots <- function(...){
+  dots <- list(...)
+  args <- dots[pmatch(names(dots), names(formals((gen_data))))]
+  sampledt    <- do.call(gen_data, args)
+  
+  p1 <- ggplot(data = sampledt, aes(x = p)) + 
+    geom_histogram(bins = 30 ) + 
+    scale_x_continuous(limits = c(0, 1)) +
+    ggtitle('Distribution of Pr(A|Z)') + 
+    theme(
+      plot.title = element_text(size = 9)
+    )
+  
+  p2 <- ggplot(data = distinct(sampledt, group, fA), aes(x = fA)) + 
+    geom_histogram(bins = 20) + 
+    scale_x_continuous(limits = c(0, 1)) + 
+    ggtitle('Distribution of f(A)') + 
+    theme(
+      plot.title = element_text(size = 9)
+    )
+ arrangeGrob(
+  grobs = list(ggplotGrob(p1), ggplotGrob(p2)), 
+  ncol = 1,
+  widths = unit(2.5, 'in'))
+}
+
+# Arrange all plots for a scenario
+make_scenario_plots <- function(.sid){
+  dargs <- filter(scenarios, sid == .sid)
+  pp <-make_example_plots(
+    m = 300, 
+    ni = 20,
+    gamma = dargs$gamma[[1]], 
+    theta = dargs$theta[[1]], 
+    beta  = dargs$beta[[1]])
+  
+  row2 <- arrangeGrob(
+      grobs = list(
+        pp, 
+        ggplotGrob(make_bias_plot(.sid))),
+      widths = unit(c(2.5, 4.25), 'in'),
+      ncol = 2,
+      padding = unit(0, 'lines'))
+  
+  # Organize final output
+  arrangeGrob(
+    grobs = list(
+      textGrob(label = paste('Scenario', .sid),
+               x = 0,
+               just = 'left'),
+      row2),
+      nrow = 2,
+      heights = unit(c(.5, 4), 'in')
+  )
+}
+```
+
+```{r}
+plots <- lapply(1:12, function(i) make_scenario_plots(i))
+```
+
+```{r}
+grid.draw(plots[[1]])
+```
+
+```{r}
+grid.draw(plots[[2]])
+```
+
+```{r}
+grid.draw(plots[[3]])
+```
+
+```{r}
+grid.draw(plots[[4]])
+```
+
+```{r}
+grid.draw(plots[[5]])
+```
+
+```{r}
+grid.draw(plots[[6]])
+```
+
+```{r}
+grid.draw(plots[[7]])
+```
+
+```{r}
+grid.draw(plots[[8]])
+```
+
+```{r}
+grid.draw(plots[[9]])
+```
+
+```{r}
+grid.draw(plots[[10]])
+```
+
+```{r}
+grid.draw(plots[[11]])
+```
+
+```{r}
+grid.draw(plots[[12]])
+```
+
+
+
+```{r, eval = FALSE}
+estimates %>%
+  filter(sid == 12, !is.na(a)) %>%
+  ggplot(
+    data = .,
+    aes(x = factor(alpha), y = log10(abs(bias)))) +
+    geom_violin(scale = 'width') + 
+    scale_y_continuous(
+      name = expression('log'[10]*'(|bias|)')
+    ) +
+    coord_cartesian(
+      ylim = c(-6, 3)
+    ) + 
+    scale_x_discrete(
+      name = expression(alpha)
+    ) + 
+  facet_grid(a ~  method + model_spec)
+```
+
+
+

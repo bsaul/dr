@@ -32,9 +32,10 @@ oracle <- expand.grid(
   sid    = 1:12,
   alpha = c(0.1, 0.5, 0.9), 
   a     = c(0, 1, NA)) %>%
-  mutate(truth = 3 + I(sid > 4) * a * 2 + I(sid > 8) * alpha * 1) %>%
+  ## sqrt(2/pi) is mean of half normal distr when sigma = 1
+  mutate(truth = 3 + (-1.5*sqrt(2/pi)) + I(sid > 4) * a * 2 + I(sid > 8) * alpha * 1) %>%
   mutate(truth = ifelse(!is.na(a), truth,
-                        3 + I(sid > 4) * 1 + I(sid > 8) * alpha * 1))
+                        3 + (-1.5*sqrt(2/pi)) + I(sid > 4) * 1 + I(sid > 8) * alpha * 1))
   
 # to do: add truth for marginal means
 
@@ -120,8 +121,8 @@ estimates <- lapply(seq_along(simulations), function(k) {
   }) %>% bind_rows()
 }) %>% bind_rows() 
   
-estimates <- estimates %>% 
-  group_by(sid, method, a, alpha) %>%
+estimates <- estimates %>% #select(-bias, -failed, -truth) %>%
+  group_by(model_spec, sid, method, a, alpha) %>%
   left_join(oracle, by = c('sid', 'a', 'alpha')) %>%
   mutate(bias      = estimate - truth,
          failed    = is.na(estimate) | is.infinite(estimate))
