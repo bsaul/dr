@@ -3,35 +3,62 @@
 #' @export
 #------------------------------------------------------------------------------#
 
-dr_eefun <- function(data, t_model, o_model){
+generic_eefun <- function(data, models, randomization, estimator_type){
   
-  score_fun_t <- geex::make_eefun(t_model, data = data, 
-                                  numderiv_opts = list(method = 'simple'))
-  score_fun_o <- geex::make_eefun(o_model, data = data)
-  estimators <- dr_estimators(data = data, t_model = t_model, o_model = o_model)
+  comp <- extract_model_info(models = models, data = data, estimator_type)
+  p   <- comp$p
   
-  ## indices
-  X_t <- geex::get_design_matrix(geex::get_fixed_formula(t_model), data = data)
-  X_o <- geex::get_design_matrix(geex::get_fixed_formula(o_model), data = data)
-  p_t <- ncol(X_t) + 1
-  p_o <- ncol(X_o)
-  p   <- p_t + p_o
-  index_t <- 1:p_t
-  index_o <- (p_t + 1):(p_t + p_o)
+  ## Create estimating equation functions for nontarget parameters
+  if(estimator_type %in% c('ipw', 'dbr')){
+    score_fun_t <- geex::make_eefun(
+      models$t_model, 
+      data = data, 
+      numderiv_opts = list(method = 'simple'))
+    p_t <- comp$p_t
+    index_t <- 1:p_t # index for nontarget propensity model parameters
+  }
+  
+  if(estimator_type %in% c('otc', 'dbr')){
+    score_fun_o <- geex::make_eefun(
+      models$o_model, 
+      data = data)
+    
+    p_o <- comp$p_o
+    
+    if(estimator_type == 'dbr'){
+      index_o <- (p_t + 1):(p_t + p_o) # index for nontarget propensity model parameters
+    } else {
+      index_o <- 1:comp$p_o
+    }
+  }
+  
+  ## Create estimating equation functions for target parameters
+  estimatorFUN <- match.fun(paste0(estimator_type, '_estimator'))
+  est_fun <- estimatorFUN(
+    data          = data, 
+    models        = models,
+    randomization = randomization
+  )
   
   function(theta, alpha){
     
     index_target <- (p + 1):(length(theta))
     ### Non-target parameters ###
-    scores_t <- score_fun_t(theta[index_t])
-    scores_o <- score_fun_o(theta[index_o])
+    if(estimator_type == 'dbr'){
+      scores_t <- score_fun_t(theta[index_t])
+      scores_o <- score_fun_o(theta[index_o])
+      scores   <- c(scores_t, scores_o)
+    } else if(estimator_type == 'ipw'){
+      scores <- score_fun_t(theta[index_t])
+    } else if(estimator_type == 'otc'){
+      scores <- score_fun_o(theta[index_o])
+    }
     
     ### Target parameters ###
-    target <- estimators(theta, alpha = alpha)
+    target <- est_fun(theta[1:p], alpha = alpha)
 
     ### Estimating Equations ###
-    c(scores_t, 
-      scores_o,
+    c(scores,
       target - theta[index_target])
   }
 }
