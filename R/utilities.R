@@ -102,3 +102,40 @@ make_models <- function(model_args, data)
   })
  out
 }
+
+#------------------------------------------------------------------------------#
+#' Extract relevant information from list of models
+#' @export
+#------------------------------------------------------------------------------#
+
+extract_model_info <- function(models, data, estimator_type){
+
+  stopifnot(estimator_type %in% c('ipw', 'otc', 'dbr'))
+  t_model <- models$t_model
+  stopifnot(class(t_model) == 'glmerMod') # currently designed to only work with merMod objects with random intercept
+  o_model <- models$o_model
+
+  ## component data
+  out <- list()
+  if(estimator_type %in% c('ipw', 'dbr')){
+    out$X_t <- geex::get_design_matrix(geex::get_fixed_formula(t_model), data = data)
+    out$Y   <- geex::get_response(formula(o_model), data = data)
+    out$A   <- geex::get_response(A ~ 1, data = data)
+    out$N   <- length(out$Y)  
+    out$p_t <- ncol(out$X_t) + 1
+    out$p   <- out$p_t
+  } 
+  if (estimator_type %in% c('otc', 'dbr')){
+    out$X_o    <- as.data.frame(geex::get_design_matrix(geex::get_fixed_formula(o_model), data = data))
+    out$X_o_ex <- expand_outcome_frame(out$X_o, geex::get_fixed_formula(o_model))
+    out$N      <- nrow(out$X_o)
+    out$p_o    <- ncol(out$X_o)
+    out$p      <- out$p_o
+    out$rhs_o  <- geex::get_fixed_formula(o_model)
+    out$inv_link_o <- family(o_model)$linkinv
+  } 
+  if (estimator_type == 'dbr'){
+    out$p <- out$p_t + out$p_o
+  }
+  out
+}
