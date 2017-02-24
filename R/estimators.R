@@ -3,12 +3,13 @@
 #' @export
 #------------------------------------------------------------------------------#
 
-ipw_estimator <- function(data, models, randomization){
+ipw_estimator <- function(data, models, randomization, hajek = FALSE, ...){
   
   ## component data
   comp <- extract_model_info(model = models, data = data, 'ipw')
   Y <- comp$Y
   A <- comp$A
+  N <- comp$N
   ## components for IPW estimator
   ip_fun <- weight_estimator(
     A = comp$A, 
@@ -21,22 +22,31 @@ ipw_estimator <- function(data, models, randomization){
     
     ### IPW estimator ###
     ipw <- ip_fun(theta = theta[index_t], alpha = alpha)
-    ipw_ce0 <- mean(Y * (A == 0)) * ipw / (1 - alpha)
-    ipw_ce1 <- mean(Y * (A == 1)) * ipw / alpha
+    ipw_0 <- sum(Y * (A == 0)) * ipw / (1 - alpha)
+    ipw_1 <- sum(Y * (A == 1)) * ipw / alpha
     # ipw_ce  <- mean(Y) * ipw 
     
-    x <- c(ipw_ce0, ipw_ce1)
-    names(x) <- paste0(c('ipw_Y0_', 'ipw_Y1_'), alpha)
-    x
+    if(hajek){
+      Nhat0 <- sum(A == 0) * ipw / (1 - alpha)
+      Nhat1 <- sum(A == 1) * ipw / alpha
+      out <- c(ipw_0/Nhat0, ipw_1/Nhat1)
+      names(out) <- paste0(c('ipw_hjk_Y0_', 'ipw_hjk_Y1_' ), alpha)
+    } else {
+      out <- c(ipw_0/N, ipw_1/N)
+      names(out) <- paste0(c('ipw_Y0_', 'ipw_Y1_' ), alpha)
+    }
+    out
   }
 }
+
+
 
 #------------------------------------------------------------------------------#
 #' Makes OTC (outcome based) estimator for group-level data
 #' @export
 #------------------------------------------------------------------------------#
 
-otc_estimator <- function(data, models, randomization){
+otc_estimator <- function(data, models, randomization, ...){
   
   ## component data
   comp <- extract_model_info(model = models, data = data, 'otc')
@@ -92,7 +102,7 @@ otc_estimator <- function(data, models, randomization){
 #' @export
 #------------------------------------------------------------------------------#
 
-dbr_estimator <- function(data, models, randomization){
+dbr_estimator <- function(data, models, randomization, ...){
   
   ## component data
   comp <- extract_model_info(model = models, data = data, 'dbr')
@@ -134,15 +144,9 @@ dbr_estimator <- function(data, models, randomization){
     ## Overall marginal means... ###
     # term1   <- Ybar * ipw 
     # Ybar  <- sum(Y - fY)
-    
-    ## Hajek corrections
-    Nhat0 <- sum(A == 0) * ipw / (1 - alpha)
-    Nhat1 <- sum(A == 1) * ipw / alpha
-    dbr_hjk_ce0 <- (term1_0 + term2[1]*N)/N
-    dbr_hjk_ce1 <- (term1_1 + term2[2]*N)/N
 
-    x <- c(dbr_ce0, dbr_ce1, dbr_hjk_ce0, dbr_hjk_ce1)
-    names(x) <- paste0(c('dbr_Y0_', 'dbr_Y1_', 'dbr_hjk_Y0_', 'dbr_hjk_Y1_'), alpha)
+    x <- c(dbr_ce0, dbr_ce1)
+    names(x) <- paste0(c('dbr_Y0_', 'dbr_Y1_'), alpha)
     x
   }
 }
@@ -152,7 +156,15 @@ dbr_estimator <- function(data, models, randomization){
 #' @export
 #------------------------------------------------------------------------------#
 holding <- function(){
-
+  
+  ## Hajek corrections
+  Nhat0 <- sum(A == 0) * ipw / (1 - alpha)
+  Nhat1 <- sum(A == 1) * ipw / alpha
+  dbr_hjk_ce0 <- (term1_0 + term2[1]*N)/Nhat0
+  dbr_hjk_ce1 <- (term1_1 + term2[2]*N)/Nhat1
+  ## Hajek corrections
+  Nhat0 <- sum(A == 0) * ipw / (1 - alpha)
+  Nhat1 <- sum(A == 1) * ipw / alpha
   
   hjk_ipw_ce0 <- (sum(Y * (A == 0)) * ipw / (1 - alpha )) / Nhat0
   hjk_ipw_ce1 <- (sum(Y * (A == 1)) * ipw / alpha) / Nhat1
