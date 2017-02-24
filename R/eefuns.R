@@ -3,7 +3,7 @@
 #' @export
 #------------------------------------------------------------------------------#
 
-generic_eefun <- function(data, models, randomization, estimator_type){
+generic_eefun <- function(data, models, randomization, estimator_type, hajek = FALSE){
   
   comp <- extract_model_info(models = models, data = data, estimator_type)
   p   <- comp$p
@@ -34,12 +34,14 @@ generic_eefun <- function(data, models, randomization, estimator_type){
   
   ## Create estimating equation functions for target parameters
   estimatorFUN <- match.fun(paste0(estimator_type, '_estimator'))
-  est_fun <- estimatorFUN(
+  estimator <- estimatorFUN(
     data          = data, 
     models        = models,
-    randomization = randomization
+    randomization = randomization,
+    hajek         = hajek
   )
   
+  ### PSI function ###
   function(theta, alpha){
     
     index_target <- (p + 1):(length(theta))
@@ -55,10 +57,10 @@ generic_eefun <- function(data, models, randomization, estimator_type){
     }
     
     ### Target parameters ###
-    target <- est_fun(theta[1:p], alpha = alpha)
-
+    target <- estimator(theta[1:p], alpha = alpha)
+    
     ### Estimating Equations ###
-    c(scores,
-      target - theta[index_target])
+     c(scores,
+       target - theta[index_target])
   }
 }
