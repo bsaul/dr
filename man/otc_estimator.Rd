@@ -4,7 +4,7 @@
 \alias{otc_estimator}
 \title{Makes OTC (outcome based) estimator for group-level data}
 \usage{
-otc_estimator(data, models, randomization)
+otc_estimator(data, models, randomization, ...)
 }
 \description{
 Makes OTC (outcome based) estimator for group-level data

@@ -4,7 +4,7 @@
 \alias{ipw_estimator}
 \title{Makes IPW estimator for group-level data}
 \usage{
-ipw_estimator(data, models, randomization)
+ipw_estimator(data, models, randomization, hajek = FALSE, ...)
 }
 \description{
 Makes IPW estimator for group-level data

@@ -4,7 +4,7 @@
 \alias{dbr_estimator}
 \title{Makes DBR estimators for group-level data}
 \usage{
-dbr_estimator(data, models, randomization)
+dbr_estimator(data, models, randomization, hajek, ...)
 }
 \description{
 Makes DBR estimators for group-level data
