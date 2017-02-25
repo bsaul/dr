@@ -6,7 +6,8 @@
 generic_eefun <- function(data, models, randomization, estimator_type, hajek = FALSE){
   
   comp <- extract_model_info(models = models, data = data, estimator_type)
-  p   <- comp$p
+  A <- comp$A
+  p <- comp$p
   
   ## Create estimating equation functions for nontarget parameters
   if(estimator_type %in% c('ipw', 'dbr')){
@@ -57,10 +58,17 @@ generic_eefun <- function(data, models, randomization, estimator_type, hajek = F
     }
     
     ### Target parameters ###
-    target <- estimator(theta[1:p], alpha = alpha)
-    
+    grp_est <- estimator(theta[1:p], alpha = alpha)
+   
     ### Estimating Equations ###
-     c(scores,
-       target - theta[index_target])
+    if(hajek){
+      c(scores,
+        # cancel out contribution of group estimate AND target parameter
+        (sum(A == 0) > 0 ) * (grp_est[1] - theta[p + 1]), 
+        (sum(A == 1) > 0 ) * (grp_est[2] - theta[p + 2]))
+    } else {
+      c(scores,
+        grp_est - theta[index_target])
+    }
   }
 }
