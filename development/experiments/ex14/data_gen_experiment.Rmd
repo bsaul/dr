@@ -1,0 +1,181 @@
+---
+title: "Bias the Menace"
+output: pdf_document
+---
+
+B. Saul and B. Barkley have observed that interference estimators have bias that does not go away (or at least doesn't shrink quickly) in some situations. As the same estimator code does produce asymptotically unbiased estimators in other situations, we wish to understand the source of the bias. Is it the code? the math? Do the estimators not work well under certain data generating situations?
+
+The bias from IPW (i.e. `inferference`), outcome, and doubly robust estimators of Liu et al will assessed for the following data generating scenarios. $n_i$ will be fixed at 20 for $m = 300$ groups. Bias will be checked for 250 simulated datasets.
+
+Treatment will be simulated from:
+\[
+A_{ij} \sim Bern(plogis(\gamma_0 + \gamma_1 |Z_{1ij}| + \gamma_2 Z_{2ij} + \gamma_3 |Z_{1ij}| Z_{2ij} + b_i))
+\]
+
+where $Z_{1ij} \sim N(0, 1)$, $Z_{2ij} \sim Bern(0.5)$, and $b_i \sim N(0, \theta^2)$.
+
+The outcome will be simulated from:
+
+\[
+Y_{ij} \sim N(\beta_0 + \beta_1 A_{ij} + \beta_2 f(A_i) + \beta_3 Z_{1ij} + \beta_4 Z_{2ij} + \beta_4 |Z_{1ij}| Z_{2ij} , 1)
+\]
+
+where $f(A_i)$ is the proportion of subjects treated in group $i$.
+
+The following values of $\alpha$ will be considered in the estimator: (0.1, 0.5, 0.9).
+
+The scenarios are described below along with histograms from a single dataset.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, fig.height = 3)
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+```
+
+```{r functions}
+gen_data <- function(m, ni, gamma, theta, beta){
+  n <- m * ni
+  data_frame(
+    m   = m,
+    ni  = ni,
+    group = rep(1:m, each = ni),
+    Z1  = rnorm(n, sd = 1),
+    Z1_abs = abs(Z1),
+    Z2  = rbinom(n, size = 1, prob = .5),
+    b   = rep(rnorm(m, sd = theta), each = ni),
+    p   = as.numeric(plogis(cbind(1, Z1_abs, Z2) %*% gamma + b)),
+    A   = rbinom(n, size = 1, prob = p),
+    fA  = rep(tapply(A, group, mean), each = ni),
+    Y   = rnorm(n, mean = (cbind(1, A, fA, Z1_abs, Z2, Z1_abs*Z2) %*% beta), sd = 1)
+  )
+}
+```
+
+## Scenario 1
+
+\[
+\gamma = (.1, .2, 0) \quad  \theta = 0.3 \quad \beta = (2, 0, 0, -1.5, 2)
+\]
+
+* No treatment effect
+* tight distribution of $\Pr(A|Z)$
+* few groups (if any) that have coverages near 0.1 or 0.9
+
+```{r scenario1}
+dt <- gen_data(300, 20, c(.1, .2, 0), .3, c(2, 0, 0, -1.5, 2))
+
+p1 <- ggplot(data = dt, aes(x = p)) + 
+  geom_histogram(bins = 30 ) + 
+  scale_x_continuous(limits = c(0, 1)) +
+  ggtitle('Distribution of Pr(A|Z)')
+p2 <- ggplot(data = distinct(dt, group, fA), aes(x = fA)) + 
+  geom_histogram(bins = 20) + 
+  scale_x_continuous(limits = c(0, 1)) + 
+  ggtitle('Distribution of f(A)')
+grid.arrange(p1, p2, nrow = 1)
+```
+## Scenario 2
+
+\[
+\gamma = (2.1, .4, -4.2) \quad  \theta = .3 \quad \beta = (2, 0, 0, -1.5, 2)
+\]
+
+* No treatment effect
+* bimodal distribution of $\Pr(A|Z)$
+* few groups (if any) that have coverages near 0.1 or 0.9
+
+```{r scenario2}
+dt <- gen_data(300, 20, c(2.1, .4, -4.2), .3, c(2, 0, 0, -1.5, 2))
+
+p1 <- ggplot(data = dt, aes(x = p)) + 
+  geom_histogram(bins = 30 ) + 
+  scale_x_continuous(limits = c(0, 1)) +
+  ggtitle('Distribution of Pr(A|Z)')
+p2 <- ggplot(data = distinct(dt, group, fA), aes(x = fA)) + 
+  geom_histogram(bins = 20) + 
+  scale_x_continuous(limits = c(0, 1)) + 
+  ggtitle('Distribution of f(A)')
+grid.arrange(p1, p2, nrow = 1)
+```
+
+## Scenario 3
+
+\[
+\gamma = (-1, .5, -1) \quad  \theta = .3 \quad \beta = (2, 0, 0, -1.5, 2)
+\]
+
+* No treatment effect
+* skewed distribution of $\Pr(A|Z)$
+* few groups (if any) that have coverages near 0.9 
+
+```{r scenario3}
+dt <- gen_data(300, 20, c(-1, .5, -1), .5, c(2, 0, 0, -1.5, 2))
+
+p1 <- ggplot(data = dt, aes(x = p)) + 
+  geom_histogram(bins = 30 ) + 
+  scale_x_continuous(limits = c(0, 1)) +
+  ggtitle('Distribution of Pr(A|Z)')
+p2 <- ggplot(data = distinct(dt, group, fA), aes(x = fA)) + 
+  geom_histogram(bins = 20) + 
+  scale_x_continuous(limits = c(0, 1)) + 
+  ggtitle('Distribution of f(A)')
+grid.arrange(p1, p2, nrow = 1)
+```
+
+## Scenario 4
+
+\[
+\gamma = (0, .75, 0) \quad  \theta = 1.5 \quad \beta = (2, 0, 0, -1.5, 2)
+\]
+
+* No treatment effect
+* uniform distribution of $\Pr(A|Z)$
+* uniformish distribution of coverages
+
+```{r scenario4}
+dt <- gen_data(300, 20, c(0, .75, 0), 1.5, c(2, 0, 0, -1.5, 2))
+
+p1 <- ggplot(data = dt, aes(x = p)) + 
+  geom_histogram(bins = 30 ) + 
+  scale_x_continuous(limits = c(0, 1)) +
+  ggtitle('Distribution of Pr(A|Z)')
+p2 <- ggplot(data = distinct(dt, group, fA), aes(x = fA)) + 
+  geom_histogram(bins = 20) + 
+  scale_x_continuous(limits = c(0, 1)) + 
+  ggtitle('Distribution of f(A)')
+grid.arrange(p1, p2, nrow = 1)
+```
+
+## Scenario 5
+
+Repeat Scenario 1 but with $\beta_1 = 2$ (i.e. a direct effect of treatment).
+
+## Scenario 6
+
+Repeat Scenario 2 but with $\beta_1 = 2$ (i.e. a direct effect of treatment).
+
+## Scenario 7
+
+Repeat Scenario 3 but with $\beta_1 = 2$ (i.e. a direct effect of treatment).
+
+## Scenario 8
+
+Repeat Scenario 4 but with $\beta_1 = 2$ (i.e. a direct effect of treatment).
+
+## Scenario 9
+
+Repeat Scenario 1 but with $\beta_1 = 2$ and $\beta_2 = 1$ (i.e. a direct and indirect effect of treatment).
+
+## Scenario 10
+
+Repeat Scenario 2 but with $\beta_1 = 2$ and $\beta_2 = 1$ (i.e. a direct and indirect effect of treatment).
+
+## Scenario 11
+
+Repeat Scenario 3 but with $\beta_1 = 2$ and $\beta_2 = 1$ (i.e. a direct and indirect effect of treatment).
+
+## Scenario 12
+
+Repeat Scenario 4 but with $\beta_1 = 2$ and $\beta_2 = 1$ (i.e. a direct and indirect effect of treatment).
+
