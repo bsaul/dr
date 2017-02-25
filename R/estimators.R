@@ -25,11 +25,14 @@ ipw_estimator <- function(data, models, randomization, hajek = FALSE, ...){
     ipw_0 <- sum(Y * (A == 0)) * ipw / (1 - alpha)
     ipw_1 <- sum(Y * (A == 1)) * ipw / alpha
     # ipw_ce  <- mean(Y) * ipw 
-    
+
     if(hajek){
+
       Nhat0 <- sum(A == 0) * ipw / (1 - alpha)
       Nhat1 <- sum(A == 1) * ipw / alpha
-      out <- c(ipw_0/Nhat0, ipw_1/Nhat1)
+      out <- c(
+        ifelse(sum(A == 0) > 0, ipw_0/Nhat0, 0), 
+        ifelse(sum(A == 1) > 0, ipw_1/Nhat1, 0))
       names(out) <- paste0(c('ipw_hjk_Y0_', 'ipw_hjk_Y1_' ), alpha)
     } else {
       out <- c(ipw_0/N, ipw_1/N)
@@ -102,7 +105,7 @@ otc_estimator <- function(data, models, randomization, ...){
 #' @export
 #------------------------------------------------------------------------------#
 
-dbr_estimator <- function(data, models, randomization, ...){
+dbr_estimator <- function(data, models, randomization, hajek, ...){
   
   ## component data
   comp <- extract_model_info(model = models, data = data, 'dbr')
@@ -138,45 +141,31 @@ dbr_estimator <- function(data, models, randomization, ...){
     term1_1 <- Ybar1 * ipw / alpha
     term2   <- dr_term2_fun(theta[index_o], alpha)
     
-    dbr_ce0 <- (term1_0 + term2[1]*N)/N
-    dbr_ce1 <- (term1_1 + term2[2]*N)/N
+    dbr_0 <- (term1_0 + term2[1]*N)
+    dbr_1 <- (term1_1 + term2[2]*N)
     
     ## Overall marginal means... ###
     # term1   <- Ybar * ipw 
     # Ybar  <- sum(Y - fY)
 
-    x <- c(dbr_ce0, dbr_ce1)
-    names(x) <- paste0(c('dbr_Y0_', 'dbr_Y1_'), alpha)
-    x
+    if(hajek){
+      Nhat0 <- sum(A == 0) * ipw / (1 - alpha)
+      Nhat1 <- sum(A == 1) * ipw / alpha
+      # out <- c(
+      #   ifelse(sum(A == 0) > 0, dbr_0/Nhat0, 0), 
+      #   ifelse(sum(A == 1) > 0, dbr_1/Nhat1, 0))
+      out <- c(
+        ifelse(sum(A == 0) > 0, term1_0/Nhat0 + term2[1], 0),
+        ifelse(sum(A == 1) > 0, term1_1/Nhat1 + term2[2], 0))
+      names(out) <- paste0(c('dbr_hjk_Y0_', 'dbr_hjk_Y1_' ), alpha)
+    } else {
+      out <- c(dbr_0/N, dbr_1/N)
+      names(out) <- paste0(c('dbr_Y0_', 'dbr_Y1_' ), alpha)
+    }
+    out
   }
 }
 
-#------------------------------------------------------------------------------#
-#' IP weight estimator
-#' @export
-#------------------------------------------------------------------------------#
-holding <- function(){
-  
-  ## Hajek corrections
-  Nhat0 <- sum(A == 0) * ipw / (1 - alpha)
-  Nhat1 <- sum(A == 1) * ipw / alpha
-  dbr_hjk_ce0 <- (term1_0 + term2[1]*N)/Nhat0
-  dbr_hjk_ce1 <- (term1_1 + term2[2]*N)/Nhat1
-  ## Hajek corrections
-  Nhat0 <- sum(A == 0) * ipw / (1 - alpha)
-  Nhat1 <- sum(A == 1) * ipw / alpha
-  
-  hjk_ipw_ce0 <- (sum(Y * (A == 0)) * ipw / (1 - alpha )) / Nhat0
-  hjk_ipw_ce1 <- (sum(Y * (A == 1)) * ipw / alpha) / Nhat1
-  hjk_ipw_ce0 <- ifelse(is.nan(hjk_ipw_ce0) | is.infinite(hjk_ipw_ce0), 0, hjk_ipw_ce0)
-  hjk_ipw_ce1 <- ifelse(is.nan(hjk_ipw_ce1) | is.infinite(hjk_ipw_ce1), 0, hjk_ipw_ce1)
-  
-  ## DBR
-  hjk_dbr_ce0 <- (term1_0 + otc_ce0*N)/Nhat0
-  hjk_dbr_ce1 <- (term1_1 + otc_ce1*N)/Nhat1
-  hjk_dbr_ce0 <- ifelse(is.nan(hjk_dbr_ce0) | is.infinite(hjk_dbr_ce0), 0, hjk_dbr_ce0)
-  hjk_dbr_ce1 <- ifelse(is.nan(hjk_dbr_ce1) | is.infinite(hjk_dbr_ce1), 0, hjk_dbr_ce1)
-}
 
 #------------------------------------------------------------------------------#
 #' IP weight estimator
