@@ -11,22 +11,8 @@ library(sandwich)
 library(sandwichShop)
 # Load necessary functions
 # source('R/functions_v2.R', echo = T, max.deparse.length = 5000)
-source('R/functions_v4.R', echo = T, max.deparse.length = 5000)
 # alphas <- c(.3, .45, .6)
 alphas <- seq(.3, .6, by = .01)
-
-
-# choleradt <- vaccinesim %>%
-#   group_by(group) %>%
-#   mutate(fA = mean(A))
-# 
-# results <- estimation(treatment_formula = A ~ X1 + X2 + (1|group), 
-#                       outcome_formula = y ~ A + fA + A*fA + X1 + X2,
-#                       outcome_method = glm,
-#                       outcome_method_opts = list(family = binomial),
-#                       this_data = choleradt,
-#                       allocations = alphas,
-#                       target_a = 0)
 
 load( pipe( 'ssh saulb@diamond.bios.unc.edu "cat /home/groups/projects/mhudgens/emch/data/R_data/emch_analysis_data.Rdata"' ))
 
