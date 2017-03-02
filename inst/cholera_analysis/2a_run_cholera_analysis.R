@@ -36,12 +36,12 @@ analysis_model_args <- list(
 
 results <- estimate_cholera_parms(
   data        = choleradt,
-  allocations = c(0.5),
+  allocations = alphas,
   model_args  = analysis_model_args
 )
 
 
 
-save(results_a0, results_a1, file = 'cholera_analysis/cholera_results.rda')
+save(results, file = 'inst/cholera_analysis/cholera_results.rda')
 
   
