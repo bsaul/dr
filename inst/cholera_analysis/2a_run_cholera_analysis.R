@@ -7,10 +7,11 @@
 
 library(dplyr)
 library(dr)
+library(doMC)
+registerDoMC(4)
 # library(geex)
-# alphas <- c(.3, .45, .6)
-alphas <- seq(.3, .6, by = .01)
-
+# alphas <- .45
+alphas <- lapply(seq(.3, .6, by = .02), function(x) sort(c(.4, x)))
 
 load( pipe( 'ssh saulb@diamond.bios.unc.edu "cat /home/groups/projects/mhudgens/emch/data/R_data/emch_analysis_data.Rdata"' ))
 

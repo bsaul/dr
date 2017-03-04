@@ -28,13 +28,6 @@ estimate_cholera_parms <- function(data, allocations, model_args, ...){
     dbr = list(type      = 'dbr',
                hajek     = FALSE,
                theta     = c(theta_t, theta_o))
-    # ,
-    # ipw_hjk = list(type  = 'ipw',
-    #            hajek     = TRUE,
-    #            theta     = theta_t),
-    # dbr_hjk = list(type  = 'dbr',
-    #            hajek     = TRUE,
-    #            theta     = c(theta_t, theta_o))
   )
   
   all <- lapply(estimator_args, function(eargs){
@@ -72,24 +65,24 @@ estimate_cholera_parms <- function(data, allocations, model_args, ...){
         hajek            = eargs$hajek)
       
       Sigma <- try(geex::compute_sigma(mats$A, mats$B), silent = TRUE)
-      if(is(Sigma, 'try-error')){
-        std_error <- NA
-      } else {
-        std_error <- sqrt(diag(Sigma)[(p + 1):(p + 2)])
-      }
+
       ## END VCOV estimates ##
       
       # Convert to data_frame
-      data_frame(
-        method    = eargs$type,
-        hajek     = eargs$hajek,
-        a         = 0:1,
-        alpha     = allocation,
-        estimate  = target,
-        std_error = std_error)
+      list(
+        alpha    = allocation,
+        estimate = target,
+        vcov     = Sigma
+      )
+      # data_frame(
+      #   method    = eargs$type,
+      #   hajek     = eargs$hajek,
+      #   a         = 0:1,
+      #   alpha     = allocation,
+      #   estimate  = target,
+      #   std_error = std_error)
     }) # END lapply per allocation
-    bind_rows(hold) # combine estimates for allocations
+    hold
   }) # END lapply per estimator
-  
-  bind_rows(all) # combine estimates for estimators
+  all
 }
