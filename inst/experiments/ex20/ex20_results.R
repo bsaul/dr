@@ -322,8 +322,9 @@ ggsave(filename = paste0('inst/experiments/ex20/figures/', 'y_0_5', '.pdf'),
 
 
 
-#######
-
+#------------------------------------------------------------------------------#
+# data generating story ####
+#------------------------------------------------------------------------------#
 
 # Make plots to demonstrate example of scenario
 make_example_plots <- function(...){
@@ -333,7 +334,9 @@ make_example_plots <- function(...){
   
   p1 <- ggplot(data = sampledt, aes(x = p)) + 
     geom_histogram(bins = 30 ) + 
-    scale_x_continuous(limits = c(0, 1)) +
+    scale_x_continuous(
+      name = '',
+      limits = c(0, 1)) +
     ggtitle('Distribution of Pr(A|Z)') + 
     theme(
       plot.title = element_text(size = 9)
@@ -341,14 +344,75 @@ make_example_plots <- function(...){
   
   p2 <- ggplot(data = distinct(sampledt, group, fA), aes(x = fA)) + 
     geom_histogram(bins = 20) + 
-    scale_x_continuous(limits = c(0, 1)) + 
+    scale_x_continuous(
+      name = '',
+      limits = c(0, 1)) + 
     ggtitle('Distribution of f(A)') + 
     theme(
       plot.title = element_text(size = 9)
     )
   arrangeGrob(
     grobs = list(ggplotGrob(p1), ggplotGrob(p2)), 
-    ncol = 2,
-    heights = unit(1.5, 'in'),
-    widths = unit(c(2.5, 2.5), 'in'))
+    nrow = 2,
+    heights = unit(c(1.5, 1.5), 'in'),
+    widths = unit(c(2), 'in'))
 }
+
+
+plot_four_b <- function(.sid, .a){
+  p1 <- plot_three(
+    .sid           = .sid, 
+    .model_spec    = 'tcor_ocor',
+    .method_labels = TRUE, 
+    .alpha         = .1, 
+    .a             = .a, 
+    .spec_label    = paste0('Y(', .a, ', 0.1)')) 
+  p2 <- plot_three(
+    .sid           = .sid, 
+    .model_spec    = 'tcor_ocor',
+    .method_labels = TRUE, 
+    .alpha         = .5, 
+    .a             = .a, 
+    .spec_label    = paste0('Y(', .a, ', 0.5)')) 
+  p3 <- plot_three(
+    .sid           = .sid, 
+    .model_spec    = 'tcor_ocor',
+    .method_labels = TRUE, 
+    .alpha         = .9, 
+    .a             = .a, 
+    .spec_label    = paste0('Y(', .a, ', 0.9)')) 
+  arrangeGrob(
+    axes_aligned, p1, p2, p3,
+    widths = unit(c(.8, rep(.5*3 + .25, 3)), 'in'),
+    ncol = 4)
+}
+
+plot_five_b <- function(.sid, .a){
+  xx <- scenarios %>% filter(sid == .sid)
+  yy <- make_example_plots(
+    beta = xx$beta[[1]], 
+    gamma = xx$gamma[[1]], 
+    theta = xx$theta[[1]],
+    m = xx$m, ni = xx$ni) 
+  
+  arrangeGrob(
+    arrangeGrob(
+      textGrob(label = 'Data Generating Scenario'),
+      yy,
+      nrow = 2,
+      heights = unit(c(.5, 3), 'in')),
+    plot_four_b(.sid = .sid, .a = .a),
+    nrow = 1,
+    widths = unit(c(2, sum(c(.8, rep(.5*3 + .25, 3)))), 'in')
+  )
+}
+grid.newpage()
+
+lapply(c(9, 10, 11, 12), function(sid){
+  p <- plot_five_b(sid, 1) 
+  
+  ggsave(filename = paste0('inst/experiments/ex20/figures/scn', sid, '.pdf'),
+         plot = p,
+         width = 8.5, height = 4)
+})
+
