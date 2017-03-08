@@ -33,10 +33,10 @@ ipw_estimator <- function(data, models, randomization, hajek = FALSE, ...){
       out <- c(
         ifelse(sum(A == 0) > 0, ipw_0/Nhat0, 0), 
         ifelse(sum(A == 1) > 0, ipw_1/Nhat1, 0))
-      names(out) <- paste0(c('ipw_hjk_Y0_', 'ipw_hjk_Y1_' ), alpha)
+      names(out) <- paste0(rep(c('ipw_hjk_Y0_', 'ipw_hjk_Y1_'), each = length(alpha)), alpha)
     } else {
       out <- c(ipw_0/N, ipw_1/N)
-      names(out) <- paste0(c('ipw_Y0_', 'ipw_Y1_' ), alpha)
+      names(out) <- paste0(rep(c('ipw_Y0_', 'ipw_Y1_'), each = length(alpha)), alpha)
     }
     out
   }
@@ -96,7 +96,7 @@ otc_estimator <- function(data, models, randomization, ...){
     # otc_ce  <- apply(part1, 2, sum)/N
     
     x <- c(otc_ce0, otc_ce1)
-    names(x) <- paste0(c('otc_Y0_', 'otc_Y1_'), alpha)
+    names(x) <- paste0(rep(c('otc_Y0_', 'otc_Y1_'), each = length(alpha)), alpha)
     x
   }
 }
@@ -141,26 +141,19 @@ dbr_estimator <- function(data, models, randomization, hajek, ...){
     term1_1 <- Ybar1 * ipw / alpha
     term2   <- dr_term2_fun(theta[index_o], alpha)
     
-    dbr_0 <- (term1_0 + term2[1]*N)
-    dbr_1 <- (term1_1 + term2[2]*N)
+    dbr_0 <- (term1_0 + term2[1:length(alpha)]*N)
+    dbr_1 <- (term1_1 + term2[(length(alpha) + 1):length(term2)]*N)
     
-    ## Overall marginal means... ###
-    # term1   <- Ybar * ipw 
-    # Ybar  <- sum(Y - fY)
-
     if(hajek){
       Nhat0 <- sum(A == 0) * ipw / (1 - alpha)
       Nhat1 <- sum(A == 1) * ipw / alpha
-      # out <- c(
-      #   ifelse(sum(A == 0) > 0, dbr_0/Nhat0, 0), 
-      #   ifelse(sum(A == 1) > 0, dbr_1/Nhat1, 0))
       out <- c(
         ifelse(sum(A == 0) > 0, term1_0/Nhat0 + term2[1], 0),
         ifelse(sum(A == 1) > 0, term1_1/Nhat1 + term2[2], 0))
-      names(out) <- paste0(c('dbr_hjk_Y0_', 'dbr_hjk_Y1_' ), alpha)
+      names(out) <- paste0(rep(c('dbr_hjk_Y0_', 'dbr_hjk_Y1_'), each = length(alpha)), alpha)
     } else {
       out <- c(dbr_0/N, dbr_1/N)
-      names(out) <- paste0(c('dbr_Y0_', 'dbr_Y1_' ), alpha)
+      names(out) <- paste0(rep(c('dbr_Y0_', 'dbr_Y1_'), each = length(alpha)), alpha)
     }
     out
   }
