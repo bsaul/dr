@@ -20,6 +20,7 @@ choleradt <- analysis_c %>%
   mutate(fA = mean(A)) %>%
   filter(n() < 1074)
 
+
 analysis_model_args <- list(
   t_model = 
     list(method = lme4::glmer,
@@ -34,15 +35,24 @@ analysis_model_args <- list(
            id      = quote(group)))
 )
 
-
 results <- estimate_cholera_parms(
   data        = choleradt,
-  allocations = alphas,
+  allocations = alphas[4],
   model_args  = analysis_model_args
 )
 
+dr_results <- lapply(seq_along(alphas), function(i){
+  attempt <- try(estimate_cholera_parms(
+    data        = choleradt,
+    allocations = alphas[i],
+    model_args  = analysis_model_args
+  ))
+  if(is(attempt, 'try-error')){
+    NULL
+  } else{
+    attempt
+  }
+})
 
-
-save(results, file = 'inst/cholera_analysis/cholera_results.rda')
-
+save(dr_results, file = 'inst/cholera_analysis/cholera_results_dr.rda')
   

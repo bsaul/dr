@@ -19,12 +19,12 @@ estimate_cholera_parms <- function(data, allocations, model_args, ...){
   
   ## TEMPORARY!! (hopefully) ##
   estimator_args <- list(
-    ipw = list(type      = 'ipw',
-               hajek     = FALSE,
-               theta     = theta_t),
-    otc = list(type      = 'otc',
-               hajek     = FALSE,
-               theta     = theta_o),
+    # ipw = list(type      = 'ipw',
+    #            hajek     = FALSE,
+    #            theta     = theta_t),
+    # otc = list(type      = 'otc',
+    #            hajek     = FALSE,
+    #            theta     = theta_o),
     dbr = list(type      = 'dbr',
                hajek     = FALSE,
                theta     = c(theta_t, theta_o))
