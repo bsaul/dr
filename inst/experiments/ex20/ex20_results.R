@@ -10,7 +10,7 @@ library(ggbeeswarm)
 library(grid)
 library(gridExtra)
 
-# load(file = 'inst/experiments/ex20/ex20_results.rda')
+load(file = 'inst/experiments/ex20/ex20_results.rda')
 
 ### Level one
 plot_one <- function(.sid, .model_spec, .method, .alpha, .a, .axis_labels = FALSE, .method_labels = FALSE){
@@ -337,7 +337,7 @@ make_example_plots <- function(...){
     scale_x_continuous(
       name = '',
       limits = c(0, 1)) +
-    ggtitle('Distribution of Pr(A|Z)') + 
+    ggtitle('Distribution of Pr(A|X)') + 
     theme(
       plot.title = element_text(size = 9)
     )
