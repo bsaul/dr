@@ -53,21 +53,22 @@ otc_estimator <- function(data, models, randomization, ...){
   
   ## component data
   comp <- extract_model_info(model = models, data = data, 'otc')
-  MM   <- model.matrix(comp$rhs_o, data = comp$X_o_ex) 
-  N    <- comp$N
-  ## indices
+
+  MM   <- model.matrix(comp$rhs_o, data = comp$X_o_ex)
   index_o <- 1:comp$p
+ 
+  N    <- comp$N
   function(theta, alpha){
 
     ### OTC estimator ###
     # compute fitted value for expanded data.frame
     mu <- as.numeric(comp$inv_link_o(MM %*% theta[index_o]))
-    
+
     # compute pi term per number treated in group per subject
     pi_term_a <- vapply(alpha, function(x) { # vapply so it can work over a vector of alphas
       dbinom(comp$X_o_ex$sum_a, comp$N - 1, x)}, 
       numeric(nrow(comp$X_o_ex)))
-    
+
     # mulitply mu_ij by the pi term rowwise
     # apply over columns so that it can work over a vector of alphas
     piXmu_a <- apply(pi_term_a, 2, function(col) col * mu)
@@ -94,7 +95,6 @@ otc_estimator <- function(data, models, randomization, ...){
     # }) 
     # 
     # otc_ce  <- apply(part1, 2, sum)/N
-    
     x <- c(otc_ce0, otc_ce1)
     names(x) <- paste0(rep(c('otc_Y0_', 'otc_Y1_'), each = length(alpha)), alpha)
     x
@@ -159,7 +159,57 @@ dbr_estimator <- function(data, models, randomization, hajek, ...){
   }
 }
 
+#------------------------------------------------------------------------------#
+#' Makes WLS (DBR based) estimator for group-level data
+#' @export
+#------------------------------------------------------------------------------#
 
+wls_dbr_estimator <- function(data, models, randomization, ...){
+  
+  ## component data
+  comp <- extract_model_info(model = models, data = data, 'wls_dbr')
+
+  MM_0   <- model.matrix(comp$rhs_o_wls_0, data = comp$X_o_wls_0)
+  MM_1   <- model.matrix(comp$rhs_o_wls_1, data = comp$X_o_wls_1)
+  index_t <- 1:comp$p_t
+  index_o_0 <- (comp$p_t + 1):(comp$p_t + comp$p_o_0)
+  index_o_1 <- (comp$p_t + comp$p_o_0 + 1):(comp$p_t + comp$p_o_0 + comp$p_o_1)
+  
+  N    <- comp$N
+  function(theta, alpha){
+    
+    ### OTC estimator ###
+    # compute fitted value for expanded data.frame
+    mu_0 <- as.numeric(comp$inv_link_o(MM_0 %*% theta[index_o_0]))
+    mu_1 <- as.numeric(comp$inv_link_o(MM_1 %*% theta[index_o_1]))
+    mu <- c(rbind(mu_0, mu_1))
+    mu <- rep(mu, each =  N)
+  
+    # compute pi term per number treated in group per subject
+    pi_term_a <- vapply(alpha, function(x) { # vapply so it can work over a vector of alphas
+      dbinom(comp$X_o_ex$sum_a, comp$N - 1, x)}, 
+      numeric(nrow(comp$X_o_ex)))
+    # mulitply mu_ij by the pi term rowwise
+    # apply over columns so that it can work over a vector of alphas
+    piXmu_a <- apply(pi_term_a, 2, function(col) col * mu)
+    
+    # sum within levels of A (0:1) WITHIN subjects
+    piXmu_a <- apply(piXmu_a, 2, function(col) { 
+      tapply(col, paste(comp$X_o_ex$A, comp$X_o_ex$ID), sum) 
+    }) 
+    
+    # sum within levels of A (0:1) ACROSS subjects
+    wls_dbr_ce_a <- apply(piXmu_a , 2, function(col) {
+      tapply(col, rep(0:1, each = N), sum)} )
+    
+    wls_dbr_ce0 <- wls_dbr_ce_a[1, ]/N
+    wls_dbr_ce1 <- wls_dbr_ce_a[2, ]/N
+
+    x <- c(wls_dbr_ce0, wls_dbr_ce1) # OTC CE0 and CE1 are the same
+    names(x) <- paste0(rep(c('wls_dbr_Y0_', 'wls_dbr_Y1_'), each = length(alpha)), alpha)
+    x
+  }
+}
 #------------------------------------------------------------------------------#
 #' IP weight estimator
 #' @export
