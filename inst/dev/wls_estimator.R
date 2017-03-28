@@ -17,7 +17,7 @@ mods <- make_models(model_args = list(
     data = exdt)
 
 
-wls_preprocess <- function(data, models, randomization = 1){
+wls_preprocess <- function(data, models, randomization = 1, a, alpha){
   splitdt <- split(data, data$group)
   lapply(splitdt, function(x){
     comp <- extract_model_info(model = models, data = x, 'dbr')
@@ -34,70 +34,40 @@ wls_preprocess <- function(data, models, randomization = 1){
       A = comp$A, 
       X = comp$X_t, 
       randomization = randomization)
-    W_WLS <- function(a, alpha){
-      IPW <- ip_fun(unlist(lme4::getME(models$t_model, c('beta', 'theta'))), alpha = alpha)
-      IPW <- IPW / dbinom(A, 1, prob = alpha)
-      (A == a) * t(L) * IPW
-    }
+    
+    IPW <- ip_fun(unlist(lme4::getME(models$t_model, c('beta', 'theta'))), alpha = alpha)
+    (A == a) * IPW / dbinom(A, 1, prob = alpha)
 
-  })
+  }) %>%
+    unlist()
+
 }
 
-wls_preprocess(exdt, mods)[[1]](1, .5)
+mods$wls_model_0 <- glm(Y ~ fA + Z1_abs + Z2 + Z1_abs*Z2, 
+                        family  = gaussian(link = 'identity'),
+                        weights = wls_preprocess(exdt, mods, a = 0, alpha= .6),
+                        data    = exdt)
+mods$wls_model_1 <- glm(Y ~ fA + Z1_abs + Z2 + Z1_abs*Z2, 
+                      family  = gaussian(link = 'identity'),
+                      weights = wls_preprocess(exdt, mods, a = 1, alpha= .6),
+                      data    = exdt)
 
+theta_oo <- unlist(lme4::getME(mods$t_model, c('beta', 'theta')))
 
+fun1 <- wls_dbr_estimator(data = exdt %>% filter(group == 1),
+                  models = mods,
+                  randomization = 1)
 
+fun1 <- otc_estimator(data = exdt %>% filter(group == 1),
+                          models = mods,
+                          randomization = 1)
 
-dbr_wls_estimator <- function(data, models, randomization, hajek, ...){
-  
-  ## component data
-  comp <- extract_model_info(model = models, data = data, 'dbr')
-  Y <- comp$Y
-  A <- comp$A
-  N <- comp$N
-  ## components for IPW part
-  ip_fun <- weight_estimator(
-    A = comp$A, 
-    X = comp$X_t, 
-    randomization = randomization)
-  ## components for OTC part
-  dr_term1_fun <- make_dr_term1(
-    comp$X_o, 
-    inv_link = comp$inv_link_o)
-  
-  dr_term2_fun <- otc_estimator(data, models, randomization)
-  
-  ## indices
-  p_t <- comp$p_t
-  p_o <- comp$p_o
-  p   <- p_t + p_o
-  index_t <- 1:p_t
-  index_o <- (p_t + 1):(p_t + p_o)
-  
-  function(theta, alpha){
-    
-    fY      <- dr_term1_fun(theta[index_o])
-    ipw     <- ip_fun(theta[index_t], alpha)
-    Ybar0   <- sum((A == 0) * (Y - fY) )
-    Ybar1   <- sum((A == 1) * (Y - fY) )
-    term1_0 <- Ybar0 * ipw / (1 - alpha)
-    term1_1 <- Ybar1 * ipw / alpha
-    term2   <- dr_term2_fun(theta[index_o], alpha)
-    
-    dbr_0 <- (term1_0 + term2[1:length(alpha)]*N)
-    dbr_1 <- (term1_1 + term2[(length(alpha) + 1):length(term2)]*N)
-    
-    if(hajek){
-      Nhat0 <- sum(A == 0) * ipw / (1 - alpha)
-      Nhat1 <- sum(A == 1) * ipw / alpha
-      out <- c(
-        ifelse(sum(A == 0) > 0, term1_0/Nhat0 + term2[1], 0),
-        ifelse(sum(A == 1) > 0, term1_1/Nhat1 + term2[2], 0))
-      names(out) <- paste0(rep(c('dbr_hjk_Y0_', 'dbr_hjk_Y1_'), each = length(alpha)), alpha)
-    } else {
-      out <- c(dbr_0/N, dbr_1/N)
-      names(out) <- paste0(rep(c('dbr_Y0_', 'dbr_Y1_'), each = length(alpha)), alpha)
-    }
-    out
-  }
-}
+fun1(c(theta_oo, coef(mods$wls_model_0), coef(mods$wls_model_1), 0, 0), alpha = .5)
+fun1(c(coef(mods$o_model), 0, 0), alpha = .5)
+
+fun_ee <- generic_eefun(
+  data = exdt %>% filter(group == 1),
+  models = mods,
+  estimator_type = 'wls_dbr',
+  randomization = 1)
+fun_ee(c(theta_oo, coef(mods$wls_model_0), coef(mods$wls_model_1), 0, 0), alpha = .5)
