@@ -10,7 +10,7 @@ generic_eefun <- function(data, models, randomization, estimator_type, hajek = F
   p <- comp$p
   
   ## Create estimating equation functions for nontarget parameters
-  if(estimator_type %in% c('ipw', 'dbr')){
+  if(estimator_type %in% c('ipw', 'dbr', 'wls_dbr')){
     score_fun_t <- geex::make_eefun(
       models$t_model, 
       data = data, 
@@ -32,7 +32,20 @@ generic_eefun <- function(data, models, randomization, estimator_type, hajek = F
       index_o <- 1:comp$p_o
     }
   }
-  
+ 
+  if(estimator_type == 'wls_dbr'){
+    score_fun_wls_0 <- geex::make_eefun(
+      models$wls_model_0, 
+      data = data)
+    score_fun_wls_1 <- geex::make_eefun(
+      models$wls_model_1, 
+      data = data)
+    
+    index_t <- 1:comp$p_t
+    index_o_0 <- (comp$p_t + 1):(comp$p_t + comp$p_o_0)
+    index_o_1 <- (comp$p_t + comp$p_o_0 + 1):(comp$p_t + comp$p_o_0 + comp$p_o_1)
+  }
+   
   ## Create estimating equation functions for target parameters
   estimatorFUN <- match.fun(paste0(estimator_type, '_estimator'))
   estimator <- estimatorFUN(
@@ -55,6 +68,11 @@ generic_eefun <- function(data, models, randomization, estimator_type, hajek = F
       scores <- score_fun_t(theta[index_t])
     } else if(estimator_type == 'otc'){
       scores <- score_fun_o(theta[index_o])
+    } else if(estimator_type == 'wls_dbr'){
+      scores_t <- score_fun_t(theta[index_t])
+      scores_wls_0 <- score_fun_wls_0(theta[index_o_0])
+      scores_wls_1 <- score_fun_wls_1(theta[index_o_1])
+      scores   <- c(scores_t, scores_wls_0, scores_wls_1)
     }
     
     ### Target parameters ###
