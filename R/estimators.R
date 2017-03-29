@@ -105,7 +105,7 @@ otc_estimator <- function(data, models, randomization, ...){
 #' @export
 #------------------------------------------------------------------------------#
 
-dbr_estimator <- function(data, models, randomization, hajek, ...){
+dbr_estimator <- function(data, models, randomization, hajek = FALSE, ...){
   
   ## component data
   comp <- extract_model_info(model = models, data = data, 'dbr')
@@ -160,17 +160,22 @@ dbr_estimator <- function(data, models, randomization, hajek, ...){
 }
 
 #------------------------------------------------------------------------------#
-#' Makes WLS (DBR based) estimator for group-level data
+#' Makes WLS andregression-on-propensity (DBR) estimators for group-level data
+#' (i.e.) regression based
 #' @export
 #------------------------------------------------------------------------------#
 
-wls_dbr_estimator <- function(data, models, randomization, ...){
+reg_dbr_estimator <- function(data, models, randomization, regression_type, ...){
   
   ## component data
-  comp <- extract_model_info(model = models, data = data, 'wls_dbr')
+  comp <- extract_model_info(
+    model = models, 
+    data = data, 
+    estimator_type = 'reg_dbr',
+    regression_type = regression_type)
 
-  MM_0   <- model.matrix(comp$rhs_o_wls_0, data = comp$X_o_wls_0)
-  MM_1   <- model.matrix(comp$rhs_o_wls_1, data = comp$X_o_wls_1)
+  MM_0   <- model.matrix(comp$rhs_o_reg_0, data = comp$X_o_reg_0)
+  MM_1   <- model.matrix(comp$rhs_o_reg_1, data = comp$X_o_reg_1)
   index_t <- 1:comp$p_t
   index_o_0 <- (comp$p_t + 1):(comp$p_t + comp$p_o_0)
   index_o_1 <- (comp$p_t + comp$p_o_0 + 1):(comp$p_t + comp$p_o_0 + comp$p_o_1)
@@ -199,14 +204,16 @@ wls_dbr_estimator <- function(data, models, randomization, ...){
     }) 
     
     # sum within levels of A (0:1) ACROSS subjects
-    wls_dbr_ce_a <- apply(piXmu_a , 2, function(col) {
+    dbr2_ce_a <- apply(piXmu_a , 2, function(col) {
       tapply(col, rep(0:1, each = N), sum)} )
     
-    wls_dbr_ce0 <- wls_dbr_ce_a[1, ]/N
-    wls_dbr_ce1 <- wls_dbr_ce_a[2, ]/N
+    dbr2_ce0 <- dbr2_ce_a[1, ]/N
+    dbr2_ce1 <- dbr2_ce_a[2, ]/N
 
-    x <- c(wls_dbr_ce0, wls_dbr_ce1) # OTC CE0 and CE1 are the same
-    names(x) <- paste0(rep(c('wls_dbr_Y0_', 'wls_dbr_Y1_'), each = length(alpha)), alpha)
+    x <- c(dbr2_ce0, dbr2_ce1) # OTC CE0 and CE1 are the same
+    label0 <- paste0(regression_type, '_dbr_Y0_')
+    label1 <- paste0(regression_type, '_dbr_Y1_')
+    names(x) <- paste0(rep(c(label0, label1), each = length(alpha)), alpha)
     x
   }
 }
@@ -235,6 +242,37 @@ weight_estimator <- function(A, X, lower = -Inf, upper = Inf, randomization = 1)
   # memoise::memoise(f)
 }
 
+#------------------------------------------------------------------------------#
+#' Create vector of IP weights
+#' @export
+#------------------------------------------------------------------------------#
+
+
+make_ipw_vector <- function(fulldata, models, group, randomization = 1, a, alpha){
+  splitdt <- split(fulldata, fulldata[[group]])
+  
+  lapply(splitdt, function(x){
+    comp <- extract_model_info(model = models, data = x, 'dbr')
+    Y   <- comp$Y
+    A   <- comp$A
+    N   <- comp$N
+    X_o <- comp$X_o
+    f_o <- terms.formula(comp$rhs_o)
+    L   <- model.matrix(drop.terms(f_o, attr(f_o, 'term.labels') == 'A'),
+                        data = x)
+    
+    ## components for IPW part
+    ip_fun <- weight_estimator(
+      A = comp$A, 
+      X = comp$X_t, 
+      randomization = randomization)
+    
+    IPW <- ip_fun(unlist(lme4::getME(models$t_model, c('beta', 'theta'))), alpha = alpha)
+    IPW / dbinom(A, 1, prob = alpha)
+    
+  }) %>%
+    unlist()
+}
 
 #------------------------------------------------------------------------------#
 #' Makes the first term in the DR estimator
