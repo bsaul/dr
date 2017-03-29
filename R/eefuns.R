@@ -3,14 +3,22 @@
 #' @export
 #------------------------------------------------------------------------------#
 
-generic_eefun <- function(data, models, randomization, estimator_type, hajek = FALSE){
+generic_eefun <- function(
+  data, 
+  models, 
+  randomization, 
+  estimator_type, 
+  regression_type = 'none',
+  hajek = FALSE){
   
-  comp <- extract_model_info(models = models, data = data, estimator_type)
+  comp <- extract_model_info(models = models, data = data, 
+                             estimator_type = estimator_type,
+                             regression_type = regression_type)
   A <- comp$A
   p <- comp$p
   
   ## Create estimating equation functions for nontarget parameters
-  if(estimator_type %in% c('ipw', 'dbr', 'wls_dbr')){
+  if(estimator_type %in% c('ipw', 'dbr', 'reg_dbr')){
     score_fun_t <- geex::make_eefun(
       models$t_model, 
       data = data, 
@@ -33,13 +41,23 @@ generic_eefun <- function(data, models, randomization, estimator_type, hajek = F
     }
   }
  
-  if(estimator_type == 'wls_dbr'){
-    score_fun_wls_0 <- geex::make_eefun(
-      models$wls_model_0, 
-      data = data)
-    score_fun_wls_1 <- geex::make_eefun(
-      models$wls_model_1, 
-      data = data)
+  if(estimator_type == 'reg_dbr'){
+    if(regression_type == 'wls'){
+      score_fun_reg_0 <- geex::make_eefun(
+        models$wls_model_0, 
+        data = data)
+      score_fun_reg_1 <- geex::make_eefun(
+        models$wls_model_1, 
+        data = data)
+    } else if(regression_type == 'pcov'){
+      score_fun_reg_0 <- geex::make_eefun(
+        models$pcov_model_0, 
+        data = data)
+      score_fun_reg_1 <- geex::make_eefun(
+        models$pcov_model_1, 
+        data = data)
+    }
+
     
     index_t <- 1:comp$p_t
     index_o_0 <- (comp$p_t + 1):(comp$p_t + comp$p_o_0)
@@ -52,7 +70,8 @@ generic_eefun <- function(data, models, randomization, estimator_type, hajek = F
     data          = data, 
     models        = models,
     randomization = randomization,
-    hajek         = hajek
+    hajek         = hajek,
+    regression_type = regression_type
   )
   
   ### PSI function ###
@@ -68,11 +87,11 @@ generic_eefun <- function(data, models, randomization, estimator_type, hajek = F
       scores <- score_fun_t(theta[index_t])
     } else if(estimator_type == 'otc'){
       scores <- score_fun_o(theta[index_o])
-    } else if(estimator_type == 'wls_dbr'){
+    } else if(estimator_type == 'reg_dbr'){
       scores_t <- score_fun_t(theta[index_t])
-      scores_wls_0 <- score_fun_wls_0(theta[index_o_0])
-      scores_wls_1 <- score_fun_wls_1(theta[index_o_1])
-      scores   <- c(scores_t, scores_wls_0, scores_wls_1)
+      scores_reg_0 <- score_fun_reg_0(theta[index_o_0])
+      scores_reg_1 <- score_fun_reg_1(theta[index_o_1])
+      scores   <- c(scores_t, scores_reg_0, scores_reg_1)
     }
     
     ### Target parameters ###
