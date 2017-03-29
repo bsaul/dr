@@ -108,20 +108,25 @@ make_models <- function(model_args, data)
 #' @export
 #------------------------------------------------------------------------------#
 
-extract_model_info <- function(models, data, estimator_type){
+extract_model_info <- function(models, data, estimator_type, regression_type = 'none'){
 
-  stopifnot(estimator_type %in% c('ipw', 'otc', 'dbr', 'wls_dbr'))
+  stopifnot(estimator_type %in% c('ipw', 'otc', 'dbr', 'reg_dbr'))
   t_model <- models$t_model
   stopifnot(class(t_model) == 'glmerMod') # currently designed to only work with merMod objects with random intercept
   o_model <- models$o_model
-  if(estimator_type == 'wls_dbr'){
-    wls_model_0 <- models$wls_model_0
-    wls_model_1 <- models$wls_model_1
+  if(estimator_type == 'reg_dbr' & regression_type == 'wls'){
+    model_0 <- models$wls_model_0
+    model_1 <- models$wls_model_1
+  }
+  
+  if(estimator_type == 'reg_dbr' & regression_type == 'pcov'){
+    model_0 <- models$pcov_model_0
+    model_1 <- models$pcov_model_1
   }
   
   ## component data
   out <- list()
-  if(estimator_type %in% c('ipw', 'dbr', 'wls_dbr')){
+  if(estimator_type %in% c('ipw', 'dbr', 'reg_dbr')){
     out$X_t <- geex::get_design_matrix(geex::get_fixed_formula(t_model), data = data)
     out$Y   <- geex::get_response(formula(o_model), data = data)
     out$A   <- geex::get_response(A ~ 1, data = data)
@@ -138,23 +143,23 @@ extract_model_info <- function(models, data, estimator_type){
     out$rhs_o  <- geex::get_fixed_formula(o_model)
     out$inv_link_o <- family(o_model)$linkinv
   } 
-  if (estimator_type == 'wls_dbr'){
-    out$X_o_wls_1 <- as.data.frame(geex::get_design_matrix(geex::get_fixed_formula(wls_model_1), data = data))
-    out$X_o_wls_0 <- as.data.frame(geex::get_design_matrix(geex::get_fixed_formula(wls_model_0), data = data))
-    out$rhs_o_0   <- update.formula(geex::get_fixed_formula(mods$wls_model_0), ~ A + .)
-    out$rhs_o_1   <- update.formula(geex::get_fixed_formula(mods$wls_model_1), ~ A + .)
+  if (estimator_type == 'reg_dbr'){
+    out$X_o_reg_1 <- as.data.frame(geex::get_design_matrix(geex::get_fixed_formula(model_1), data = data))
+    out$X_o_reg_0 <- as.data.frame(geex::get_design_matrix(geex::get_fixed_formula(model_0), data = data))
+    out$rhs_o_0   <- update.formula(geex::get_fixed_formula(model_0), ~ A + .)
+    out$rhs_o_1   <- update.formula(geex::get_fixed_formula(model_1), ~ A + .)
     out$X_o    <- as.data.frame(geex::get_design_matrix(out$rhs_o_0, data = data))
     out$X_o_ex <- expand_outcome_frame(out$X_o, out$rhs_o)
     out$N      <- nrow(out$X_o)
-    out$p_o_1  <- ncol(out$X_o_wls_1)
-    out$p_o_0  <- ncol(out$X_o_wls_0)
+    out$p_o_1  <- ncol(out$X_o_reg_1)
+    out$p_o_0  <- ncol(out$X_o_reg_0)
     out$p_o    <- out$p_o_1 + out$p_o_0
     out$p      <- out$p_t + out$p_o
-    out$rhs_o_wls_1  <- geex::get_fixed_formula(wls_model_1)
-    out$rhs_o_wls_0  <- geex::get_fixed_formula(wls_model_0)
-    out$inv_link_o <- family(wls_model_0)$linkinv
+    out$rhs_o_reg_1  <- geex::get_fixed_formula(model_1)
+    out$rhs_o_reg_0  <- geex::get_fixed_formula(model_0)
+    out$inv_link_o <- family(model_0)$linkinv
   } 
-  if (estimator_type %in% c('dbr', 'wls_dbr')){
+  if (estimator_type == 'dbr'){
     out$p <- out$p_t + out$p_o
   }
   out
