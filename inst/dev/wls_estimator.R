@@ -16,58 +16,78 @@ mods <- make_models(model_args = list(
              id      = quote(group)))),
     data = exdt)
 
+theta_tt <- unlist(lme4::getME(mods$t_model, c('beta', 'theta')))
+theta_oo <- coef(mods$o_model)
 
-wls_preprocess <- function(data, models, randomization = 1, a, alpha){
-  splitdt <- split(data, data$group)
-  lapply(splitdt, function(x){
-    comp <- extract_model_info(model = models, data = x, 'dbr')
-    Y   <- comp$Y
-    A   <- comp$A
-    N   <- comp$N
-    X_o <- comp$X_o
-    f_o <- terms.formula(comp$rhs_o)
-    L   <- model.matrix(drop.terms(f_o, attr(f_o, 'term.labels') == 'A'),
-                        data = x)
+fun0 <- dbr_estimator(
+  data = exdt %>% filter(group == 1),
+  models = mods,
+  randomization = 1)
 
-    ## components for IPW part
-    ip_fun <- weight_estimator(
-      A = comp$A, 
-      X = comp$X_t, 
-      randomization = randomization)
-    
-    IPW <- ip_fun(unlist(lme4::getME(models$t_model, c('beta', 'theta'))), alpha = alpha)
-    (A == a) * IPW / dbinom(A, 1, prob = alpha)
+fun0(c(theta_tt, theta_oo, 0, 0), alpha = .5)
 
-  }) %>%
-    unlist()
-
-}
+fun_ee0 <- generic_eefun(
+  data = exdt %>% filter(group == 1),
+  models = mods,
+  estimator_type = 'dbr',
+  randomization = 1)
+fun_ee0(c(theta_tt, theta_oo, 0, 0), alpha = .5)
 
 mods$wls_model_0 <- glm(Y ~ fA + Z1_abs + Z2 + Z1_abs*Z2, 
                         family  = gaussian(link = 'identity'),
-                        weights = wls_preprocess(exdt, mods, a = 0, alpha= .6),
+                        weights = (exdt$A == 0) * make_ipw_vector(exdt, mods, 'group', a = 0, alpha= .5),
                         data    = exdt)
 mods$wls_model_1 <- glm(Y ~ fA + Z1_abs + Z2 + Z1_abs*Z2, 
                       family  = gaussian(link = 'identity'),
-                      weights = wls_preprocess(exdt, mods, a = 1, alpha= .6),
+                      weights = (exdt$A == 1) * make_ipw_vector(exdt, mods, 'group', a = 1, alpha= .5),
                       data    = exdt)
 
-theta_oo <- unlist(lme4::getME(mods$t_model, c('beta', 'theta')))
-
-fun1 <- wls_dbr_estimator(data = exdt %>% filter(group == 1),
-                  models = mods,
-                  randomization = 1)
-
-fun1 <- otc_estimator(data = exdt %>% filter(group == 1),
-                          models = mods,
-                          randomization = 1)
-
-fun1(c(theta_oo, coef(mods$wls_model_0), coef(mods$wls_model_1), 0, 0), alpha = .5)
-fun1(c(coef(mods$o_model), 0, 0), alpha = .5)
-
-fun_ee <- generic_eefun(
+fun1 <- reg_dbr_estimator(
   data = exdt %>% filter(group == 1),
   models = mods,
-  estimator_type = 'wls_dbr',
+  regression_type = 'wls',
   randomization = 1)
-fun_ee(c(theta_oo, coef(mods$wls_model_0), coef(mods$wls_model_1), 0, 0), alpha = .5)
+
+fun1(c(theta_tt, coef(mods$wls_model_0), coef(mods$wls_model_1), 0, 0), alpha = .5)
+
+
+fun_ee1 <- generic_eefun(
+  data = exdt %>% filter(group == 1),
+  models = mods,
+  estimator_type = 'reg_dbr',
+  randomization = 1,
+  regression_type = 'wls')
+fun_ee1(c(theta_tt, coef(mods$wls_model_0), coef(mods$wls_model_1), 0, 0), alpha = .5)
+
+####  regression-on-propensity
+
+exdt <- exdt %>%
+  mutate_(
+    ipw0 =~ make_ipw_vector(exdt, mods, 'group', a = 0, alpha= .5),
+    ipw1 =~ make_ipw_vector(exdt, mods, 'group', a = 1, alpha= .5)
+  )
+
+mods$pcov_model_0 <- glm(Y ~ fA + Z1_abs + Z2 + Z1_abs*Z2 + ipw0, 
+                        family  = gaussian(link = 'identity'),
+                        weights = (exdt$A == 0) * 1,
+                        data    = exdt)
+mods$pcov_model_1 <- glm(Y ~ fA + Z1_abs + Z2 + Z1_abs*Z2 + ipw1, 
+                        family  = gaussian(link = 'identity'),
+                        weights = (exdt$A == 1) * 1,
+                        data    = exdt)
+fun2 <-  reg_dbr_estimator(
+  data = exdt %>% filter(group == 1),
+  models = mods,
+  regression_type = 'pcov',
+  randomization = 1)
+
+fun2(c(theta_tt, coef(mods$pcov_model_0), coef(mods$pcov_model_1), 0, 0), alpha = .5)
+
+fun_ee2 <- generic_eefun(
+  data = exdt %>% filter(group == 1),
+  models = mods,
+  estimator_type = 'reg_dbr',
+  randomization = 1,
+  regression_type = 'pcov')
+fun_ee2(c(theta_tt, coef(mods$pcov_model_0), coef(mods$pcov_model_1), 0, 0), alpha = .5)
+
