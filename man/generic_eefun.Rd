@@ -4,7 +4,8 @@
 \alias{generic_eefun}
 \title{Estimating equations for IPW, OTC, and DBR estimators}
 \usage{
-generic_eefun(data, models, randomization, estimator_type, hajek = FALSE)
+generic_eefun(data, models, randomization, estimator_type,
+  estimator_label = NULL, hajek = FALSE)
 }
 \description{
 Estimating equations for IPW, OTC, and DBR estimators

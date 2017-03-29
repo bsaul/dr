@@ -4,7 +4,7 @@
 \alias{extract_model_info}
 \title{Extract relevant information from list of models}
 \usage{
-extract_model_info(models, data, estimator_type)
+extract_model_info(models, data, estimator_type, regression_type = NULL)
 }
 \description{
 Extract relevant information from list of models
