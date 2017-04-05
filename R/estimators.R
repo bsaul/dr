@@ -173,44 +173,66 @@ reg_dbr_estimator <- function(data, models, randomization, regression_type, ...)
     data = data, 
     estimator_type = 'reg_dbr',
     regression_type = regression_type)
-
-  MM_0   <- model.matrix(comp$rhs_o_reg_0, data = comp$X_o_reg_0)
-  MM_1   <- model.matrix(comp$rhs_o_reg_1, data = comp$X_o_reg_1)
+  
+  X_ex_0 <- comp$X_o_ex %>% filter(A == 0)
+  X_ex_1 <- comp$X_o_ex %>% filter(A == 1)
+  if(regression_type == 'wls'){
+    MM_0   <- model.matrix(comp$rhs_o_reg_0, data = X_ex_0)
+    MM_1   <- model.matrix(comp$rhs_o_reg_1, data = X_ex_1)
+  } else if(regression_type == 'pcov'){
+    MM_0   <- model.matrix(comp$rhs_o_reg_0, data = comp$X_o_reg_0)
+    MM_1   <- model.matrix(comp$rhs_o_reg_1, data = comp$X_o_reg_1)
+  }
+  
   index_t <- 1:comp$p_t
   index_o_0 <- (comp$p_t + 1):(comp$p_t + comp$p_o_0)
   index_o_1 <- (comp$p_t + comp$p_o_0 + 1):(comp$p_t + comp$p_o_0 + comp$p_o_1)
   
   N    <- comp$N
   function(theta, alpha){
+    stopifnot(length(alpha) == 1)
     
-    ### OTC estimator ###
-    # compute fitted value for expanded data.frame
-    mu_0 <- as.numeric(comp$inv_link_o(MM_0 %*% theta[index_o_0]))
-    mu_1 <- as.numeric(comp$inv_link_o(MM_1 %*% theta[index_o_1]))
-    mu <- c(rbind(mu_0, mu_1))
-    mu <- rep(mu, each =  N)
-  
-    # compute pi term per number treated in group per subject
-    pi_term_a <- vapply(alpha, function(x) { # vapply so it can work over a vector of alphas
-      dbinom(comp$X_o_ex$sum_a, comp$N - 1, x)}, 
-      numeric(nrow(comp$X_o_ex)))
-    # mulitply mu_ij by the pi term rowwise
-    # apply over columns so that it can work over a vector of alphas
-    piXmu_a <- apply(pi_term_a, 2, function(col) col * mu)
-    
-    # sum within levels of A (0:1) WITHIN subjects
-    piXmu_a <- apply(piXmu_a, 2, function(col) { 
-      tapply(col, paste(comp$X_o_ex$A, comp$X_o_ex$ID), sum) 
-    }) 
-    
-    # sum within levels of A (0:1) ACROSS subjects
-    dbr2_ce_a <- apply(piXmu_a , 2, function(col) {
-      tapply(col, rep(0:1, each = N), sum)} )
-    
-    dbr2_ce0 <- dbr2_ce_a[1, ]/N
-    dbr2_ce1 <- dbr2_ce_a[2, ]/N
+    ### Regression-based DRR estimator ###
 
-    x <- c(dbr2_ce0, dbr2_ce1) # OTC CE0 and CE1 are the same
+    if(regression_type == 'wls'){
+      # compute fitted value for expanded data.frame
+      mu_0 <- as.numeric(comp$inv_link_o(MM_0 %*% theta[index_o_0]))
+      mu_1 <- as.numeric(comp$inv_link_o(MM_1 %*% theta[index_o_1]))
+      # compute pi term per number treated in group per subject
+      pi_term_a <- dbinom(X_ex_0$sum_a, comp$N - 1, alpha)
+  
+      # mulitply mu_ij by the pi term rowwise
+      piXmu_a_0 <- mu_0 * pi_term_a
+      piXmu_a_1 <- mu_1 * pi_term_a
+  
+      # sum within levels of A (0:1) WITHIN subjects
+      piXmu_a <- tapply(
+        X     = c(piXmu_a_0, piXmu_a_1), 
+        INDEX = paste(rep(0:1, each = nrow(X_ex_0)), c(X_ex_0$ID, X_ex_1$ID)), 
+        FUN   = sum)
+      
+      # sum within levels of A (0:1) ACROSS subjects
+      dbr2_ce_a <- tapply(
+        X     = piXmu_a, 
+        INDEX = rep(0:1, each = N), 
+        FUN   = sum)
+      
+      dbr2_ce0 <- dbr2_ce_a[1]/N
+      dbr2_ce1 <- dbr2_ce_a[2]/N
+    } else if(regression_type == 'pcov'){
+      A_tilde <- rbinom(N, 1, prob = alpha)
+      fA <- sum(A_tilde)/N
+      MM_0[, 'fA'] <- fA
+      MM_1[, 'fA'] <- fA
+      mu_0 <- as.numeric(comp$inv_link_o(MM_0 %*% theta[index_o_0]))
+      mu_1 <- as.numeric(comp$inv_link_o(MM_1 %*% theta[index_o_1]))
+      
+      dbr2_ce0 <- sum(mu_0)/N
+      dbr2_ce1 <- sum(mu_1)/N
+    }
+
+
+    x <- c(dbr2_ce0, dbr2_ce1) 
     label0 <- paste0(regression_type, '_dbr_Y0_')
     label1 <- paste0(regression_type, '_dbr_Y1_')
     names(x) <- paste0(rep(c(label0, label1), each = length(alpha)), alpha)
@@ -263,12 +285,12 @@ make_ipw_vector <- function(fulldata, models, group, randomization = 1, a, alpha
     
     ## components for IPW part
     ip_fun <- weight_estimator(
-      A = comp$A, 
+      A = rep(a, N), 
       X = comp$X_t, 
       randomization = randomization)
     
     IPW <- ip_fun(unlist(lme4::getME(models$t_model, c('beta', 'theta'))), alpha = alpha)
-    IPW / dbinom(A, 1, prob = alpha)
+    IPW / dbinom(rep(a, N), 1, prob = alpha)
     
   }) %>%
     unlist()
