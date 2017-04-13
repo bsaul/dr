@@ -5,7 +5,7 @@
 \title{Estimating equations for IPW, OTC, and DBR estimators}
 \usage{
 generic_eefun(data, models, randomization, estimator_type,
-  estimator_label = NULL, hajek = FALSE)
+  regression_type = "none", hajek = FALSE)
 }
 \description{
 Estimating equations for IPW, OTC, and DBR estimators

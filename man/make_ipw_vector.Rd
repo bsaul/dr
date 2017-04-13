@@ -4,7 +4,7 @@
 \alias{make_ipw_vector}
 \title{Create vector of IP weights}
 \usage{
-make_ipw_vector(fulldata, models, group, randomization = 1, a, alpha)
+make_ipw_vector(fulldata, models, group, randomization = 1, alpha)
 }
 \description{
 Create vector of IP weights
