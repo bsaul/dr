@@ -270,7 +270,7 @@ weight_estimator <- function(A, X, lower = -Inf, upper = Inf, randomization = 1)
 #------------------------------------------------------------------------------#
 
 
-make_ipw_vector <- function(fulldata, models, group, randomization = 1, a, alpha){
+make_ipw_vector <- function(fulldata, models, group, randomization = 1, alpha){
   splitdt <- split(fulldata, fulldata[[group]])
   
   lapply(splitdt, function(x){
@@ -285,12 +285,12 @@ make_ipw_vector <- function(fulldata, models, group, randomization = 1, a, alpha
     
     ## components for IPW part
     ip_fun <- weight_estimator(
-      A = rep(a, N), 
+      A = A, 
       X = comp$X_t, 
       randomization = randomization)
     
     IPW <- ip_fun(unlist(lme4::getME(models$t_model, c('beta', 'theta'))), alpha = alpha)
-    IPW / dbinom(rep(a, N), 1, prob = alpha)
+    IPW / dbinom(A, 1, prob = alpha)
     
   }) %>%
     unlist()
