@@ -74,16 +74,18 @@ tcor_omis_margs <- tcor_ocor_margs
 tcor_omis_margs$o_model$formula      <- Y ~ A + fA + Z1 + Z2
 tcor_omis_margs$wls_model_0$formula  <- Y ~ fA + Z1 + Z2
 tcor_omis_margs$wls_model_1$formula  <- Y ~ fA + Z1 + Z2
-tcor_omis_margs$pcov_model_0$formula <- Y ~ fA + Z1 + Z2 + ipw0
-tcor_omis_margs$pcov_model_1$formula <- Y ~ fA + Z1 + Z2 + ipw1
+# tcor_omis_margs$pcov_model_0$formula <- Y ~ 1
+# tcor_omis_margs$pcov_model_1$formula <- Y ~ 1
+tcor_omis_margs$pcov_model_0$formula <- Y ~ fA + Z1 + Z2 + ipw
+tcor_omis_margs$pcov_model_1$formula <- Y ~ fA + Z1 + Z2 + ipw
 
 tmis_omis_margs <- tcor_ocor_margs
 tmis_omis_margs$t_model$formula      <- A ~ Z1 + Z2 + (1|group)
 tmis_omis_margs$o_model$formula      <- Y ~ A + fA + Z1 + Z2
 tmis_omis_margs$wls_model_0$formula  <- Y ~ fA + Z1 + Z2
 tmis_omis_margs$wls_model_1$formula  <- Y ~ fA + Z1 + Z2
-tmis_omis_margs$pcov_model_0$formula <- Y ~ fA + Z1 + Z2 + ipw0
-tmis_omis_margs$pcov_model_1$formula <- Y ~ fA + Z1 + Z2 + ipw1
+tmis_omis_margs$pcov_model_0$formula <- Y ~ fA + Z1 + Z2 + ipw
+tmis_omis_margs$pcov_model_1$formula <- Y ~ fA + Z1 + Z2 + ipw
 
 margs <- list(
   tcor_ocor = tcor_ocor_margs,

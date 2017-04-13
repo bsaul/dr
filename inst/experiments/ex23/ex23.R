@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------#
-#   Title: Development e23
+#   Title: Development ex23
 #  Author: B. Saul
 #    Date: 2017-02-25
 # Purpose: Understand and pinpoint bias observed in previous experiments
@@ -8,9 +8,9 @@ library(dplyr)
 library(dr)
 library(doMC)
 registerDoMC(4)
-source('inst/experiments/e23/e23_funs.R')
-source('inst/experiments/e23/e23_settings.R')
-nsims <- 350
+source('inst/experiments/ex23/ex23_funs.R')
+source('inst/experiments/ex23/ex23_settings.R')
+nsims <- 1
 which_scenarios <- 9
 
 ## Compute estimates ##
@@ -39,5 +39,5 @@ results <- estimates  %>%
             ese       = sd(estimate * !failed, na.rm = TRUE))
 
 save(estimates, scenarios, oracle, results, nsims, margs,
-     file = 'inst/experiments/e23/e23_results.rda')
+     file = 'inst/experiments/ex23/ex23_results.rda')
 

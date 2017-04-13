@@ -11,30 +11,29 @@ est_sim <- function(simdt, allocations, model_args, compute_se, ...){
 
   hold <- lapply(allocations, function(allocation){
     
-    ipw0 <- make_ipw_vector(fulldata = simdt, models = m, group = 'group', 
-                            a = 0, alpha = allocation)
-    ipw1 <- make_ipw_vector(fulldata = simdt, models = m, group = 'group', 
-                            a = 1, alpha = allocation)
+    ipw <- make_ipw_vector(fulldata = simdt, models = m, group = 'group', 
+                           alpha = allocation)
     A <- simdt$A
     # Add IP weights to dataset
     simdt <- simdt %>%
       mutate_(
-        ipw0 =~ ipw0,
-        ipw1 =~ ipw1
+        ipw0 =~ ipw * (A == 0),
+        ipw1 =~ ipw * (A == 1)
       )
-    
+    ipw0 <- simdt$ipw0
+    ipw1 <- simdt$ipw1
     #print(model_args)
     # Fit regression-based models
     wls_model_0 <- try(glm(
       formula = model_args[['wls_model_0']][['formula']], 
       family  = model_args[['wls_model_0']][['options']][['family']],
-      weights = (A == 0) * ipw0,
+      weights = ipw0,
       data    = simdt))
 
     wls_model_1 <- try(glm(
       formula = model_args[['wls_model_1']][['formula']], 
       family  = model_args[['wls_model_1']][['options']][['family']],
-      weights = (A == 1) * ipw1,
+      weights = ipw1,
       data    = simdt))
    
     # in some data generating situations the glm model fails to converge,
@@ -134,8 +133,8 @@ est_sim <- function(simdt, allocations, model_args, compute_se, ...){
          })
          
          target <- target %>% list_matrix() %>% apply(., 2, mean)
-         # print(eargs$type)
-         # print(target)
+         print(eargs$type)
+         print(target)
          ## END Point estimates ##
          ## BEGIN VCOV estimates ##
          if(compute_se){
@@ -161,6 +160,7 @@ est_sim <- function(simdt, allocations, model_args, compute_se, ...){
 
          ## END VCOV estimates ##
        } else if(eargs$skipit == TRUE){
+         n_allocation <- length(allocation)
          target <- NA
          std_error <- NA
        }
