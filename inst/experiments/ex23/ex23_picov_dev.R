@@ -1,6 +1,7 @@
 library(lme4)
+library(dplyr)
 
-#### Generate data #### 
+#### Generate simulated datasets #### 
 sim_data <- gen_sim(
   nsims = 10,
   m = 100, #  of groups
@@ -10,7 +11,8 @@ sim_data <- gen_sim(
   beta  = c(2.0, 2.0, 1.0, -1.5, 2.0, -3.0))
 
 
-#### Compute Yhat(0, 0.5) per simulation ####
+#### Compute Yhat(0, ALPHA) per simulation ####
+ALPHA <- 0.5
 
 lapply(sim_data, function(dt){
   
@@ -27,11 +29,12 @@ lapply(sim_data, function(dt){
   lapply(split(dt, f = dt$group), function(x){
     ip_fun <- weight_estimator(
       A = x$A, 
-      X = model.matrix(get_fixed_formula(t_model), data = x), 
-      randomization = 1)
+      X = model.matrix(get_fixed_formula(t_model), data = x))
     
-    IPW <- ip_fun(theta_t, alpha = 0.5)
-    IPW / dbinom(x$A, 1, prob = 0.5)
+    IPW <- ip_fun(theta_t, alpha = ALPHA)
+    # IPW has pi = prod_i^n, so to remove contribution of jth subject,
+    # divide by alpha^A_{ij} (1 - alpha)^(1 - A_ij)
+    IPW / dbinom(x$A, 1, prob = ALPHA) 
   }) %>% unlist -> 
     dt$ipw
   
@@ -46,13 +49,19 @@ lapply(sim_data, function(dt){
   N <- nrow(dt)
   
   ## Method 1 ##
-  k <- 10 # number of resample for A_tilde
+  k <- 10 # number of resamples for A_tilde
   out <- numeric(k)
   for(i in 1:k){
-    A_tilde     <- rbinom(N, 1, prob = .5)
+    # Sample an A_tilde for each k
+    A_tilde     <- rbinom(N, 1, prob = ALPHA)
+    
+    # Replace A with A_tilde
     new_data    <- dt
     new_data$A  <- A_tilde
-
+    
+    # With A_tilde, compute pi/f PER subject after setting 
+    # a given subject's a_ij to 0. This needs to happen within a group,
+    # hence split the data by group, then do the computations.
     split_data <- split(new_data, f = new_data$group)
 
     m_i <- lapply(split_data, function(grp_data){
@@ -64,10 +73,11 @@ lapply(sim_data, function(dt){
 
         ip_fun <- weight_estimator(
           A = A_new,
-          X = model.matrix(get_fixed_formula(t_model), data = grp_data),
-          randomization = 1)
+          X = model.matrix(get_fixed_formula(t_model), data = grp_data))
 
-        grp_data$ipw[j] <- ip_fun(theta_t, .5)
+        grp_data$ipw[j] <- ip_fun(theta_t, ALPHA)/(1 - ALPHA)
+        # IPW has pi = prod_i^n, so to remove contribution of jth subject,
+        # divide by (1 - alpha)^(1 - 0)
 
         j_data    <- grp_data[j, ]
         j_data$fA <- mean(A_new)
@@ -83,59 +93,12 @@ lapply(sim_data, function(dt){
   }
 
   mean(out)
-  #   ## Method 2 ## - testing
-  #   resamples <- 100
-  # 
-  #   split_dt <- split(dt, f = dt$group)
-  #   lapply(split_dt, function(x){
-  #     ni   <- nrow(x)
-  # 
-  #     # Generate a_i vectors #
-  #     aMAT <- matrix(0, nrow = ni, ncol = resamples)
-  #     for(j in 1:resamples){
-  #       # how many get treated?
-  #       ntreated <- sample(0:ni, 1)
-  #       # which ones get treated
-  #       index_treated <- sample(0:ni, ntreated)
-  #       # replace 0 with 1 in aMAT for those treated
-  #       
-  #       aMAT[index_treated, j] <- 1
-  #     }
-  #     
-  #     # Compute m_i
-  #     mpi <- numeric(ni)
-  #     # compute ip weight and m_ij PER subject
-  #     for(j in 1:nrow(x)){
-  #       
-  #       apply(aMAT, 2, function(a_i){
-  #           newdata <- x
-  #           newdata$fA <- mean(a_i)
-  #           a_i[j] <- 0 # set A_ij to a_ij = 0
-  #         
-  #         ip_fun <- weight_estimator(
-  #           A = a_i, 
-  #           X = model.matrix(geex::get_fixed_formula(t_model), data = x), 
-  #           randomization = 1)
-  #         
-  #         newdata$ipw[j] <- ip_fun(theta_t, .5)
-  #         
-  #         j_data    <- x[j, ]
-  #         j_data$fA <- mean(a_i)
-  #         m_ij <- predict(picovm, newdata = j_data)
-  #         pi <- prod(.5^a_i * (1 - .5)^(1 - a_i))/(1 - .5)
-  #         # print(m_ij)
-  #         m_ij * pi
-  #       }) -> hold
-  #       mpi[j] <- (sum(hold) * 2^ni / resamples)
-  #     }
-  #     mean(mpi)
-  #   }) -> grp_estimator
-  # 
-  # mean(unlist(grp_estimator))
     
 })  -> results
 
 results <- unlist(results)
 results
 
-truth <- 1.106346 # Y(0, 0.5)
+truth <- 1.106346 # Y(0, ALPHA)
+
+mean(results - truth)
