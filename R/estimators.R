@@ -261,7 +261,6 @@ weight_estimator <- function(A, X, lower = -Inf, upper = Inf, randomization = 1)
       } }, numeric(1))
   }
   f
-  # memoise::memoise(f)
 }
 
 #------------------------------------------------------------------------------#
