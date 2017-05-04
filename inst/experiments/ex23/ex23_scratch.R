@@ -68,8 +68,8 @@ dbr_estimator_test <- function(data, models, randomization, ...){
           X = comp$X_t, 
           randomization = randomization)
         
-        ipw0[j] <- ip_fun_0(theta_t, alpha)
-        ipw1[j] <- ip_fun_1(theta_t, alpha)
+        ipw0[j] <- ip_fun_0(theta_t, alpha)/(1 - alpha)
+        ipw1[j] <- ip_fun_1(theta_t, alpha)/alpha
       }
       
       # print(cbind(ipw0, ipw1))
@@ -233,9 +233,9 @@ if(is(pcov_model_0, 'try-error') | is(pcov_model_1, 'try-error')){
 # theta_pcov_0[1] <- 1
 # theta_pcov_1[1] <- 1
 # theta_pcov_0[2:5] <- 0
-# theta_pcov_1[2:5] <- 0
-theta_pcov_0[5] <- 0
-theta_pcov_1[5] <- 0
+# # theta_pcov_1[2:5] <- 0
+# theta_pcov_0[5] <- 0
+# theta_pcov_1[5] <- 0
 test_split <- split(test, f = test$group)
 theta <- c(theta_t, theta_pcov_0, theta_pcov_1)
 rm(A)
