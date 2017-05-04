@@ -2,13 +2,13 @@
 % Please edit documentation in R/estimators.R
 \name{reg_dbr_estimator}
 \alias{reg_dbr_estimator}
-\title{Makes WLS andregression-on-propensity (DBR) estimators for group-level data
+\title{Makes WLS (DBR) estimators for group-level data
 (i.e.) regression based}
 \usage{
 reg_dbr_estimator(data, models, randomization, regression_type, ...)
 }
 \description{
-Makes WLS andregression-on-propensity (DBR) estimators for group-level data
+Makes WLS (DBR) estimators for group-level data
 (i.e.) regression based
 }
 

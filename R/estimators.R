@@ -160,12 +160,12 @@ dbr_estimator <- function(data, models, randomization, hajek = FALSE, ...){
 }
 
 #------------------------------------------------------------------------------#
-#' Makes WLS andregression-on-propensity (DBR) estimators for group-level data
+#' Makes WLS (DBR) estimators for group-level data
 #' (i.e.) regression based
 #' @export
 #------------------------------------------------------------------------------#
 
-reg_dbr_estimator <- function(data, models, randomization, regression_type, ...){
+wls_dbr_estimator <- function(data, models, randomization, regression_type, ...){
   
   ## component data
   comp <- extract_model_info(
@@ -239,6 +239,107 @@ reg_dbr_estimator <- function(data, models, randomization, regression_type, ...)
     x
   }
 }
+
+#------------------------------------------------------------------------------#
+#' Makes regression with propensity (DBR) estimators for group-level data
+#' (i.e.) regression based
+#' @export
+#------------------------------------------------------------------------------#
+
+pcov_dbr_estimator <- function(data, models, randomization, ...){
+  
+  ## component data
+  comp <- extract_model_info(
+    model = models, 
+    data = data, 
+    estimator_type = 'reg_dbr',
+    regression_type = 'pcov')
+  
+  A  <- comp$A
+  N  <- comp$N
+  lnkinv <- comp$inv_link_o
+  
+  ip_fun <- weight_estimator(
+    A = comp$A, 
+    X = comp$X_t, 
+    randomization = randomization)
+  
+  dr_term1_fun_0 <- make_dr_term1(
+    comp$X_o_reg_0, 
+    inv_link = comp$inv_link_o)
+  
+  dr_term1_fun_1 <- make_dr_term1(
+    comp$X_o_reg_1, 
+    inv_link = comp$inv_link_o)
+  
+  MM_0   <- model.matrix(comp$rhs_o_reg_0, data = comp$X_o_reg_0)
+  MM_1   <- model.matrix(comp$rhs_o_reg_1, data = comp$X_o_reg_1)
+  
+  index_t   <- 1:comp$p_t
+  index_o_0 <- (comp$p_t + 1):(comp$p_t + comp$p_o_0)
+  index_o_1 <- (comp$p_t + comp$p_o_0 + 1):(comp$p_t + comp$p_o_0 + comp$p_o_1)
+  
+  function(theta, alpha){
+    stopifnot(length(alpha) == 1)
+    
+    ## Method 1 ##
+    K <- 10 # number of resamples for A_tilde
+    out_0 <- out_1 <- numeric(K)
+    for(k in 1:K){
+      # Sample an A_tilde for each k
+      A_tilde     <- rbinom(N, 1, prob = alpha)
+      
+      # Replace A with A_tilde
+      new_data    <- data
+      new_data$A  <- A_tilde
+      
+      # With A_tilde, compute pi/f PER subject after setting 
+      # a given subject's a_ij to 0.
+      
+      hold_0 <- hold_1 <- numeric(nrow(data))
+      # compute ip weight and m_ij PER subject
+      for(j in 1:nrow(data)){
+        dt_0 <- dt_1 <- data
+        A_new_0 <- A_new_1 <- data$A
+        A_new_0[j] <- 0 # set A_ij to a_ij = 0
+        A_new_1[j] <- 1 # set A_ij to a_ij = 1
+        
+        ip_fun_0 <- weight_estimator(
+          A = A_new_0,
+          X = comp$X_t)
+        
+        ip_fun_1 <- weight_estimator(
+          A = A_new_1,
+          X = comp$X_t)
+        
+        # IPW has pi = prod_i^n, so to remove contribution of jth subject,
+        # divide by (1 - alpha)^(1 - 0)
+        dt_0$ipw[j] <- ip_fun_0(theta[index_t], alpha)/( 1 - alpha)
+        dt_1$ipw[j] <- ip_fun_1(theta[index_t], alpha)/(alpha)
+        
+        
+        j_data_0    <- dt_0[j, , drop = FALSE]
+        j_data_0$fA <- mean(A_new_0)
+        j_data_1    <- dt_1[j, , drop = FALSE]
+        j_data_1$fA <- mean(A_new_1)
+        j_row_0     <- model.matrix(comp$rhs_o_reg_0, data = j_data_0)
+        j_row_1     <- model.matrix(comp$rhs_o_reg_1, data = j_data_1)
+        
+        m_ij_0    <- lnkinv(j_row_0 %*% theta[index_o_0])
+        m_ij_1    <- lnkinv(j_row_1 %*% theta[index_o_1])
+        hold_0[j] <- m_ij_0
+        hold_1[j] <- m_ij_1
+      }
+      
+      out_0[k] <- mean(hold_0)
+      out_1[k] <- mean(hold_1)
+    }
+    
+    x <- c(mean(out_0), mean(out_1))
+    x
+  }
+}
+
 #------------------------------------------------------------------------------#
 #' IP weight estimator
 #' @export
