@@ -3,7 +3,7 @@ library(dplyr)
 
 #### Generate simulated datasets #### 
 sim_data <- gen_sim(
-  nsims = 10,
+  nsims = 2,
   m = 100, #  of groups
   ni = 30, #  of subject per group  
   gamma = c(0.1, 0.2, 0.0, 0.2),
@@ -13,6 +13,7 @@ sim_data <- gen_sim(
 
 #### Compute Yhat(0, ALPHA) per simulation ####
 ALPHA <- 0.5
+little_a <- 1
 
 lapply(sim_data, function(dt){
   
@@ -43,7 +44,7 @@ lapply(sim_data, function(dt){
     Y ~ fA + Z1 + Z2 + ipw, # incorrect
     # Y ~ fA + Z1_abs + Z2 + Z1_abs*Z2 + ipw, # correct,
     data = dt, 
-    weights = (dt$A == 0) * 1,
+    weights = (dt$A == little_a) * 1,
     family = gaussian(link = 'identity'))
   
   N <- nrow(dt)
@@ -69,13 +70,13 @@ lapply(sim_data, function(dt){
       # compute ip weight and m_ij PER subject
       for(j in 1:nrow(grp_data)){
         A_new    <- grp_data$A
-        A_new[j] <- 0 # set A_ij to a_ij = 0
+        A_new[j] <- little_a # set A_ij to a_ij = 0
 
         ip_fun <- weight_estimator(
           A = A_new,
           X = model.matrix(get_fixed_formula(t_model), data = grp_data))
 
-        grp_data$ipw[j] <- ip_fun(theta_t, ALPHA)/(1 - ALPHA)
+        grp_data$ipw[j] <- ip_fun(theta_t, ALPHA)/( (ALPHA^little_a) * ((1 - ALPHA)^(1 - little_a)) )
         # IPW has pi = prod_i^n, so to remove contribution of jth subject,
         # divide by (1 - alpha)^(1 - 0)
 
@@ -99,6 +100,6 @@ lapply(sim_data, function(dt){
 results <- unlist(results)
 results
 
-truth <- 1.106346 # Y(0, ALPHA)
+truth <- 3.106346^little_a * (1.106346^(1 - little_a)) # Y(0, ALPHA)
 
 mean(results - truth)
