@@ -15,6 +15,7 @@ which_scenarios <- 9
 
 ## Compute estimates ##
 allocations <- c(0.1, 0.5, 0.9)
+allocations <- 0.5
 estimates <- do_scenarios(nsims, which_scenarios, allocations, 
                           all_model_args = margs,
                           compute_se = FALSE,

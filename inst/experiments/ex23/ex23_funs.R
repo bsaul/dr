@@ -11,12 +11,13 @@ est_sim <- function(simdt, allocations, model_args, compute_se, ...){
 
   hold <- lapply(allocations, function(allocation){
     
-    ipw <- make_ipw_vector(fulldata = simdt, models = m, group = 'group', 
+    ipwv <- make_ipw_vector(fulldata = simdt, models = m, group = 'group', 
                            alpha = allocation)
     A <- simdt$A
     # Add IP weights to dataset
     simdt <- simdt %>%
       mutate_(
+        ipw  =~ ipwv,
         ipw0 =~ ipw * (A == 0),
         ipw1 =~ ipw * (A == 1)
       )
@@ -47,8 +48,8 @@ est_sim <- function(simdt, allocations, model_args, compute_se, ...){
       skipwls <- FALSE
       m$wls_model_0 <- wls_model_0
       m$wls_model_1 <- wls_model_1
-      theta_wls_0 <- coef(m$wls_model_0)
-      theta_wls_1 <- coef(m$wls_model_1)
+      theta_wls_0   <- coef(m$wls_model_0)
+      theta_wls_1   <- coef(m$wls_model_1)
     }
     
     pcov_model_0 <- try(glm(
@@ -71,8 +72,8 @@ est_sim <- function(simdt, allocations, model_args, compute_se, ...){
       skippcov <- FALSE
       m$pcov_model_0  <- pcov_model_0
       m$pcov_model_1  <- pcov_model_1
-      theta_pcov_0 <- coef(m$pcov_model_0)
-      theta_pcov_1 <- coef(m$pcov_model_1)
+      theta_pcov_0    <- coef(m$pcov_model_0)
+      theta_pcov_1    <- coef(m$pcov_model_1)
     }
 
     ## TEMPORARY!! (hopefully) ##
@@ -92,13 +93,13 @@ est_sim <- function(simdt, allocations, model_args, compute_se, ...){
                  theta     = c(theta_t, theta_o),
                  regtyp    = 'none',
                  skipit    = FALSE),
-      wls_dbr = list(type  = 'reg_dbr',
+      wls_dbr = list(type  = 'wls_dbr',
                      theta = if(skipwls == TRUE) {NA} else {
                                     c(theta_t, theta_wls_0, theta_wls_1)},
                      hajek = FALSE,
                      regtyp    = 'wls',
                      skipit    = skipwls),
-      pcov_dbr = list(type  = 'reg_dbr',
+      pcov_dbr = list(type  = 'pcov_dbr',
                      theta = if(skippcov == TRUE) {NA} else {
                                     c(theta_t, theta_pcov_0, theta_pcov_1)},
                      hajek = FALSE,
