@@ -134,8 +134,8 @@ est_sim <- function(simdt, allocations, model_args, compute_se, ...){
          })
          
          target <- target %>% list_matrix() %>% apply(., 2, mean)
-         print(eargs$type)
-         print(target)
+         # print(eargs$type)
+         # print(target)
          ## END Point estimates ##
          ## BEGIN VCOV estimates ##
          if(compute_se){

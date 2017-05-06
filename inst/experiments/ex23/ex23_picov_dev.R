@@ -11,7 +11,7 @@ sim_data <- gen_sim(
   beta  = c(2.0, 2.0, 1.0, -1.5, 2.0, -3.0))
 
 
-#### Compute Yhat(0, ALPHA) per simulation ####
+#### Compute Yhat(little_a, ALPHA) per simulation ####
 ALPHA <- 0.5
 little_a <- 1
 
@@ -78,7 +78,7 @@ lapply(sim_data, function(dt){
 
         grp_data$ipw[j] <- ip_fun(theta_t, ALPHA)/( (ALPHA^little_a) * ((1 - ALPHA)^(1 - little_a)) )
         # IPW has pi = prod_i^n, so to remove contribution of jth subject,
-        # divide by (1 - alpha)^(1 - 0)
+        # divide by ALPHA^little_a * (1 - ALPHA)^(1 - little_a0)
 
         j_data    <- grp_data[j, ]
         j_data$fA <- mean(A_new)

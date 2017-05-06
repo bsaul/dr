@@ -50,10 +50,10 @@ plot_one <- function(.sid, .model_spec, .method, .alpha, .a, .axis_labels = FALS
   } else if(.method == 'dbr'){
     color <- "#359721"
     method_lab <- 'DBR'
-  } else if(.method =='reg_dbrwls'){
+  } else if(.method =='wls_dbrwls'){
     color <- "#94d3bc"
     method_lab <- 'DBR\n(WLS)'
-  } else if(.method =='reg_dbrpcov'){
+  } else if(.method =='pcov_dbrpcov'){
     color <- "#0b5313"
     method_lab <- 'DBR\n(PCov)'
   }
@@ -166,7 +166,7 @@ plot_one <- function(.sid, .model_spec, .method, .alpha, .a, .axis_labels = FALS
 ### Level 2: 
 plot_two <- function(.sid, .model_spec, .method_labels, .alpha, .a){
   arrangeGrob(
-    grobs = lapply(c('ipw', 'otc', 'dbr', 'reg_dbrwls', 'reg_dbrpcov'), function(x) {
+    grobs = lapply(c('ipw', 'otc', 'dbr', 'wls_dbrwls', 'pcov_dbrpcov'), function(x) {
       plot_one(.sid         = .sid, 
                .model_spec  = .model_spec, 
                .method      = x, 

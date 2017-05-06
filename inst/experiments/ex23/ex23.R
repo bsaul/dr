@@ -10,12 +10,12 @@ library(doMC)
 registerDoMC(4)
 source('inst/experiments/ex23/ex23_funs.R')
 source('inst/experiments/ex23/ex23_settings.R')
-nsims <- 1
+nsims <- 100
 which_scenarios <- 9
 
 ## Compute estimates ##
 allocations <- c(0.1, 0.5, 0.9)
-allocations <- 0.5
+# allocations <- 0.5
 estimates <- do_scenarios(nsims, which_scenarios, allocations, 
                           all_model_args = margs,
                           compute_se = FALSE,
