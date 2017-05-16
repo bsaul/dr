@@ -165,7 +165,7 @@ dbr_estimator <- function(data, models, randomization, hajek = FALSE, ...){
 #' @export
 #------------------------------------------------------------------------------#
 
-wls_dbr_estimator <- function(data, models, randomization, regression_type, ...){
+wls_dbr_estimator <- function(data, models, randomization, regression_type = 'wls', ...){
   
   ## component data
   comp <- extract_model_info(
@@ -176,14 +176,9 @@ wls_dbr_estimator <- function(data, models, randomization, regression_type, ...)
   
   X_ex_0 <- comp$X_o_ex %>% filter(A == 0)
   X_ex_1 <- comp$X_o_ex %>% filter(A == 1)
-  if(regression_type == 'wls'){
-    MM_0   <- model.matrix(comp$rhs_o_reg_0, data = X_ex_0)
-    MM_1   <- model.matrix(comp$rhs_o_reg_1, data = X_ex_1)
-  } else if(regression_type == 'pcov'){
-    MM_0   <- model.matrix(comp$rhs_o_reg_0, data = comp$X_o_reg_0)
-    MM_1   <- model.matrix(comp$rhs_o_reg_1, data = comp$X_o_reg_1)
-  }
-  
+  MM_0   <- model.matrix(comp$rhs_o_reg_0, data = X_ex_0)
+  MM_1   <- model.matrix(comp$rhs_o_reg_1, data = X_ex_1)
+
   index_t <- 1:comp$p_t
   index_o_0 <- (comp$p_t + 1):(comp$p_t + comp$p_o_0)
   index_o_1 <- (comp$p_t + comp$p_o_0 + 1):(comp$p_t + comp$p_o_0 + comp$p_o_1)
@@ -194,43 +189,30 @@ wls_dbr_estimator <- function(data, models, randomization, regression_type, ...)
     
     ### Regression-based DRR estimator ###
 
-    if(regression_type == 'wls'){
-      # compute fitted value for expanded data.frame
-      mu_0 <- as.numeric(comp$inv_link_o(MM_0 %*% theta[index_o_0]))
-      mu_1 <- as.numeric(comp$inv_link_o(MM_1 %*% theta[index_o_1]))
-      # compute pi term per number treated in group per subject
-      pi_term_a <- dbinom(X_ex_0$sum_a, comp$N - 1, alpha)
-  
-      # mulitply mu_ij by the pi term rowwise
-      piXmu_a_0 <- mu_0 * pi_term_a
-      piXmu_a_1 <- mu_1 * pi_term_a
-  
-      # sum within levels of A (0:1) WITHIN subjects
-      piXmu_a <- tapply(
-        X     = c(piXmu_a_0, piXmu_a_1), 
-        INDEX = paste(rep(0:1, each = nrow(X_ex_0)), c(X_ex_0$ID, X_ex_1$ID)), 
-        FUN   = sum)
-      
-      # sum within levels of A (0:1) ACROSS subjects
-      dbr2_ce_a <- tapply(
-        X     = piXmu_a, 
-        INDEX = rep(0:1, each = N), 
-        FUN   = sum)
-      
-      dbr2_ce0 <- dbr2_ce_a[1]/N
-      dbr2_ce1 <- dbr2_ce_a[2]/N
-    } else if(regression_type == 'pcov'){
-      A_tilde <- rbinom(N, 1, prob = alpha)
-      fA <- sum(A_tilde)/N
-      MM_0[, 'fA'] <- fA
-      MM_1[, 'fA'] <- fA
-      mu_0 <- as.numeric(comp$inv_link_o(MM_0 %*% theta[index_o_0]))
-      mu_1 <- as.numeric(comp$inv_link_o(MM_1 %*% theta[index_o_1]))
-      
-      dbr2_ce0 <- sum(mu_0)/N
-      dbr2_ce1 <- sum(mu_1)/N
-    }
+    # compute fitted value for expanded data.frame
+    mu_0 <- as.numeric(comp$inv_link_o(MM_0 %*% theta[index_o_0]))
+    mu_1 <- as.numeric(comp$inv_link_o(MM_1 %*% theta[index_o_1]))
+    # compute pi term per number treated in group per subject
+    pi_term_a <- dbinom(X_ex_0$sum_a, comp$N - 1, alpha)
 
+    # mulitply mu_ij by the pi term rowwise
+    piXmu_a_0 <- mu_0 * pi_term_a
+    piXmu_a_1 <- mu_1 * pi_term_a
+
+    # sum within levels of A (0:1) WITHIN subjects
+    piXmu_a <- tapply(
+      X     = c(piXmu_a_0, piXmu_a_1), 
+      INDEX = paste(rep(0:1, each = nrow(X_ex_0)), c(X_ex_0$ID, X_ex_1$ID)), 
+      FUN   = sum)
+    
+    # sum within levels of A (0:1) ACROSS subjects
+    dbr2_ce_a <- tapply(
+      X     = piXmu_a, 
+      INDEX = rep(0:1, each = N), 
+      FUN   = sum)
+    
+    dbr2_ce0 <- dbr2_ce_a[1]/N
+    dbr2_ce1 <- dbr2_ce_a[2]/N
 
     x <- c(dbr2_ce0, dbr2_ce1) 
     label0 <- paste0(regression_type, '_dbr_Y0_')
