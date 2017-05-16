@@ -12,61 +12,67 @@ estimate_cholera_parms_step0 <- function(data, model_args, allocations, ...){
   m <- make_models(model_args = model_args[c('t_model', 'o_model')], data = data)
 }
 
-estimate_cholera_parms_step1 <- function(data, models, model_args, allocation, ...){
+estimate_cholera_parms_step1 <- function(data, models, model_args, allocations, ...){
   
   ## Grab component model parameter estimates
   theta_t <- unlist(lme4::getME(models$t_model, c('beta', 'theta')))
   theta_o <- coef(models$o_model)
   # Make estimator args
-  
-  ipwv <- make_ipw_vector(fulldata = data, 
-                          models  = models, 
-                          group   = 'group', 
-                          alpha   = allocation)
-  
-  # Add IP weights to dataset
-  data <- data %>%
-    mutate_(
-      ipw  =~ ipwv,
-      ipw0 =~ ipw * (A == 0),
-      ipw1 =~ ipw * (A == 1)
-    )
-  ipw0 <- data[['ipw0']]
-  ipw1 <- data[['ipw1']]
-  A <- data[['A']]
-  
   m <- models
-  # Fit regression-based models
-  m$wls_model_0 <- try(glm(
-    formula = model_args[['wls_model_0']][['formula']],
-    family  = model_args[['wls_model_0']][['options']][['family']],
-    weights = ipw0,
-    data    = data))
-
-  m$wls_model_1 <- try(glm(
-    formula = model_args[['wls_model_1']][['formula']],
-    family  = model_args[['wls_model_1']][['options']][['family']],
-    weights = ipw1,
-    data    = data))
-
-  theta_wls_0   <- coef(m$wls_model_0)
-  theta_wls_1   <- coef(m$wls_model_1)
   
-  # m$pcov_model_0 <- try(glm(
-  #   formula = model_args[['pcov_model_0']][['formula']], 
-  #   family  = model_args[['pcov_model_0']][['options']][['family']],
-  #   weights = (A == 0) * 1,
-  #   data    = data))
-  # 
-  # m$pcov_model_1 <- try(glm(
-  #   formula = model_args[['pcov_model_1']][['formula']], 
-  #   family  = model_args[['pcov_model_1']][['options']][['family']],
-  #   weights = (A == 1) * 1,
-  #   data    = data))
-  # 
-  # theta_pcov_0 <- coef(m$pcov_model_0)
-  # theta_pcov_1 <- coef(m$pcov_model_1)
+  m$wls_model_0 <- m$wls_model_1 <- m$pcov_model_0 <- m$pcov_model_1 <-  vector('list', length(allocations))
+  names(m$wls_model_0) <-names(m$wls_model_1) <- names(m$pcov_model_0) <- names(m$pcov_model_1) <- allocations
   
+  hold <- lapply(seq_along(allocations), function(k){
+    ipwv <- make_ipw_vector(fulldata = data, 
+                            models  = models, 
+                            group   = 'group', 
+                            alpha   = allocations[k])
+    
+    # Add IP weights to dataset
+    data <- data %>%
+      mutate_(
+        ipw  =~ ipwv,
+        ipw0 =~ ipw * (A == 0),
+        ipw1 =~ ipw * (A == 1)
+      )
+    ipw0 <- data[['ipw0']]
+    ipw1 <- data[['ipw1']]
+    A <- data[['A']]
+    
+    # Fit regression-based models
+    m$wls_model_0[[k]] <<- try(glm(
+      formula = model_args[['wls_model_0']][['formula']],
+      family  = model_args[['wls_model_0']][['options']][['family']],
+      weights = ipw0,
+      data    = data))
+    
+    m$wls_model_1[[k]] <<- try(glm(
+      formula = model_args[['wls_model_1']][['formula']],
+      family  = model_args[['wls_model_1']][['options']][['family']],
+      weights = ipw1,
+      data    = data))
+    # 
+    # m$pcov_model_0[[k]] <<- try(glm(
+    #   formula = model_args[['pcov_model_0']][['formula']],
+    #   family  = model_args[['pcov_model_0']][['options']][['family']],
+    #   weights = (A == 0) * 1,
+    #   data    = data))
+    # 
+    # m$pcov_model_1[[k]] <<- try(glm(
+    #   formula = model_args[['pcov_model_1']][['formula']],
+    #   family  = model_args[['pcov_model_1']][['options']][['family']],
+    #   weights = (A == 1) * 1,
+    #   data    = data))
+    
+  })
+  
+
+  theta_wls <- lapply(seq_along(allocations), function(k){
+    c(theta_t, coef(m$wls_model_0[[k]]), coef(m$wls_model_0[[k]]))
+  })
+  
+
   estimator_args <- list(
     ipw = list(type      = 'ipw',
                hajek     = FALSE,
@@ -83,21 +89,21 @@ estimate_cholera_parms_step1 <- function(data, models, model_args, allocation, .
                theta     = c(theta_t, theta_o),
                regtyp    = 'none',
                skipit    = FALSE),
-    wls_dbr = list(type  = 'wls_dbr',
-                   theta =  c(theta_t, theta_wls_0, theta_wls_1),
-                   hajek = FALSE,
-                   regtyp    = 'wls',
-                   skipit    = FALSE)
-    # ,
-    # pcov_dbr = list(type  = 'pcov_dbr',
-    #                 theta = c(theta_t, theta_pcov_0, theta_pcov_1),
-    #                 hajek = FALSE,
-    #                 regtyp    = 'pcov',
-    #                 skipit    = TRUE)
+    wls_dbr = list(type    = 'wls_dbr',
+                   theta   =  theta_wls,
+                   hajek   = FALSE,
+                   regtyp  = 'wls',
+                   skipit  = FALSE)
+    # pcov_dbr = list(type   = 'pcov_dbr',
+    #                 theta  = c(theta_t, theta_pcov_0, theta_pcov_1),
+    #                 hajek  = FALSE,
+    #                 regtyp = 'pcov',
+    #                 skipit = TRUE)
   )
   
-  list(estimator_args = estimator_args,
-       models         = m)
+  list(
+     estimator_args = estimator_args,
+     models         = m)
 }
 
 
