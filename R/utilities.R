@@ -115,8 +115,9 @@ extract_model_info <- function(models, data, estimator_type, regression_type = '
   stopifnot(class(t_model) == 'glmerMod') # currently designed to only work with merMod objects with random intercept
   o_model <- models$o_model
   if(estimator_type == 'reg_dbr' & regression_type == 'wls'){
-    model_0 <- models$wls_model_0
-    model_1 <- models$wls_model_1
+    ## for wls the only thing that changes is coefficients (and weight), so just use first model object
+    model_0 <- models$wls_model_0[[1]]
+    model_1 <- models$wls_model_1[[1]]
   }
   
   if(estimator_type == 'reg_dbr' & regression_type == 'pcov'){
@@ -143,7 +144,7 @@ extract_model_info <- function(models, data, estimator_type, regression_type = '
     out$rhs_o  <- geex::get_fixed_formula(o_model)
     out$inv_link_o <- family(o_model)$linkinv
   } 
-  if (estimator_type == 'reg_dbr'){
+  if (estimator_type == 'reg_dbr' & regression_type == 'wls'){
     out$X_o_reg_1 <- as.data.frame(geex::get_design_matrix(geex::get_fixed_formula(model_1), data = data))
     out$X_o_reg_0 <- as.data.frame(geex::get_design_matrix(geex::get_fixed_formula(model_0), data = data))
     out$rhs_o_0   <- update.formula(geex::get_fixed_formula(model_0), ~ A + .)
@@ -153,11 +154,14 @@ extract_model_info <- function(models, data, estimator_type, regression_type = '
     out$N      <- nrow(out$X_o)
     out$p_o_1  <- ncol(out$X_o_reg_1)
     out$p_o_0  <- ncol(out$X_o_reg_0)
-    out$p_o    <- out$p_o_1 + out$p_o_0
+    out$p_o    <- out$p_o_0 + out$p_o_1 
     out$p      <- out$p_t + out$p_o
     out$rhs_o_reg_1  <- geex::get_fixed_formula(model_1)
     out$rhs_o_reg_0  <- geex::get_fixed_formula(model_0)
     out$inv_link_o <- family(model_0)$linkinv
+  } 
+  if (estimator_type == 'reg_dbr' & regression_type == 'pcov'){
+    stop('pcov needs work')
   } 
   if (estimator_type == 'dbr'){
     out$p <- out$p_t + out$p_o
