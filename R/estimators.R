@@ -179,42 +179,47 @@ wls_dbr_estimator <- function(data, models, randomization, regression_type = 'wl
   MM_0   <- model.matrix(comp$rhs_o_reg_0, data = X_ex_0)
   MM_1   <- model.matrix(comp$rhs_o_reg_1, data = X_ex_1)
 
-  index_t <- 1:comp$p_t
-  index_o_0 <- (comp$p_t + 1):(comp$p_t + comp$p_o_0)
-  index_o_1 <- (comp$p_t + comp$p_o_0 + 1):(comp$p_t + comp$p_o_0 + comp$p_o_1)
-  
+  index_t   <- 1:comp$p_t
   N    <- comp$N
+  
   function(theta, alpha){
-    stopifnot(length(alpha) == 1)
-    
+    # stopifnot(length(alpha) == 1)
+    # theta should be ordere: theta_0_alpha1, theta_0_alpha2, ..., theta_1_alpha1, theta_1_alpha2, ... 
+    ce0 <- ce1 <- numeric(length(alpha))
+    index0 <- (comp$p_t + 1):(comp$p_t + comp$p_o_0)
+    index1 <- (comp$p_t + (length(alpha)*comp$p_o_0) + 1):(comp$p_t + (length(alpha)*comp$p_o_0) + comp$p_o_1)
     ### Regression-based DRR estimator ###
+    for(k in 1:length(alpha)){
+      index0 <- index0 + (comp$p_o_0 * (k - 1))
+      index1 <- index1 + (comp$p_o_1 * (k - 1))
+      # compute fitted value for expanded data.frame
+      mu_0 <- as.numeric(comp$inv_link_o(MM_0 %*% theta[index0]))
+      mu_1 <- as.numeric(comp$inv_link_o(MM_1 %*% theta[index1]))
+      # compute pi term per number treated in group per subject
+      pi_term_a <- dbinom(X_ex_0$sum_a, comp$N - 1, alpha)
+      
+      # mulitply mu_ij by the pi term rowwise
+      piXmu_a_0 <- mu_0 * pi_term_a
+      piXmu_a_1 <- mu_1 * pi_term_a
+      
+      # sum within levels of A (0:1) WITHIN subjects
+      piXmu_a <- tapply(
+        X     = c(piXmu_a_0, piXmu_a_1), 
+        INDEX = paste(rep(0:1, each = nrow(X_ex_0)), c(X_ex_0$ID, X_ex_1$ID)), 
+        FUN   = sum)
+      
+      # sum within levels of A (0:1) ACROSS subjects
+      dbr2_ce_a <- tapply(
+        X     = piXmu_a, 
+        INDEX = rep(0:1, each = N), 
+        FUN   = sum)
+      
+      ce0[k] <- dbr2_ce_a[1]/N
+      ce1[k] <- dbr2_ce_a[2]/N
+      
+    }
 
-    # compute fitted value for expanded data.frame
-    mu_0 <- as.numeric(comp$inv_link_o(MM_0 %*% theta[index_o_0]))
-    mu_1 <- as.numeric(comp$inv_link_o(MM_1 %*% theta[index_o_1]))
-    # compute pi term per number treated in group per subject
-    pi_term_a <- dbinom(X_ex_0$sum_a, comp$N - 1, alpha)
-
-    # mulitply mu_ij by the pi term rowwise
-    piXmu_a_0 <- mu_0 * pi_term_a
-    piXmu_a_1 <- mu_1 * pi_term_a
-
-    # sum within levels of A (0:1) WITHIN subjects
-    piXmu_a <- tapply(
-      X     = c(piXmu_a_0, piXmu_a_1), 
-      INDEX = paste(rep(0:1, each = nrow(X_ex_0)), c(X_ex_0$ID, X_ex_1$ID)), 
-      FUN   = sum)
-    
-    # sum within levels of A (0:1) ACROSS subjects
-    dbr2_ce_a <- tapply(
-      X     = piXmu_a, 
-      INDEX = rep(0:1, each = N), 
-      FUN   = sum)
-    
-    dbr2_ce0 <- dbr2_ce_a[1]/N
-    dbr2_ce1 <- dbr2_ce_a[2]/N
-
-    x <- c(dbr2_ce0, dbr2_ce1) 
+    x <- c(ce0, ce1) 
     label0 <- paste0(regression_type, '_dbr_Y0_')
     label1 <- paste0(regression_type, '_dbr_Y1_')
     names(x) <- paste0(rep(c(label0, label1), each = length(alpha)), alpha)
