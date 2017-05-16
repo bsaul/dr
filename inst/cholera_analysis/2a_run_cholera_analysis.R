@@ -12,7 +12,7 @@ registerDoMC(4)
 # library(geex)
 # alphas <- .45
 alphas <- lapply(seq(.3, .6, by = .02), function(x) sort(c(.4, x)))
-alphas <- c(.4, .6)
+# alphas <- c(.4, .6)
 
 load( pipe( 'ssh saulb@diamond.bios.unc.edu "cat /home/groups/projects/mhudgens/emch/data/R_data/emch_analysis_data.Rdata"' ))
 
@@ -20,8 +20,9 @@ choleradt <- analysis_c %>%
   group_by(group) %>%
   mutate(fA = mean(A)) %>%
   filter(n() < 1074) %>%
-  ungroup()  %>%
-  filter(group < 250)
+  ungroup() 
+# %>%
+#   filter(group < 100)
 
 
 analysis_model_args <- list(
@@ -60,17 +61,10 @@ models0 <- estimate_cholera_parms_step0(
   data        = choleradt,
   model_args  = analysis_model_args
 )
-temp <- estimate_cholera_parms_step1(data = choleradt, 
-                             models = models0,
-                             model_args = analysis_model_args, 
-                             allocations = alphas)
-temp$models$wls_model_1
-temp$estimator_args
-str(temp$models)
 
 # results <- estimate_cholera_parms_step2(
 #   data        = choleradt,
-#   allocations = alphas,
+#   allocations = list(alphas),
 #   models      = models0,
 #   model_args  = analysis_model_args,
 #   compute_se  = FALSE
