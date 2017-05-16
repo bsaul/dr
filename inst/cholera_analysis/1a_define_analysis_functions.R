@@ -66,12 +66,10 @@ estimate_cholera_parms_step1 <- function(data, models, model_args, allocations, 
     #   data    = data))
     
   })
-  
-
-  theta_wls <- lapply(seq_along(allocations), function(k){
-    c(theta_t, coef(m$wls_model_0[[k]]), coef(m$wls_model_0[[k]]))
-  })
-  
+ 
+  theta_wls <- c(theta_t,
+                 unlist(lapply(m$wls_model_0, coef)),
+                 unlist(lapply(m$wls_model_1, coef))) 
 
   estimator_args <- list(
     ipw = list(type      = 'ipw',
