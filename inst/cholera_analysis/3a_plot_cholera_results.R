@@ -7,6 +7,48 @@
 
 library(ggplot2)
 
+p0 <- ggplot(
+  data = cholera_results %>% filter(effect %in% c('Y0', 'Y1')),
+  aes(x = alpha2, 
+      y = estimate,
+      group = method,
+      linetype = method,
+      color = method)
+) + 
+  geom_hline(
+    yintercept = 0
+  ) +  
+  geom_ribbon(
+    aes(ymin = conf_low,
+        ymax = conf_high,
+        # alpha = method,
+        fill  = method),
+    alpha = .2,
+    size = .2
+  ) + 
+  geom_line() + 
+  scale_color_manual(
+    values = c('ipw' = "#658b83", 'otc' = "#a4044d", 'dbr'= "#359721", 'wls_dbr' = 'black')
+  ) +
+  scale_fill_manual(
+    values = c('ipw' = "#658b83", 'otc' = "#a4044d", 'dbr'= "#359721", 'wls_dbr' = 'black')
+  ) +
+  scale_x_continuous(
+    name = expression(alpha)
+  ) +
+  facet_wrap(
+    ~ effect, 
+    nrow = 1, 
+    labeller = labeller(
+      effect = c(Y0 = 'Y(0, alpha)',
+                 Y1 = 'Y(1, alpha)'))
+  ) + 
+  theme_light() +
+  theme(
+    # legend.position = c(.75, .25),
+    strip.text.x = element_text(color = 'black')
+  )
+p0
 
 p <- ggplot(
   data = cholera_results %>% filter(effect %in% c('de', 'ie', 'te')),
@@ -30,10 +72,10 @@ p <- ggplot(
   ) + 
   geom_line() + 
   scale_color_manual(
-    values = c('ipw' = "#658b83", 'otc' = "#a4044d", 'dbr'= "#359721")
+    values = c('ipw' = "#658b83", 'otc' = "#a4044d", 'dbr'= "#359721", 'wls_dbr' = 'black')
   ) +
   scale_fill_manual(
-    values = c('ipw' = "#658b83", 'otc' = "#a4044d", 'dbr'= "#359721")
+    values = c('ipw' = "#658b83", 'otc' = "#a4044d", 'dbr'= "#359721", 'wls_dbr' = 'black')
   ) +
   scale_x_continuous(
     name = expression(alpha)

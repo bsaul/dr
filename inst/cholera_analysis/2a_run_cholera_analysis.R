@@ -85,5 +85,5 @@ results <- lapply(seq_along(alphas), function(i){
   }
 })
 
-save(dr_results, file = paste0('inst/cholera_analysis/cholera_results_dr_', Sys.Date(),'.rda'))
+save(results, file = paste0('inst/cholera_analysis/cholera_results_dr_', Sys.Date(),'.rda'))
   
