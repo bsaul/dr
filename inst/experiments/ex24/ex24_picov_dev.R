@@ -1,9 +1,10 @@
 library(lme4)
 library(dplyr)
+library(dr)
 
 #### Generate simulated datasets #### 
 sim_data <- gen_sim(
-  nsims = 2,
+  nsims = 50,
   m = 100, #  of groups
   ni = 30, #  of subject per group  
   gamma = c(0.1, 0.2, 0.0, 0.2),
@@ -50,7 +51,7 @@ lapply(sim_data, function(dt){
   N <- nrow(dt)
   
   ## Method 1 ##
-  k <- 25 # number of resamples for A_tilde
+  k <- 1 # number of resamples for A_tilde
   out <- numeric(k)
   for(i in 1:k){
     # Sample an A_tilde for each k
@@ -72,10 +73,9 @@ lapply(sim_data, function(dt){
         A_new    <- grp_data$A
         A_new[j] <- little_a # set A_ij to a_ij = 0
         
-        ip_fun <- weight_estimator_picov(
+        ip_fun <- weight_estimator(
           A = A_new,
-          X = model.matrix(get_fixed_formula(t_model), data = grp_data),
-          b = grp_data$bhat)
+          X = model.matrix(get_fixed_formula(t_model), data = grp_data))
 
         grp_data$ipw[j] <- ip_fun(theta_t, ALPHA)/( (ALPHA^little_a) * ((1 - ALPHA)^(1 - little_a)) )
         # IPW has pi = prod_i^n, so to remove contribution of jth subject,
