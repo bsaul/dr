@@ -76,6 +76,7 @@ results <- lapply(seq_along(alphas), function(i){
     allocations = alphas[i],
     models      = models0,
     model_args  = analysis_model_args,
+    randomization  = 2/3,
     compute_se  = FALSE
   ))
   if(is(attempt, 'try-error')){

@@ -12,7 +12,7 @@ estimate_cholera_parms_step0 <- function(data, model_args, allocations, ...){
   m <- make_models(model_args = model_args[c('t_model', 'o_model')], data = data)
 }
 
-estimate_cholera_parms_step1 <- function(data, models, model_args, allocations, ...){
+estimate_cholera_parms_step1 <- function(data, models, model_args, allocations, randomization, ...){
   
   ## Grab component model parameter estimates
   theta_t <- unlist(lme4::getME(models$t_model, c('beta', 'theta')))
@@ -27,7 +27,8 @@ estimate_cholera_parms_step1 <- function(data, models, model_args, allocations, 
     ipwv <- make_ipw_vector(fulldata = data, 
                             models  = models, 
                             group   = 'group', 
-                            alpha   = allocations[k])
+                            alpha   = allocations[k],
+                            randomization = randomization)
     
     # Add IP weights to dataset
     data <- data %>%
@@ -105,14 +106,18 @@ estimate_cholera_parms_step1 <- function(data, models, model_args, allocations, 
 }
 
 
-estimate_cholera_parms_step2 <- function(data, allocations, models, model_args, compute_se = TRUE, ...){  
+estimate_cholera_parms_step2 <- function(data, allocations, models, model_args, randomization, compute_se = TRUE, ...){  
 
   geexList <- list(eeFUN = generic_eefun, splitdt = split(data, data$group))
   
   ## Estimate parameters for each allocation
   hold <- lapply(allocations, function(allocation){
     
-    temp <- estimate_cholera_parms_step1(data, models, model_args, allocation)
+    temp <- estimate_cholera_parms_step1(data          = data, 
+                                         models        = models, 
+                                         model_args    = model_args, 
+                                         allocations   = allocation, 
+                                         randomization = randomization)
     estimator_args <- temp$estimator_args
     m <- temp$models
     
@@ -131,7 +136,7 @@ estimate_cholera_parms_step2 <- function(data, allocations, models, model_args, 
           estimator <- make_estimator_fun(
             data          = grp_dt,
             models        = m,
-            randomization = 2/3,
+            randomization = randomization,
             hajek         = eargs$hajek,
             regression_type = eargs$regtyp)
           # Evaluate estimator function
@@ -150,7 +155,7 @@ estimate_cholera_parms_step2 <- function(data, allocations, models, model_args, 
             theta            = c(eargs$theta, target),
             numDeriv_options = list(method = 'simple'),
             models           = m,
-            randomization    = 2/3,
+            randomization    = randomization,
             estimator_type   = eargs$type,
             hajek            = eargs$hajek,
             regression_type  = eargs$regtyp)
