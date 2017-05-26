@@ -190,13 +190,16 @@ wls_dbr_estimator <- function(data, models, randomization, regression_type = 'wl
     index1 <- (comp$p_t + (length(alpha)*comp$p_o_0) + 1):(comp$p_t + (length(alpha)*comp$p_o_0) + comp$p_o_1)
     ### Regression-based DRR estimator ###
     for(k in 1:length(alpha)){
-      index0 <- index0 + (comp$p_o_0 * (k - 1))
-      index1 <- index1 + (comp$p_o_1 * (k - 1))
+      if(k > 1){
+        index0 <- index0 + comp$p_o_0
+        index1 <- index1 + comp$p_o_1
+      }
+
       # compute fitted value for expanded data.frame
       mu_0 <- as.numeric(comp$inv_link_o(MM_0 %*% theta[index0]))
       mu_1 <- as.numeric(comp$inv_link_o(MM_1 %*% theta[index1]))
       # compute pi term per number treated in group per subject
-      pi_term_a <- dbinom(X_ex_0$sum_a, comp$N - 1, alpha)
+      pi_term_a <- dbinom(X_ex_0$sum_a, comp$N - 1, alpha[k])
       
       # mulitply mu_ij by the pi term rowwise
       piXmu_a_0 <- mu_0 * pi_term_a
