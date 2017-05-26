@@ -5,7 +5,7 @@
 \title{Makes WLS (DBR) estimators for group-level data
 (i.e.) regression based}
 \usage{
-wls_dbr_estimator(data, models, randomization, regression_type, ...)
+wls_dbr_estimator(data, models, randomization, regression_type = "wls", ...)
 }
 \description{
 Makes WLS (DBR) estimators for group-level data
