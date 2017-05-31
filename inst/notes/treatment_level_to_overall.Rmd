@@ -1,0 +1,46 @@
+---
+title: "TBD"
+author: "Bradley Saul"
+date: "May 30, 2017"
+output: pdf_document
+---
+
+\[
+\pi(a_i; \alpha) = \prod_{j = 1}^{n_i} \alpha^{a_{ij}}(1 - \alpha)^{1 - a_{ij}}
+\]
+
+Note that:
+\[
+\pi(a_{i(-j)}; \alpha) =  \pi(a_i; \alpha)/(\alpha^{a_{ij}}(1 - \alpha)^{1 - a_{ij}})
+\]
+
+Now:
+
+\begin{align*}
+\bar{y}_i(\alpha) &= \sum_j \pi(a_i; \alpha) \bar{y}_{ij} \\
+&= \sum_j \left\{\pi(a_i; \alpha) [I(a_{ij} = 0)\bar{y}_{ij} + I(a_{ij} = 1)\bar{y}_{ij}] \right\} \\
+&= \sum_j \left\{ \left[  (1 - \alpha) \pi(a_{i(-j)}; \alpha) I(a_{ij} = 0)\bar{y}_{ij} + \alpha \pi(a_{i(-j)}; \alpha)  \bar{y}_{ij} \right] \right\} \\
+&= (1 - \alpha) \bar{y}_i(0, \alpha) + \alpha \bar{y}_i(1, \alpha) \\
+\end{align*}
+
+Then:
+
+\begin{align*}
+\overline{OE}(\alpha, \alpha') &= \bar{y}(\alpha) - \bar{y}(\alpha') \\
+&= (1 - \alpha) \bar{y}(0, \alpha) + \alpha \bar{y}(1, \alpha) - [(1 - \alpha') \bar{y}(0, \alpha') + \alpha' \bar{y}(1, \alpha')] \\
+&= [\bar{y}(0, \alpha) - \bar{y}(0, \alpha')] - [\alpha \bar{y}(0, \alpha) - \alpha' \bar{y}(0, \alpha')]
++ [\alpha \bar{y}(1, \alpha) + \alpha' \bar{y}(1, \alpha')] \\
+\end{align*}
+
+Suppose no indirect effect:
+\[
+\overline{IE}(\alpha, \alpha') = \bar{y}(0; \alpha) - \bar{y}(0; \alpha') = 0
+\]
+
+Then the true value of the first term in $\overline{OE}(\alpha, \alpha')$ is zero and:
+
+\begin{align*}
+\overline{OE}(\alpha, \alpha') &= \alpha[ \bar{y}(1, \alpha) - \bar{y}(0, \alpha)] -  \alpha'[\bar{y}(1, \alpha') -  \bar{y}(0, \alpha')] \\
+\end{align*}
+
+That is, the overall effect is a linear combination of direct effects.
