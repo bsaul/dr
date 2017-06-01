@@ -18,7 +18,7 @@ generic_eefun <- function(
   p <- comp$p
   
   ## Create estimating equation functions for nontarget parameters
-  if(estimator_type %in% c('ipw', 'dbr', 'reg_dbr')){
+  if(estimator_type %in% c('ipw', 'dbr', 'wls_dbr')){
     score_fun_t <- geex::make_eefun(
       models$t_model, 
       data = data, 
@@ -41,22 +41,11 @@ generic_eefun <- function(
     }
   }
  
-  if(estimator_type == 'reg_dbr'){
-    if(regression_type == 'wls'){
-      score_fun_reg_0 <- geex::make_eefun(
-        models$wls_model_0, 
-        data = data)
-      score_fun_reg_1 <- geex::make_eefun(
-        models$wls_model_1, 
-        data = data)
-    } else if(regression_type == 'pcov'){
-      score_fun_reg_0 <- geex::make_eefun(
-        models$pcov_model_0, 
-        data = data)
-      score_fun_reg_1 <- geex::make_eefun(
-        models$pcov_model_1, 
-        data = data)
-    }
+  if(estimator_type == 'wls_dbr'){
+    score_funs_0 <- lapply(models$wls_model_0, function(x) {
+        geex::make_eefun(x, data = data)})
+    score_funs_1 <- lapply(models$wls_model_1, function(x) {
+        geex::make_eefun(x, data = data)})
 
     
     index_t <- 1:comp$p_t
@@ -77,7 +66,8 @@ generic_eefun <- function(
   ### PSI function ###
   function(theta, alpha){
     
-    index_target <- (p + 1):(length(theta))
+    index_target <- ((length(theta) - (length(alpha) * 2)) + 1):(length(theta))
+    
     ### Non-target parameters ###
     if(estimator_type == 'dbr'){
       scores_t <- score_fun_t(theta[index_t])
@@ -87,15 +77,30 @@ generic_eefun <- function(
       scores <- score_fun_t(theta[index_t])
     } else if(estimator_type == 'otc'){
       scores <- score_fun_o(theta[index_o])
-    } else if(estimator_type == 'reg_dbr'){
+    } else if(estimator_type == 'wls_dbr'){
       scores_t <- score_fun_t(theta[index_t])
-      scores_reg_0 <- score_fun_reg_0(theta[index_o_0])
-      scores_reg_1 <- score_fun_reg_1(theta[index_o_1])
-      scores   <- c(scores_t, scores_reg_0, scores_reg_1)
+      index0 <- (comp$p_t + 1):(comp$p_t + comp$p_o_0)
+      index1 <- (comp$p_t + (length(alpha)*comp$p_o_0) + 1):(comp$p_t + (length(alpha)*comp$p_o_0) + comp$p_o_1)
+      
+      lapply(seq_along(score_funs_0), function(k){
+        if(k > 1){
+          index0 <<- index0 + comp$p_o_0
+        }
+        score_funs_0[[k]](theta[index0])
+      }) %>% unlist() -> scores_0
+      
+      lapply(seq_along(score_funs_1), function(k){
+        if(k > 1){
+          index1 <<- index1 + comp$p_o_1
+        }
+        score_funs_1[[k]](theta[index1])
+      }) %>% unlist() -> scores_1
+
+      scores <- c(scores_t, scores_0, scores_1)
     }
     
     ### Target parameters ###
-    grp_est <- estimator(theta[1:p], alpha = alpha)
+    grp_est <- estimator(theta[-index_target], alpha = alpha)
    
     ### Estimating Equations ###
     if(hajek){
