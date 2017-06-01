@@ -171,7 +171,7 @@ wls_dbr_estimator <- function(data, models, randomization, regression_type = 'wl
   comp <- extract_model_info(
     model = models, 
     data = data, 
-    estimator_type = 'reg_dbr',
+    estimator_type = 'wls_dbr',
     regression_type = regression_type)
   
   X_ex_0 <- comp$X_o_ex %>% filter(A == 0)
@@ -242,7 +242,7 @@ pcov_dbr_estimator <- function(data, models, randomization, ...){
   comp <- extract_model_info(
     model = models, 
     data = data, 
-    estimator_type = 'reg_dbr',
+    estimator_type = 'pcov_dbr',
     regression_type = 'pcov')
   
   A  <- comp$A
