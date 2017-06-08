@@ -10,5 +10,8 @@ sim_power <- function(target_p, accuracy, alpha){
 }
 
 
-# to second decimal accuracy for coverage of 90%, .01 level
-sim_power(.95, 0.005, .01) ## chosen sample size (rounded to 24000)
+# to second decimal accuracy for coverage of 95%, .01 level
+sim_power(.95, 0.005, .01) ## chosen sample size (rounded to 13000)
+
+# to first decimal accuracy for coverage of 5%, .01 level
+sim_power(.5, 0.05, .01) ## chosen sample size (rounded to 700)
