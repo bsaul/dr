@@ -347,8 +347,10 @@ $U=-E\{\partial G_{\alpha}^{D,DR\_\pi\text{cov}}(O_i;\theta)/\partial \theta\}$ 
 \section{Simulations}\label{sec: DR_simulation}
 
 Simulations were conducted to verify the consistency of the IPW, regression and DR robust estimators given in Sections \ref{subsec: IPW_and_reg_estimator} and \ref{subsec: DE_estimator} as well as to compare their efficiency and robustness when the model is either correct or mis-specified.
-Simulations were conducted under four
-scenarios: (i) the propensity model is correct but the potential outcome model is wrong, (ii) the propensity model is wrong but the potential outcome model is correct, (iii) both the propensity model and the potential outcome model are correct, and (iv) neither the propensity model or the potential outcome model is correct. For scenario (i), the simulation study was conducted in
+
+Simulations were conducted under four model specification scenarios: (i) propensity and outcome models correctly specified, (ii) propensity model incorrect and outcome model correct, (iii) propensity model correct and outcome model incorrect, and (iv) both models incorrect.
+
+The simulation study was conducted in
 the following steps:
 
 \noindent \hangindent=1.5cm Step 1: Covariates $(Z_{1ij},Z_{2ij},Z_{3ij},Z_{4ij})$ were independently sampled from N(0,$I_4$) for $j = 1,\ldots,N_i$, $i=1,\ldots,k$, where $I_4$ are 4 by 4 identity matrix. Let $X_{1ij}=\exp(Z_{1ij}/2)$, $X_{2ij}=Z_{2ij}/\{1+\exp(Z_{1ij})\}+10$, $X_{3ij}=(Z_{1ij}Z_{3ij}/25+0.6)^3$ and $X_{4ij}=(Z_{1ij}+Z_{4ij}+20)^2$.
