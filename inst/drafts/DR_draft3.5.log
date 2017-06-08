@@ -1,0 +1,1146 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.5.22)  7 JUN 2017 13:48
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**DR_draft3.5.tex
+(./DR_draft3.5.tex
+LaTeX2e <2016/03/31>
+Babel <3.9r> and hyphenation patterns for 83 language(s) loaded.
+(./bio.cls
+
+LaTeX Warning: You have requested document class `bio',
+               but the document class provides `biostatistics'.
+
+Document Class: biostatistics 
+(/usr/local/texlive/2016/texmf-dist/tex/latex/amscls/amsthm.sty
+Package: amsthm 2015/03/04 v2.20.2
+\thm@style=\toks14
+\thm@bodyfont=\toks15
+\thm@headfont=\toks16
+\thm@notefont=\toks17
+\thm@headpunct=\toks18
+\thm@preskip=\skip41
+\thm@postskip=\skip42
+\thm@headsep=\skip43
+\dth@everypar=\toks19
+)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/multirow/multirow.sty
+\bigstrutjot=\dimen102
+)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2016/03/10 v2.15b AMS math features
+\@mathmargin=\skip44
+
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2016/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2000/06/29 v2.01 AMS text
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks20
+\ex@=\dimen103
+))
+(/usr/local/texlive/2016/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen104
+)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2016/03/08 v2.02 operator names
+)
+\inf@bad=\count79
+LaTeX Info: Redefining \frac on input line 199.
+\uproot@=\count80
+\leftroot@=\count81
+LaTeX Info: Redefining \overline on input line 297.
+\classnum@=\count82
+\DOTSCASE@=\count83
+LaTeX Info: Redefining \ldots on input line 394.
+LaTeX Info: Redefining \dots on input line 397.
+LaTeX Info: Redefining \cdots on input line 518.
+\Mathstrutbox@=\box26
+\strutbox@=\box27
+\big@size=\dimen105
+LaTeX Font Info:    Redeclaring font encoding OML on input line 634.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 635.
+\macc@depth=\count84
+\c@MaxMatrixCols=\count85
+\dotsspace@=\muskip10
+\c@parentequation=\count86
+\dspbrk@lvl=\count87
+\tag@help=\toks21
+\row@=\count88
+\column@=\count89
+\maxfields@=\count90
+\andhelp@=\toks22
+\eqnshift@=\dimen106
+\alignsep@=\dimen107
+\tagshift@=\dimen108
+\tagwidth@=\dimen109
+\totwidth@=\dimen110
+\lineht@=\dimen111
+\@envbody=\toks23
+\multlinegap=\skip45
+\multlinetaggap=\skip46
+\mathdisplay@stack=\toks24
+LaTeX Info: Redefining \[ on input line 2739.
+LaTeX Info: Redefining \] on input line 2740.
+)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/fancybox/fancybox.sty
+Package: fancybox 2010/05/15 1.4
+
+Style option: `fancybox' v1.4 <2010/05/15> (tvz)
+\@fancybox=\box28
+\shadowsize=\dimen112
+\@Sbox=\box29
+\do@VerbBox=\toks25
+\the@fancyput=\toks26
+\this@fancyput=\toks27
+\EndVerbatimTokens=\toks28
+\Verbatim@Outfile=\write3
+\Verbatim@Infile=\read1
+) (/usr/local/texlive/2016/texmf-dist/tex/latex/amsfonts/amssymb.sty
+Package: amssymb 2013/01/14 v3.01 AMS font symbols
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+))
+(/usr/local/texlive/2016/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2014/10/28 v1.0g Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks29
+)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2016/05/09 v1.0r Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2016/01/03 v1.10 sin cos tan (DPC)
+)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/01/02 v1.10 sample graphics configuration
+)
+Package graphics Info: Driver file: dvips.def on input line 96.
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/graphics/dvips.def
+File: dvips.def 2015/12/30 v3.0k Driver-dependent file (DPC,SPQR)
+))
+\Gin@req@height=\dimen113
+\Gin@req@width=\dimen114
+)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/lastpage/lastpage.sty
+Package: lastpage 2015/03/29 v1.2m Refers to last page's name (HMM; JPG)
+)
+\@and=\box30
+\c@section=\count91
+\c@subsection=\count92
+\c@subsubsection=\count93
+\c@paragraph=\count94
+\boxH=\box31
+\boxHrunin=\box32
+\c@figure=\count95
+\c@table=\count96
+\abovecaptionskip=\skip47
+\belowcaptionskip=\skip48
+\c@tblcap=\count97
+\tabbox=\box33
+\tabnotesbox=\box34
+\tablen=\skip49
+\tabnoteslen=\skip50
+\markwidth=\dimen115
+\marklength=\dimen116
+\markdistance=\dimen117
+\trimwidth=\dimen118
+\trimheight=\dimen119
+\rhsink=\dimen120
+\leftmarginodd=\dimen121
+\leftmargineven=\dimen122
+\leftmarginodda=\dimen123
+\leftmarginevena=\dimen124
+\auxaaa=\dimen125
+\auxbbb=\dimen126
+\auxccc=\dimen127
+\auxddd=\dimen128
+\tempbbb=\dimen129
+\rhsinka=\dimen130
+\c@theorem=\count98
+\c@Proposition=\count99
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/natbib/natbib.sty
+Package: natbib 2010/09/13 8.31b (PWD, AO)
+\bibhang=\skip51
+\bibsep=\skip52
+LaTeX Info: Redefining \cite on input line 694.
+\c@NAT@ctr=\count100
+))
+(/usr/local/texlive/2016/texmf-dist/tex/latex/hyperref/hyperref.sty
+Package: hyperref 2016/05/05 v6.83n Hypertext links for LaTeX
+
+(/usr/local/texlive/2016/texmf-dist/tex/generic/oberdiek/hobsub-hyperref.sty
+Package: hobsub-hyperref 2016/05/16 v1.14 Bundle oberdiek, subset hyperref (HO)
+
+
+(/usr/local/texlive/2016/texmf-dist/tex/generic/oberdiek/hobsub-generic.sty
+Package: hobsub-generic 2016/05/16 v1.14 Bundle oberdiek, subset generic (HO)
+Package: hobsub 2016/05/16 v1.14 Construct package bundles (HO)
+Package: infwarerr 2016/05/16 v1.4 Providing info/warning/error messages (HO)
+Package: ltxcmds 2016/05/16 v1.23 LaTeX kernel commands for general use (HO)
+Package: ifluatex 2016/05/16 v1.4 Provides the ifluatex switch (HO)
+Package ifluatex Info: LuaTeX not detected.
+Package: ifvtex 2016/05/16 v1.6 Detect VTeX and its facilities (HO)
+Package ifvtex Info: VTeX not detected.
+Package: intcalc 2016/05/16 v1.2 Expandable calculations with integers (HO)
+Package: ifpdf 2016/05/14 v3.1 Provides the ifpdf switch
+Package: etexcmds 2016/05/16 v1.6 Avoid name clashes with e-TeX commands (HO)
+Package etexcmds Info: Could not find \expanded.
+(etexcmds)             That can mean that you are not using pdfTeX 1.50 or
+(etexcmds)             that some package has redefined \expanded.
+(etexcmds)             In the latter case, load this package earlier.
+Package: kvsetkeys 2016/05/16 v1.17 Key value parser (HO)
+Package: kvdefinekeys 2016/05/16 v1.4 Define keys (HO)
+Package: pdftexcmds 2016/05/10 v0.21 Utility functions of pdfTeX for LuaTeX (HO
+)
+Package pdftexcmds Info: LuaTeX not detected.
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+Package: pdfescape 2016/05/16 v1.14 Implements pdfTeX's escape features (HO)
+Package: bigintcalc 2016/05/16 v1.4 Expandable calculations on big integers (HO
+)
+Package: bitset 2016/05/16 v1.2 Handle bit-vector datatype (HO)
+Package: uniquecounter 2016/05/16 v1.3 Provide unlimited unique counter (HO)
+)
+Package hobsub Info: Skipping package `hobsub' (already loaded).
+Package: letltxmacro 2016/05/16 v1.5 Let assignment for LaTeX macros (HO)
+Package: hopatch 2016/05/16 v1.3 Wrapper for package hooks (HO)
+Package: xcolor-patch 2016/05/16 xcolor patch
+Package: atveryend 2016/05/16 v1.9 Hooks at the very end of document (HO)
+Package: atbegshi 2016/05/16 v1.17 At begin shipout hook (HO)
+Package: refcount 2016/05/16 v3.5 Data extraction from label references (HO)
+Package: hycolor 2016/05/16 v1.8 Color options for hyperref/bookmark (HO)
+)
+(/usr/local/texlive/2016/texmf-dist/tex/generic/ifxetex/ifxetex.sty
+Package: ifxetex 2010/09/12 v0.6 Provides ifxetex conditional
+)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/oberdiek/auxhook.sty
+Package: auxhook 2016/05/16 v1.4 Hooks for auxiliary files (HO)
+)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/oberdiek/kvoptions.sty
+Package: kvoptions 2016/05/16 v3.12 Key value format for package options (HO)
+)
+\@linkdim=\dimen131
+\Hy@linkcounter=\count101
+\Hy@pagecounter=\count102
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/hyperref/pd1enc.def
+File: pd1enc.def 2016/05/05 v6.83n Hyperref: PDFDocEncoding definition (HO)
+)
+\Hy@SavedSpaceFactor=\count103
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/latexconfig/hyperref.cfg
+File: hyperref.cfg 2002/06/06 v1.2 hyperref configuration of TeXLive
+)
+Package hyperref Info: Option `colorlinks' set `true' on input line 4322.
+Package hyperref Info: Hyper figures OFF on input line 4446.
+Package hyperref Info: Link nesting OFF on input line 4451.
+Package hyperref Info: Hyper index ON on input line 4454.
+Package hyperref Info: Plain pages OFF on input line 4461.
+Package hyperref Info: Backreferencing OFF on input line 4466.
+Package hyperref Info: Implicit mode ON; LaTeX internals redefined.
+Package hyperref Info: Bookmarks ON on input line 4691.
+\c@Hy@tempcnt=\count104
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/url/url.sty
+\Urlmuskip=\muskip11
+Package: url 2013/09/16  ver 3.4  Verb mode for urls, etc.
+)
+LaTeX Info: Redefining \url on input line 5044.
+\XeTeXLinkMargin=\dimen132
+\Fld@menulength=\count105
+\Field@Width=\dimen133
+\Fld@charsize=\dimen134
+Package hyperref Info: Hyper figures OFF on input line 6298.
+Package hyperref Info: Link nesting OFF on input line 6303.
+Package hyperref Info: Hyper index ON on input line 6306.
+Package hyperref Info: backreferencing OFF on input line 6313.
+Package hyperref Info: Link coloring ON on input line 6316.
+Package hyperref Info: Link coloring with OCG OFF on input line 6323.
+Package hyperref Info: PDF/A mode OFF on input line 6328.
+LaTeX Info: Redefining \ref on input line 6368.
+LaTeX Info: Redefining \pageref on input line 6372.
+\Hy@abspage=\count106
+\c@Item=\count107
+\c@Hfootnote=\count108
+)
+
+Package hyperref Message: Driver (autodetected): hpdftex.
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/hyperref/hpdftex.def
+File: hpdftex.def 2016/05/05 v6.83n Hyperref driver for pdfTeX
+\Fld@listcount=\count109
+\c@bookmark@seq@number=\count110
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/oberdiek/rerunfilecheck.sty
+Package: rerunfilecheck 2016/05/16 v1.8 Rerun checks for auxiliary files (HO)
+Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
+82.
+)
+\Hy@SectionHShift=\skip53
+)
+\c@proposition=\count111
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/anysize/anysize.sty
+Package: anysize 1994/08/13 setting margin sizes
+
+document style option `anysize' loaded
+Michael Salzenberg, Thomas Esser, Dirk Hillbrecht
+Version 1.0, Aug 13, 1994
+\@Leftmargin=\dimen135
+\@Rightmargin=\dimen136
+\@Topmargin=\dimen137
+\@Bottommargin=\dimen138
+) (/usr/local/texlive/2016/texmf-dist/tex/latex/caption/caption.sty
+Package: caption 2016/02/21 v3.3-144 Customizing captions (AR)
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/caption/caption3.sty
+Package: caption3 2016/02/04 v1.7-139 caption3 kernel (AR)
+Package caption3 Info: TeX engine: e-TeX on input line 67.
+\captionmargin=\dimen139
+\captionmargin@=\dimen140
+\captionwidth=\dimen141
+\caption@tempdima=\dimen142
+\caption@indent=\dimen143
+\caption@parindent=\dimen144
+\caption@hangindent=\dimen145
+Package caption Info: Unknown document class (or package),
+(caption)             standard defaults will be used.
+)
+
+Package caption Warning: Unsupported document class (or package) detected,
+(caption)                usage of the caption package is not recommended.
+See the caption package documentation for explanation.
+
+Package caption Info: \@makecaption = \long macro:#1#2->\vskip \abovecaptionski
+p \sbox \@tempboxa {\small \strut #1. #2}\ifdim \wd \@tempboxa >\hsize \noinden
+t \small \strut #1. #2\par \else \global \@minipagefalse \hb@xt@ \hsize {\hfil 
+\box \@tempboxa \hfil }\fi \vskip \belowcaptionskip .
+\c@ContinuedFloat=\count112
+Package caption Info: hyperref package is loaded.
+) (/usr/local/texlive/2016/texmf-dist/tex/latex/caption/subcaption.sty
+Package: subcaption 2016/02/20 v1.1-142 Sub-captions (AR)
+\c@subfigure=\count113
+\c@subtable=\count114
+)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/tools/bm.sty
+Package: bm 2016/02/27 v1.2a Bold Symbol Support (DPC/FMi)
+\symboldoperators=\mathgroup6
+\symboldletters=\mathgroup7
+\symboldsymbols=\mathgroup8
+LaTeX Font Info:    Redeclaring math alphabet \mathbf on input line 142.
+LaTeX Info: Redefining \bm on input line 208.
+)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/doublestroke/dsfont.sty
+Package: dsfont 1995/08/01 v0.1 Double stroke roman fonts
+)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/booktabs/booktabs.sty
+Package: booktabs 2016/04/27 v1.618033 publication quality tables
+\heavyrulewidth=\dimen146
+\lightrulewidth=\dimen147
+\cmidrulewidth=\dimen148
+\belowrulesep=\dimen149
+\belowbottomsep=\dimen150
+\aboverulesep=\dimen151
+\abovetopsep=\dimen152
+\cmidrulesep=\dimen153
+\cmidrulekern=\dimen154
+\defaultaddspace=\dimen155
+\@cmidla=\count115
+\@cmidlb=\count116
+\@aboverulesep=\dimen156
+\@belowrulesep=\dimen157
+\@thisruleclass=\count117
+\@lastruleclass=\count118
+\@thisrulewidth=\dimen158
+)
+(/usr/local/texlive/2016/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
+\fancy@headwidth=\skip54
+\f@ncyO@elh=\skip55
+\f@ncyO@erh=\skip56
+\f@ncyO@olh=\skip57
+\f@ncyO@orh=\skip58
+\f@ncyO@elf=\skip59
+\f@ncyO@erf=\skip60
+\f@ncyO@olf=\skip61
+\f@ncyO@orf=\skip62
+)
+(./DR_draft3.5.aux)
+\openout1 = `DR_draft3.5.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 57.
+LaTeX Font Info:    ... okay on input line 57.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 57.
+LaTeX Font Info:    ... okay on input line 57.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 57.
+LaTeX Font Info:    ... okay on input line 57.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 57.
+LaTeX Font Info:    ... okay on input line 57.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 57.
+LaTeX Font Info:    ... okay on input line 57.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 57.
+LaTeX Font Info:    ... okay on input line 57.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 57.
+LaTeX Font Info:    ... okay on input line 57.
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
+Package: epstopdf-base 2016/05/15 v2.6 Base part for package epstopdf
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/oberdiek/grfext.sty
+Package: grfext 2016/05/16 v1.2 Manage graphics extensions (HO)
+)
+
+Package epstopdf Warning: Drivers other than `pdftex' and `luatex' are not supp
+orted.
+
+)
+Package lastpage Info: Please have a look at the pageslts package at
+(lastpage)             https://www.ctan.org/pkg/pageslts
+(lastpage)             ! on input line 57.
+\AtBeginShipoutBox=\box35
+ (/usr/local/texlive/2016/texmf-dist/tex/latex/graphics/color.sty
+Package: color 2016/05/09 v1.1c Standard LaTeX Color (DPC)
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package color Info: Driver file: pdftex.def on input line 144.
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/pdftex-def/pdftex.def
+File: pdftex.def 2011/05/27 v0.06d Graphics/color for pdfTeX
+\Gread@gobject=\count119
+
+(/usr/local/texlive/2016/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count120
+\scratchdimen=\dimen159
+\scratchbox=\box36
+\nofMPsegments=\count121
+\nofMParguments=\count122
+\everyMPshowfont=\toks30
+\MPscratchCnt=\count123
+\MPscratchDim=\dimen160
+\MPnumerator=\count124
+\makeMPintoPDFobject=\count125
+\everyMPtoPDFconversion=\toks31
+)))
+Package hyperref Info: Link coloring ON on input line 57.
+ (/usr/local/texlive/2016/texmf-dist/tex/latex/hyperref/nameref.sty
+Package: nameref 2012/10/27 v2.43 Cross-referencing by name of section
+
+(/usr/local/texlive/2016/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
+Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
+)
+\c@section@level=\count126
+)
+LaTeX Info: Redefining \ref on input line 57.
+LaTeX Info: Redefining \pageref on input line 57.
+LaTeX Info: Redefining \nameref on input line 57.
+\@outlinefile=\write4
+\openout4 = `DR_draft3.5.out'.
+
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: End \AtBeginDocument code.
+LaTeX Font Info:    Try loading font information for U+msa on input line 83.
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Try loading font information for U+msb on input line 83.
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 83.
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/base/omscmr.fd
+File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <6> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 83.
+
+
+Package hyperref Warning: Ignoring empty anchor on input line 83.
+
+
+! LaTeX Error: Undefined color `citecolor'.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.93 \newpage
+             
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: Undefined color `citecolor'.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.93 \newpage
+             
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+Underfull \hbox (badness 10000) has occurred while \output is active
+[]
+ []
+
+
+Overfull \vbox (10.0pt too high) has occurred while \output is active []
+
+
+
+LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <6.5> not available
+(Font)              size <6> substituted on input line 93.
+
+LaTeX Font Info:    Calculating math sizes for size <6.5> on input line 93.
+
+LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <4.54997> not available
+(Font)              size <5> substituted on input line 93.
+
+
+LaTeX Font Warning: Font shape `OT1/cmr/m/n' in size <3.25> not available
+(Font)              size <5> substituted on input line 93.
+
+
+LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <6.5> not available
+(Font)              size <6> substituted on input line 93.
+
+
+LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <4.54997> not available
+(Font)              size <5> substituted on input line 93.
+
+
+LaTeX Font Warning: Font shape `OML/cmm/m/it' in size <3.25> not available
+(Font)              size <5> substituted on input line 93.
+
+
+LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <6.5> not available
+(Font)              size <6> substituted on input line 93.
+
+
+LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <4.54997> not available
+(Font)              size <5> substituted on input line 93.
+
+
+LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <3.25> not available
+(Font)              size <5> substituted on input line 93.
+
+
+LaTeX Font Warning: Font shape `OT1/cmr/bx/n' in size <6.5> not available
+(Font)              size <6> substituted on input line 93.
+
+
+LaTeX Font Warning: Font shape `OT1/cmr/bx/n' in size <4.54997> not available
+(Font)              size <5> substituted on input line 93.
+
+
+LaTeX Font Warning: Font shape `OT1/cmr/bx/n' in size <3.25> not available
+(Font)              size <5> substituted on input line 93.
+
+
+LaTeX Font Warning: Font shape `OML/cmm/b/it' in size <6.5> not available
+(Font)              size <6> substituted on input line 93.
+
+
+LaTeX Font Warning: Font shape `OML/cmm/b/it' in size <4.54997> not available
+(Font)              size <5> substituted on input line 93.
+
+
+LaTeX Font Warning: Font shape `OML/cmm/b/it' in size <3.25> not available
+(Font)              size <5> substituted on input line 93.
+
+
+LaTeX Font Warning: Font shape `OMS/cmsy/b/n' in size <6.5> not available
+(Font)              size <6> substituted on input line 93.
+
+
+LaTeX Font Warning: Font shape `OMS/cmsy/b/n' in size <4.54997> not available
+(Font)              size <5> substituted on input line 93.
+
+
+LaTeX Font Warning: Font shape `OMS/cmsy/b/n' in size <3.25> not available
+(Font)              size <5> substituted on input line 93.
+
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <6.5> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 93.
+
+LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <6.5> not available
+(Font)              size <6> substituted on input line 93.
+
+[1{/usr/local/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+
+Package natbib Warning: Citation `rubin1980randomization' on page 2 undefined o
+n input line 96.
+
+
+Package natbib Warning: Citation `sobel2006randomized' on page 2 undefined on i
+nput line 96.
+
+
+Package natbib Warning: Citation `sobel2006randomized' on page 2 undefined on i
+nput line 96.
+
+
+Package natbib Warning: Citation `manski2013identification' on page 2 undefined
+ on input line 96.
+
+
+Package natbib Warning: Citation `lunceford2004stratification' on page 2 undefi
+ned on input line 100.
+
+
+! LaTeX Error: Undefined color `citecolor'.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.103 follows. In Section \ref{sec: DR_notation}
+                                                 we introduce notation and d...
+
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: Undefined color `citecolor'.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.103 ...ction \ref{subsec: IPW_and_reg_estimator}
+                                                   and the DR estimators are...
+
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: Undefined color `citecolor'.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.103 ...sed in Section \ref{subsec: DE_estimator}
+                                                  . Results
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: Undefined color `citecolor'.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.104 ...ented in Section \ref{sec: DR_simulation}
+                                                  . The xx vaccine study is ...
+
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: Undefined color `citecolor'.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.105 in Section \ref{sec: DR_dia}
+                                  . Method will be illustrated in an applica...
+
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: Undefined color `citecolor'.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.106 ...earch in Section \ref{sec: DR_discussion}
+                                                  .
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+Overfull \vbox (6.83331pt too high) has occurred while \output is active []
+
+
+[2]
+
+Package natbib Warning: Citation `halloran1995causal' on page 3 undefined on in
+put line 116.
+
+
+Package natbib Warning: Citation `hudgens2008toward' on page 3 undefined on inp
+ut line 116.
+
+
+Package natbib Warning: Citation `tchetgen2012causal' on page 3 undefined on in
+put line 123.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+Overfull \vbox (6.94444pt too high) has occurred while \output is active []
+
+
+[3]
+
+Package natbib Warning: Citation `tchetgen2012causal' on page 4 undefined on in
+put line 127.
+
+
+Overfull \hbox (22.16386pt too wide) in paragraph at lines 127--128
+\OML/cmm/m/it/10 N[] [][] \OT1/cmr/m/n/10 1(\OML/cmm/m/it/10 A[] \OT1/cmr/m/n/1
+0 = \OML/cmm/m/it/10 a\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 Y[]\OT1/cmr/m/n/10 (\OM
+L/cmm/m/it/10 A[]\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ^^Y\OT1/cmr/m/n/10 (\OML/cmm
+/m/it/10 A[]\OT1/cmr/m/n/10 ; \OML/cmm/m/it/10 \OT1/cmr/m/n/10 )\OML/cmm/m/it/
+10 =f\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 A[]\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 X[
+]\OT1/cmr/m/n/10 ; [])$ and $[](\OML/cmm/m/it/10 \OT1/cmr/m/n/10 ) = \OML/cmm/
+m/it/10 N[] [][] Y[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 A[]\OT1/cmr/m/n/10 )\OML/
+cmm/m/it/10 ^^Y\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 A[]\OT1/cmr/m/n/10 ; \OML/cmm/
+m/it/10 []\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 =f\OT1/cmr/m/n/10 (\OML/cmm/m/it/1
+0 A[]\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 X[]\OT1/cmr/m/n/10 ; [])$.
+ []
+
+
+Package natbib Warning: Citation `PerezHeydrich2014interference' on page 4 unde
+fined on input line 140.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+Overfull \vbox (6.83331pt too high) has occurred while \output is active []
+
+
+[4]
+Overfull \hbox (17.64828pt too wide) in paragraph at lines 150--151
+\OT1/cmr/m/n/10 gres-sion model $\OML/cmm/m/it/10 m\OT1/cmr/m/n/10 (\OML/cmm/m/
+it/10 a[]; X[]\OT1/cmr/m/n/10 ; \OML/cmm/m/it/10 ^^L\OT1/cmr/m/n/10 ) = \OML/cm
+m/m/it/10 E\OT1/cmr/m/n/10 [\OML/cmm/m/it/10 Y\OT1/cmr/m/n/10 (\OML/cmm/m/it/10
+ a[]\OT1/cmr/m/n/10 )\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 X[]\OT1/cmr/m/n/10 ; \O
+ML/cmm/m/it/10 ^^L\OT1/cmr/m/n/10 ]$. Un-der the ex-change-abil-ity as-sump-tio
+n, we have $\OML/cmm/m/it/10 m[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 a[]; X[]\OT1/
+cmr/m/n/10 ; \OML/cmm/m/it/10 ^^L\OT1/cmr/m/n/10 ) =
+ []
+
+
+! LaTeX Error: Undefined color `citecolor'.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.162 ...ction \ref{subsec: IPW_and_reg_estimator}
+                                                  , we have shown that in an...
+
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+Overfull \vbox (6.94444pt too high) has occurred while \output is active []
+
+
+[5]
+
+! LaTeX Error: Undefined color `citecolor'.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.184 ...ction \ref{subsec: IPW_and_reg_estimator}
+                                                  . For example, define $\wi...
+
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+Overfull \hbox (28.92705pt too wide) in paragraph at lines 189--190
+[] \OML/cmm/m/it/10 G[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 o[]\OT1/cmr/m/n/10 ; \
+OML/cmm/m/it/10 ^^R\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 dF\OT1/cmr/m/n/10 (\OML/cm
+m/m/it/10 y; a; x\OT1/cmr/m/n/10 ) = 0$ where $\OML/cmm/m/it/10 G[]\OT1/cmr/m/n
+/10 (\OML/cmm/m/it/10 y; a; x\OT1/cmr/m/n/10 ; \OML/cmm/m/it/10 ^^R\OT1/cmr/m/n
+/10 ) = (\OML/cmm/m/it/10 G[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 o[]\OT1/cmr/m/n/
+10 ; \OML/cmm/m/it/10 ^^V[]; ^^L; ^^M\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; G[]\OT
+1/cmr/m/n/10 (\OML/cmm/m/it/10 o[]\OT1/cmr/m/n/10 ; \OML/cmm/m/it/10 ^^V[]; ^^L
+; ^^M\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; G[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 o
+[]\OT1/cmr/m/n/10 ; \OML/cmm/m/it/10 ^^L; ^^M\OT1/cmr/m/n/10 ))[]$.
+ []
+
+
+Overfull \hbox (19.17488pt too wide) in paragraph at lines 189--190
+\OT1/cmr/m/n/10 Let $[] = ([](0\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 )\OML/cmm/m/
+it/10 ; []\OT1/cmr/m/n/10 (1\OML/cmm/m/it/10 ; \OT1/cmr/m/n/10 )\OML/cmm/m/it/
+10 ; []; []\OT1/cmr/m/n/10 )$, thus $[]$ is the so-lu-tion to the es-ti-mat-ing
+ equa-tion $[][] \OML/cmm/m/it/10 G[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 o[]\OT1/
+cmr/m/n/10 ; \OML/cmm/m/it/10 ^^R\OT1/cmr/m/n/10 ) =
+ []
+
+
+Overfull \vbox (6.83331pt too high) has occurred while \output is active []
+
+
+[6]
+
+Package natbib Warning: Citation `kang2007demystifying' on page 7 undefined on 
+input line 229.
+
+LaTeX Font Info:    Try loading font information for U+dsrom on input line 249.
+
+(/usr/local/texlive/2016/texmf-dist/tex/latex/doublestroke/Udsrom.fd
+File: Udsrom.fd 1995/08/01 v0.1 Double stroke roman font definitions
+)
+Overfull \vbox (6.94444pt too high) has occurred while \output is active []
+
+
+[7]
+Overfull \hbox (9.68805pt too wide) detected at line 256
+\OML/cmm/m/it/10 G[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 o[]\OT1/cmr/m/n/10 ; \OML
+/cmm/m/it/10 ^^R\OT1/cmr/m/n/10 ) = \OMS/cmsy/m/n/10 f\OML/cmm/m/it/10 G[]\OT1/
+cmr/m/n/10 (\OML/cmm/m/it/10 o[]\OT1/cmr/m/n/10 ; \OML/cmm/m/it/10 ^^V[]; ^^L; 
+^^M\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; G[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 o[]
+\OT1/cmr/m/n/10 ; \OML/cmm/m/it/10 ^^V[]; ^^L; ^^M\OT1/cmr/m/n/10 )\OML/cmm/m/i
+t/10 ; G[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 o[]\OT1/cmr/m/n/10 ; \OML/cmm/m/it/
+10 ^^L; ^^M\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; G[]\OT1/cmr/m/n/10 (\OML/cmm/m/i
+t/10 a[]; x[]\OT1/cmr/m/n/10 ; \OML/cmm/m/it/10 ^^M\OT1/cmr/m/n/10 )\OMS/cmsy/m
+/n/10 g[][]
+ []
+
+
+! LaTeX Error: Undefined color `citecolor'.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.260 ...ectly specified and \eqref{eq: ee_DR_WLS}
+                                                   has a unique solution, th...
+
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+Overfull \hbox (6.35876pt too wide) in paragraph at lines 263--265
+\OML/cmm/m/it/10 G[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 o\OT1/cmr/m/n/10 ; \OML/c
+mm/m/it/10 ^^R\OT1/cmr/m/n/10 ) = \OMS/cmsy/m/n/10 f\OML/cmm/m/it/10 G[]\OT1/cm
+r/m/n/10 (\OML/cmm/m/it/10 o[]\OT1/cmr/m/n/10 ; \OML/cmm/m/it/10 ^^V[]; ^^L; ^^
+M\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; G[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 o[]\O
+T1/cmr/m/n/10 ; \OML/cmm/m/it/10 ^^V[]; ^^L; ^^M\OT1/cmr/m/n/10 )\OML/cmm/m/it/
+10 ; G[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 o[]\OT1/cmr/m/n/10 ; \OML/cmm/m/it/10
+ ^^L; ^^M\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; G[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/
+10 a[]; x[]\OT1/cmr/m/n/10 ; \OML/cmm/m/it/10 ^^M\OT1/cmr/m/n/10 )\OMS/cmsy/m/n
+/10 g[]$\OT1/cmr/m/n/10 . 
+ []
+
+
+Underfull \vbox (badness 2726) has occurred while \output is active []
+
+
+Overfull \vbox (6.83331pt too high) has occurred while \output is active []
+
+
+[8]
+
+Package natbib Warning: Citation `scharfstein1999adjusting' on page 9 undefined
+ on input line 295.
+
+
+Package natbib Warning: Citation `scharfstein1999adjusting' on page 9 undefined
+ on input line 295.
+
+
+! LaTeX Error: Undefined color `citecolor'.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.314 ...imilar as in Section \ref{subsec: DR_WLS}
+                                                   by noting estimating equa...
+
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: Undefined color `citecolor'.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.314 ...estimating equation \eqref{eq: ee_DR_WLS}
+                                                   is also contained in $\ma...
+
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+Overfull \vbox (6.94444pt too high) has occurred while \output is active []
+
+
+[9]
+Overfull \hbox (63.21446pt too wide) in paragraph at lines 314--315
+\OT1/cmr/m/n/10 Thus, $[] = \OMS/cmsy/m/n/10 f[]\OT1/cmr/m/n/10 (0\OML/cmm/m/it
+/10 ; \OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; []\OT1/cmr/m/n/10 (1\OML/cmm/m/it/10
+ ; \OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; []; []\OMS/cmsy/m/n/10 g$ \OT1/cmr/m/n/
+10 is the so-lu-tion to the es-ti-mat-ing equa-tion $\U/dsrom/m/n/10 P[]\OML/cm
+m/m/it/10 G[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 o[]\OT1/cmr/m/n/10 ; \OML/cmm/m/
+it/10 ^^R\OT1/cmr/m/n/10 ) =
+ []
+
+
+! LaTeX Error: Undefined color `citecolor'.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.317 ...ectly specified and \eqref{eq: ee_DR_WLS}
+                                                   has a unique solution, th...
+
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: Undefined color `citecolor'.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.349 ...tions \ref{subsec: IPW_and_reg_estimator}
+                                                   and \ref{subsec: DE_estim...
+
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: Undefined color `citecolor'.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.349 ...estimator} and \ref{subsec: DE_estimator}
+                                                   as well as to compare the...
+
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+Overfull \hbox (20.41745pt too wide) in paragraph at lines 353--354
+[]\OT1/cmr/m/n/10 Using the same data, point and vari-ance es-ti-mates were cal
+-cu-lated from EQREFS for $\OML/cmm/m/it/10 [] \OT1/cmr/m/n/10 = 0[]1\OML/cmm/
+m/it/10 ; \OT1/cmr/m/n/10 0[]5\OML/cmm/m/it/10 ; []\OT1/cmr/m/n/10 0[]9$.
+ []
+
+
+Overfull \vbox (6.83331pt too high) has occurred while \output is active []
+
+
+[10]
+
+LaTeX Warning: Reference `fig:continuous' on page 11 undefined on input line 35
+5.
+
+
+Package natbib Warning: Citation `kang2007demystifying' undefined on input line
+ 355.
+
+
+Package natbib Warning: Citation `clemens1988field' on page 11 undefined on inp
+ut line 388.
+
+
+Package natbib Warning: Citation `clemens1988field' on page 11 undefined on inp
+ut line 388.
+
+
+Package natbib Warning: Citation `ali2005herd' on page 11 undefined on input li
+ne 390.
+
+
+Package natbib Warning: Citation `root2011role' on page 11 undefined on input l
+ine 390.
+
+
+Package natbib Warning: Citation `PerezHeydrich2014interference' on page 11 und
+efined on input line 390.
+
+
+Package natbib Warning: Citation `PerezHeydrich2014interference' on page 11 und
+efined on input line 390.
+
+
+Package natbib Warning: Citation `tsiatis2006semiparametric' undefined on input
+ line 401.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+Overfull \vbox (6.94444pt too high) has occurred while \output is active []
+
+
+[11]
+
+! LaTeX Error: Undefined color `citecolor'.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.407 ...*{Proof of Proposition \ref{thm: DR_CAN}}
+                                                  
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+! LaTeX Error: Undefined color `citecolor'.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.464 ...{Proof of Proposition \ref{prop: DR_WLS}}
+                                                  
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+Underfull \vbox (badness 3657) has occurred while \output is active []
+
+
+Overfull \vbox (6.83331pt too high) has occurred while \output is active []
+
+
+[12]
+
+! LaTeX Error: Undefined color `citecolor'.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.510 ...ndent Assuming that \eqref{eq: ee_DR_WLS}
+                                                   has a unique solution, th...
+
+You're in trouble here.  Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+
+Overfull \vbox (6.94444pt too high) has occurred while \output is active []
+
+
+[13] (./DR_draft3.5.bbl
+
+Package natbib Warning: Empty `thebibliography' environment on input line 3.
+
+) 
+AED: lastpage setting LastPage
+
+Overfull \vbox (6.83331pt too high) has occurred while \output is active []
+
+
+[14]
+
+Package natbib Warning: There were undefined citations.
+
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 574.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 574.
+(./DR_draft3.5.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 574.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 574.
+
+
+Package rerunfilecheck Warning: File `DR_draft3.5.out' has changed.
+(rerunfilecheck)                Rerun to get outlines right
+(rerunfilecheck)                or use package `bookmark'.
+
+Package rerunfilecheck Info: Checksums for `DR_draft3.5.out':
+(rerunfilecheck)             Before: <no file>
+(rerunfilecheck)             After:  BD05204C9F55194C456A64465B08C2FC;741.
+
+LaTeX Font Warning: Size substitutions with differences
+(Font)              up to 1.75pt have occurred.
+
+
+LaTeX Warning: There were undefined references.
+
+ )
+(\end occurred when \ifx on line 57 was incomplete) 
+Here is how much of TeX's memory you used:
+ 8170 strings out of 493014
+ 119113 string characters out of 6133351
+ 220246 words of memory out of 5000000
+ 11559 multiletter control sequences out of 15000+600000
+ 18780 words of font info for 72 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 36i,16n,43p,1922b,405s stack positions out of 5000i,500n,10000p,200000b,80000s
+pdfTeX warning (dest): name{
+page.} has been referenced but does not exist, replaced by a fixed one
+
+</usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb><
+/usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></
+usr/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb></us
+r/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb></us
+r/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr
+/local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/
+local/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/lo
+cal/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/loca
+l/texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/
+texlive/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/local/tex
+live/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texliv
+e/2016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2
+016/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texlive/2016
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2016/te
+xmf-dist/fonts/type1/public/amsfonts/cm/cmss10.pfb></usr/local/texlive/2016/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2016/texm
+f-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2016/texmf-
+dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2016/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2016/texmf-dist
+/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2016/texmf-dist/
+fonts/type1/public/amsfonts/cm/cmti7.pfb></usr/local/texlive/2016/texmf-dist/fo
+nts/type1/public/amsfonts/cm/cmti9.pfb></usr/local/texlive/2016/texmf-dist/font
+s/type1/public/doublestroke/dsrom10.pfb>
+Output written on DR_draft3.5.pdf (14 pages, 300332 bytes).
+PDF statistics:
+ 207 PDF objects out of 1000 (max. 8388607)
+ 166 compressed objects within 2 object streams
+ 36 named destinations out of 1000 (max. 500000)
+ 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+

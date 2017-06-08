@@ -1,0 +1,575 @@
+\documentclass[oupdraft]{bio}
+%\documentclass[12pt]{article}
+\usepackage[colorlinks=true, urlcolor=citecolor, linkcolor=citecolor, citecolor=citecolor]{hyperref}
+
+\newcommand{\vsmin}{\vspace{-2.5mm}}
+\newcommand{\vsadd}{\vspace{0.6mm}}
+\newcommand{\he}{3.8cm}
+
+
+% Add history information for the article if required
+%\history{Received August 1, 2014}
+\newtheorem{proposition}{Proposition}
+\newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}}
+\def\independenT#1#2{\mathrel{\rlap{$#1#2$}\mkern2mu{#1#2}}}
+\makeatletter
+\newcommand*{\indep}{%
+\mathbin{%
+\mathpalette{\@indep}{}%
+}%
+}
+\newcommand*{\nindep}{%
+\mathbin{% % The final symbol is a binary math operator
+\mathpalette{\@indep}{\not}% \mathpalette helps for the adaptation
+% of the symbol to the different math styles.
+}%
+}
+\newcommand*{\@indep}[2]{%
+% #1: math style
+% #2: empty or \not
+\sbox0{$#1\perp\m@th$}% box 0 contains \perp symbol
+\sbox2{$#1=$}% box 2 for the height of =
+\sbox4{$#1\vcenter{}$}% box 4 for the height of the math axis
+\rlap{\copy0}% first \perp
+\dimen@=\dimexpr\ht2-\ht4-.2pt\relax
+% The equals symbol is centered around the math axis.
+% The following equations are used to calculate the
+% right shift of the second \perp:
+% [1] ht(equals) - ht(math_axis) = line_width + 0.5 gap
+% [2] right_shift(second_perp) = line_width + gap
+% The line width is approximated by the default line width of 0.4pt
+\kern\dimen@
+{#2}%
+% {\not} in case of \nindep;
+% the braces convert the relational symbol \not to an ordinary
+% math object without additional horizontal spacing.
+\kern\dimen@
+\copy0 % second \perp
+} 
+
+\usepackage{anysize,caption,subcaption}
+\usepackage{bm}
+\usepackage{amsmath,dsfont}
+\usepackage{graphicx,booktabs}
+\usepackage{fancyhdr}
+
+\usepackage{natbib}
+\begin{document}
+
+% Title of paper
+\title{Doubly Robust Estimation in Observational Studies with Interference}
+
+% List of authors, with corresponding author marked by asterisk
+\author{
+Lan Liu\\[4pt]
+%Lan Liu$^\ast$\\[4pt]
+% Author addresses
+\textit{School of Statistics, University of Minnesota at Twin Cities}\\
+% E-mail address for correspondence
+%{liu1815@gmail.com}\\
+Michael G. Hudgens and Bradley Saul\\
+\textit{Department of Biostatistics, University of North Carolina at Chapel Hill}}
+% Running headers of paper:
+\markboth%
+% First field is the short list of authors
+{L. Liu, M. G. Hudgens and others}
+% Second field is the short title of the paper
+{Doubly Robust Estimation in the Presence of Interference}
+
+\maketitle
+
+% Add a footnote for the corresponding author if one has been
+% identified in the author list
+\footnotetext{To whom correspondence should be addressed.}
+
+\begin{abstract}
+{Interference occurs when the treatment received by one individual affects the outcomes of others. An assumption that is typically made in the interference literature is that individuals can be partitioned into
+clusters such that there is no interference between individuals in different clusters. This is sometimes referred to as partial interference. In the observational studies where individuals are not randomly assigned treatment, inverse probability weighted (IPW) estimators have been proposed under partial interference assumption. However, the validity of IPW estimators depends on the propensity score being known or correctly modeled. Alternatively, one can estimate the treatment effect using a  regression estimator which depends on an outcome regression model. In this paper, we first review IPW and regression estimators when partial interference is present and then propose
+doubly robust (DR) estimators, which utilize both models and are consistent if either model is correctly specified. Empirical results reveal the efficiency gained of doubly robust estimator over IPW estimators when both models are correctly specified. The different estimators are illustrated using data from a recent study examining the effects of cholera vaccination in a field study in Bangladesh.}
+{Causal inference; Doubly robust estimator; Interference; Observational studies.}
+\end{abstract}
+
+
+\newpage
+\section{Introduction}
+\vspace{-0.2cm}
+In causal inference, it is typically assumed that individual's potential outcome depends only on her own treatment assignment. This is part of the stable unit treatment value assumption \citep{rubin1980randomization}. However, this assumption may not hold in various settings. For example, in a vaccine trial, the infection status of one individual may depend on her vaccination status as well as the vaccination of people she commonly has contacts with. In econometrics, the decision of moving may depends on the distribution of voucher in the neighbourhood \citep{sobel2006randomized}. Recently, inference methods have been proposed when the study population can be divided into clusters and possible interference exists only among individuals in the same cluster. This is called partial interference \citep{sobel2006randomized} and can be viewed as a special case of constant treatment response \citep{manski2013identification}. Assuming partial interference, Hudgens and Halloran (2008) defined the direct, indirect
+(or spillover), total, and overall causal effects of an intervention and Tchetgen Tchetgen and VanderWeele (2012) proposed inverse probability weighted (IPW) estimators of these causal effect for observational studies. However, the validity of IPW estimators only holds when the propensity score is known or correctly modeled. Moreover, IPW estimators are known to have large variance and are unstable to small propensity scores which are quite common in a study with interference. Thus, new methods need to be developed to improve the efficiency and stabilize IPW estimators.
+
+
+In the absence of interference, doubly robust (DR) procedure are known to be effective in improving on the IPW estimators \citep{lunceford2004stratification}. Usually, when the treatment selection mechanism is beyond the control of the investigators, there are two ways of adjusting for potential confounders. One is to model the relationship between covariates and potential outcomes and the other is to model the relationship between the covariates and treatment. The IPW estimators only use the second model, while DR estimators utilize both models and are consistent when either (but not necessarily both) of the two models is correct. In practice, neither the model for the propensity score nor the outcome model is known to investigators. Thus, the DR estimator provides two chances to correctly estimate the parameter of interest. However, all existing DR estimators make the no interference between units assumption and hence there is a need to generalize the DR estimator in the presence of interference.
+
+In this paper, we develop several DR estimators for causal effects in studies assuming partial interference. The outline of the remainder of the paper is as
+follows. In Section \ref{sec: DR_notation} we introduce notation and define various causal effects. The IPW and regression estimators are defined in Section \ref{subsec: IPW_and_reg_estimator} and the DR estimators are proposed in Section \ref{subsec: DE_estimator}. Results
+from a simulation study are presented in Section \ref{sec: DR_simulation}. The xx vaccine study is introduced
+in Section \ref{sec: DR_dia}. Method will be illustrated in an application to this study. Finally, we discuss some
+limitations and propose future research in Section \ref{sec: DR_discussion}.
+
+\section{Notation, Assumptions and Estimands}\label{sec: DR_notation}
+
+\vspace{-0.2cm}
+Let $X$ denote the baseline (i.e., prior to treatment or exposure) covariates and let $Y$ be a univariate outcome of interest. Let $A$ be the random variable for the treatment received ($A=1$ if individual receives treatment and $A=0$ otherwise). Suppose there are $k$ groups of individuals in the study with $N_i$ individuals in group $i$. For each individual, $(X_{ij},A_{ij},Y_{ij})$ will be observed for $j=1,\ldots,N_i$, $i=1,\ldots,k$. Let $X_i=(X_{i1},\ldots,X_{iN_i})$ and $Y_i=(Y_{i1},\ldots,Y_{iN_i})$ be the random vectors of the covariates and outcome for all individuals in group $i$. Let $A_i=(A_{i1},\ldots,A_{iN_i})$ denote the random vector of treatment received for all $N_i$ individuals in group $i$ and let $A_{i(-j)}=A_i\backslash A_{ij}$ be the subvector of $A_i$ denoting the random vector of treatment for all individuals other than the $j^{th}$ one. Let $a_{ij}$, $a_{i(-j)}$ and $a_i$ denote the possible realizations of $A_{ij}$, $A_{i(-j)}$ and $A_i$. Define $f(A_i|X_i)=\Pr(A_i|X_i)$ to be the probability of treatment vector given the covariates and let $f(A_{ij}|X_i)=\Pr(A_{ij}|X_i)$ be the probability of treatment received by an individual. A special interference structure is that individuals interfere with each other within the same group but not across groups. This is called partial interference assumption and we make this assumption throughout. Under partial interference assumption, let $Y_{ij}(a_i)=Y_{ij}(a_{ij},a_{i(-j)})$ be the potential outcome under treatment vector $a_i$, and thus $Y_{ij}=\sum_{a_i}1(A_{i}=a_i)Y_{ij}(a_i)$.
+  Assume $O_i=(X_i,A_i,Y_i)$ are identically and independently distributed. We assume that conditional on covariates $X_i$, the treatment allocation is positive, i.e., $f(A_i=a_i|X_i)>0$ with probability 1 for all $a_i$. We also make the exchangeability assumption that $Y_{i}(a_{i})\indep A_i|X_i$, where $\indep$ denote the independence between two random variables. This is also known as the ignorability assumption in missing data literature.
+%$f(A_i|X_i)=f(A_i|X_i,Y_i(\cdot))$
+
+We say the treatment assignment is allocation strategy $\alpha$ if individuals are independently  receive treatment with probability $\alpha$. Under allocation strategy $\alpha$, the probability of having treatment $A_i$ in group $i$ is $\pi(A_i;\alpha)=\Pr(A_i;\alpha)=\prod_{j} \alpha^{A_{ij}}(1-\alpha)^{1-A_{ij}}$ and that of the individuals other than individual $j$ is $\pi(A_{i(-j)};\alpha)=\Pr(A_{i(-j)};\alpha)=\prod_{j^{'}\neq j} \alpha^{A_{ij^{'}}}(1-\alpha)^{1-A_{ij^{'}}}$.
+Define the average potential outcome under allocation strategy $\alpha$ as $ \mu_{a\alpha}= \sum_{a_{i(-j)}}E Y(a,a_{i(-j)})\pi(a_{i(-j)};\alpha)$ is the average potential outcome when individual is assigned treatment $a$ under allocation strategy $\alpha$. Define the average potential outcome conditional on covariates $X_i$ under allocation $\alpha$ to be $\mu_{\alpha}= \sum_{a_i}EY(a_i)\pi(a_i;\alpha)$. Following \citet{halloran1995causal} and \citet{hudgens2008toward}, we define the direct effect of a treatment under allocation strategy $\alpha$ to be $\overline{DE}(\alpha)=\mu_{1\alpha}-\mu_{0\alpha}$, the indirect effect
+$\overline{IE}(\alpha_1,\alpha_0)\equiv \mu_{0\alpha_1}-\mu_{0\alpha_0}$, the total effect
+$\overline{TE}(\alpha_1,\alpha_0)\equiv  \mu_{1\alpha_1}-\mu_{0\alpha_0}$, and the overall effect
+$\overline{OE}(\alpha_1,\alpha_0)\equiv  \mu_{\alpha_1}-\mu_{\alpha_0}$.
+In words, the direct effect is the difference between the average potential outcome when group $i$ receives allocation strategy $\alpha$ and an individual in that group receives treatment compared to when an individual in that group receives control. The indirect (or spillover) effect compares the average potential outcome when an individual receives control under different allocation strategy $\alpha_1$ and $\alpha_0$. The total effect equals
+the sum of the direct and indirect effects,
+while the overall effect provides a single summary measure of the effect of allocation strategy $\alpha_1$ versus $\alpha_0$.
+See \citet{tchetgen2012causal} for further discussion about these estimands.
+%\vspace{-0.2cm}
+\section{IPW and Regression Estimators}\label{subsec: IPW_and_reg_estimator}
+
+One way to adjust for confounding in observational studies is to use inverse probability weighting. Heuristically, inverse probability weighting creates a pseudo-population, in which there is no confounding, thus the average of outcomes in the pseudo-population approximates the average in a population where the treatment is randomly assigned. Under no unmeasured confounders assumption, $Y({a_i})$ is independent with $A_i$ given $f(A_i|X_i)$. When the propensity score $f(A_i|X_i)$ is known, IPW estimators for $\mu_{a\alpha}$ and $\mu_{\alpha}$ have been defined as $\widehat{Y}^{ipw}(a;\alpha)= \sum_{i=1}^k\widehat{Y}_i^{ipw}(a;\alpha)/k$ and $\widehat{Y}^{ipw}(\alpha)= \sum_{i=1}^k\widehat{Y}_i^{ipw}(\alpha)/k$ where $\widehat{Y}_i^{ipw}(a;\alpha)= N_i^{-1} \sum_{j=1}^{N_i}1(A_{ij}=a)Y_{ij}(A_{i})\pi(A_{i(-j)};\alpha)/{f}(A_i|X_i;\hat\gamma)$ and $\widehat{Y}_i^{ipw}(\alpha)= N_i^{-1} \sum_{j=1}^{N_i}Y_{ij}(A_{i})\pi(A_i;\alpha_0)/{f}(A_i|X_i;\hat\gamma)$. However, the propensity scores are generally unknown  in observational studies thus need to be modeled due to the curse of dimensionality. Let $\gamma$ denote the vector of parameters in the propensity score model and let $\hat\gamma$ denote an estimator of $\gamma$. \citet{tchetgen2012causal} proposed generalized IPW by substituting the propensity score with its estimate for example, we have $\widehat{Y}_i^{ipw}(a;\alpha)= N_i^{-1} \sum_{j=1}^{N_i}1(A_{ij}=a)Y_{ij}(A_{i})\pi(A_{i(-j)};\alpha)/{f}(A_i|X_i;\hat\gamma)$. 
+
+Various causal effect estimators have been be defined based on the IPW for the average outcomes. For example, define $\widehat{\textsc{de}}^{ipw}(\alpha)=\widehat{Y}^{ipw}(1,\alpha)-\widehat{Y}^{ipw}(0,\alpha)$ to be the IPW estimator for direct effect, define $\widehat{\textsc{ie}}^{ipw}(\alpha_1,\alpha_0)=\widehat{Y}^{ipw}(0,\alpha_1)-\widehat{Y}^{ipw}(0,\alpha_0)$, $\widehat{\textsc{te}}^{ipw}(\alpha_1,\alpha_0)=\widehat{Y}^{ipw}(1,\alpha_1)-\widehat{Y}^{ipw}(0,\alpha_0)$ and $\widehat{\textsc{oe}}^{ipw}(\alpha_1,\alpha_0)=\widehat{Y}^{ipw}(\alpha_1)-\widehat{Y}^{ipw}(\alpha_0)$ to be the IPW estimators for indirect, total and overall effects. 
+
+
+
+
+
+%However, the propensity score is usually not known but estimated. For example, after fitting the regression model $f(A_i|X_i)=\exp(\gamma_1+\gamma_{X_i}X_i+\gamma_{A_i}A_i)/\{1+\exp(\gamma_1+\gamma_{X_i}X_i+\gamma_{A_i}A_i)\}$, the maximum likelihood estimates (MLE) $\hat{\gamma}=(\hat{\gamma}_1, \hat{\gamma}_{X_i},\hat{\gamma}_{A_i})$ for ${\gamma}=({\gamma}_1, {\gamma}_{X_i},{\gamma}_{A_i})$ can be calculated and thus $\hat{f}(A_i|X_i)$ can be obtained. Tchetgen Tchetgen and VanderWeele (2012)\nocite{tchetgen2012causal} proposed group level generalized IPW estimator as $\widehat{Y}_i^{ipw}(a;\alpha)= N_i^{-1} \sum_{j=1}^{N_i}1(A_{ij}=a)Y_{ij}(A_{i})\pi(A_{i(-j)};\alpha)/\hat{f}(A_i|X_i)$ and $\widehat{Y}_i^{ipw}(\alpha)= N_i^{-1} \sum_{j=1}^{N_i}Y_{ij}(A_{i})\pi(A_i;\alpha_0)/\hat{f}(A_i|X_i)$. That is to replace the propensity score with an estimate in the denominator of the group level IPW estimators mentioned previously. The population level IPW estimators can be constructed same as when propensity score is known. Perez-Heydrich et al. (2014)\nocite{PerezHeydrich2014interference} showed that when the propensity score is corrected estimated, the generalized IPW estimators $\widehat{Y}^{ipw}_i(a,\alpha)$ and $\widehat{Y}_i^{ipw}(\alpha)$ are unbiased for $\mu_{a\alpha}$ and $\mu_{\alpha}$, $k=0,1$. 
+
+
+
+
+\citet{PerezHeydrich2014interference} derived the consistency and asymptotic normality of the IPW estimators. 
+Briefly, note that $\mu_{a\alpha}$  is the solution to $\int G^{ipw}_{a\alpha}(o_i;\mu_{a\alpha},\gamma)dF(o_i;\gamma) = 0$, where $G^{ipw}_{a\alpha}(O_i;\mu,\gamma) =\widehat{Y}_i^{ipw}(a;\alpha)- \mu$. Also, note that $\gamma$ is the solution to $\int G^{ipw}(A_i,X_i;\gamma)dF(A_i,X_i;\gamma)=0$, where $G^{ipw}(A_i,X_i;\gamma)$ is the score function for the nuisance parameter $\gamma$. Now let $\theta=(\mu_{0\alpha},\mu_{1\alpha},\gamma)$ denote the solution to the vector equation $\int G^{D, ipw}_{\alpha}(o_i;\theta) dF(o_i) = 0$ where $G^{ D,ipw}_{\alpha}(o_i;\theta)=\{G^{ipw}_{0\alpha}(o_i;\mu_{0\alpha},\gamma),G^{ipw}_{1\alpha}(o_i;\mu_{1\alpha},\gamma),G^{ipw}(a_i,x_i;\gamma)\}^T$. Let $\hat\theta^{ipw}=(\hat Y^{\text{ipw}}(0,\alpha),\hat Y^{\text{ipw}}(1,\alpha),\hat\gamma)$ be the solution to the estimating equation $\sum_{i=1}^m G^{D,ipw}_{\alpha}(o_i;\theta)=0$. And the asymptotic normality of the direct effect estimators follow from delta method.
+
+%Note that $\hat Y^{\text{ipw}}(a,\alpha)$ can be expressed as the solution $\mu$ to the estimating equation $\sum_{i=1}^m G^{ipw}_{a\alpha}( Y_i, A_i,X_i;\mu) = 0$, where $G^{ipw}_{a\alpha}(Y_i,A_i, X_i;\mu) =\widehat{Y}_i^{ipw}(a;\alpha)- \mu.$
+%Let $\mu_{a\alpha}$ equal the solution to $\int G^{ipw}_{a\alpha}(y_i,z_i,x_i;\mu_{a\alpha}) dF(y,z,l) = 0$. It is straightforward to show that $\mu_{a\alpha}=N_i^{-1}\sum_{j=1}^{N_i} \sum_{a_{i(-j)}}E Y(a,a_{i(-j)})\pi(a_{i(-j)};\alpha)=\mu_{a\alpha}$. Thus $\mu_{a\alpha}$ is the mean average potential outcome in super-population. %A similar derivation could be used to obtain 
+
+
+
+
+
+Alternatively, one can adjust for confounding by controlling for observed covariates in an outcome regression model $m(a_i,X_i;\beta)=E[Y(a_i)|X_i;\beta]$. Under the exchangeability assumption, we have $ m_{ij}(a_i,X_i;\beta)=E[Y_{ij}(a_i)|X_i;\beta]=E[Y_{ij}|A_i,X_i;\beta]$, thus the outcome regression model could be estimated based only on observed data. For example, a regression model for $Y_{ij}(A_i)$ is $m_{ij}(A_i,X_i;\beta)=\beta_1+\beta_{A_i}^{T}A_i+\beta_{X_i}^{T}X_i$, where $\beta$ is the parameters in the outcome regression model. Define the regression estimator for $\mu_{a\alpha}$ and $\mu_{\alpha}$ to be  $\widehat{Y}^{reg}(a;\alpha)=\sum_{i=1}^k\widehat{Y}_i^{reg}(a;\alpha)/k$ and $\widehat{Y}^{reg}(\alpha)=\sum_{i=1}^k\widehat{Y}_i^{reg}(\alpha)/k$, where $\widehat{Y}_i^{reg}(a;\alpha)=\sum_{j=1}^{N_i}\sum_{a_{i(-j)}}m_{ij}(a,a_{i(-j)},X_i;\hat\beta)\pi(a_{i(-j)};\alpha)/N_i$, $\widehat{Y}^{reg}_i(\alpha)=\sum_{j=1}^{N_i}\sum_{a_i}m_{ij}(a_i,X_i;\hat\beta)\pi(a_i;\alpha)/N_i$ and $\hat{\beta}$ is estimate for $\beta$. The regression causal effect estimators could be defined similarly as the IPW estimators.
+
+
+Let $G^{reg}(A_i,X_i;\beta)$ denote the score function for $\beta$ and let $G^{reg}_{a\alpha}(O_i;\mu,\beta) =\widehat{Y}_i^{reg}(a;\alpha)- \mu$. Note that $\mu_{a\alpha}$ is the solution to $\int G^{reg}_{a\alpha}(o_i;\mu_{a\alpha}) dF(o_i) = 0$ and $\beta$ is the solution to $\int G^{reg}(O_i;\beta)dF(O_i;\beta)=0$. Now let $\theta=(\mu_{0\alpha},\mu_{1\alpha},\beta)$, thus $\theta$ is the solution to the vector equation $\int G^{ D, reg}_{\alpha}(o_i;\theta) dF(o_i) = 0$ where $G^{ D,reg}_{\alpha}(o_i;\theta)=(G^{reg}_{0\alpha}(o_i;\mu_{0\alpha},\beta),G^{reg}_{1\alpha}(o_i;\mu_{1\alpha},\beta),G^{reg}(o_i;\beta))^T$. Let $\hat\theta^{reg}=(\hat Y^{reg}(0,\alpha),\hat Y^{reg}(1,\alpha),\hat\beta)$, thus $\hat \theta$ is the solution to the estimating equation $\sum_{v=1}^k G^{D,reg}_{\alpha}(o_i;\theta)=0$. Under suitable regularity conditions, the consistency and asymptotic normality of $\hat\theta$ follows directly from the estimation equation theory. 
+
+%Let $G^{reg}(A_i,X_i;\mu_{a\alpha})=\widehat{Y}^{reg}(a,\alpha)-\mu$, Note that if the potential outcome model $m(a_i,X_i)$ is consistently estimated by $\hat{m}(a_i,X_i)$, i.e., $\beta^{*}=\beta_0$ where $\beta_0$ is the true parameter, then $\widehat{Y}^{reg}(a,\alpha)\xrightarrow{p}\mu_{a\alpha}$ and $\widehat{Y}^{reg}(\alpha)\xrightarrow{p}\mu_{\alpha}$ as $m\rightarrow \infty$. 
+
+\vspace{-0.3cm}
+\section{Doubly Robust Estimators}\label{subsec: DE_estimator}
+
+\subsection{Regression estimation with residual bias correction}
+
+ In Section \ref{subsec: IPW_and_reg_estimator}, we have shown that in an observational study with interference, the parameters of interest $\mu_{a\alpha}$ and $\mu_{\alpha}$ can be consistently estimated by outcome regression estimator if the regression model is correct or by the inverse propensity weighting estimator if the propensity score model is correct.
+The DR estimators proposed below utilize both models and are consistent if either model is correct but not necessarily both. In particular, the DR estimators for $\mu_{a\alpha}$ and $\mu_{\alpha}$ are defined as  $ \widehat{Y}^{DR}(a,\alpha)= \sum_{i=1}^k\widehat{Y}_i^{DR}(a,\alpha)/k$ and $ \widehat{Y}^{DR}(\alpha)= \sum_{i=1}^k\widehat{Y}_i^{DR}(\alpha)/k$, where
+
+
+\vspace{-0.8cm}
+\begin{eqnarray*}\label{eq: DR_estimator}
+  \widehat{Y}_i^{DR}(a,\alpha)&=&N_i^{-1}\sum_{j=1}^{N_i}\Biggl\{\frac{1(A_{ij}=a)\{Y_{ij}(A_i)-m_{ij}(A_i,X_i;\hat\beta)\}}{{f}(A_i|X_i;\hat\gamma)}
+  \pi(A_{i(-j)};\alpha)\\&&+
+  \sum_{a_{i(-j)}}m_{ij}(a,a_{i(-j)},X_i;\hat\beta)\pi(a_{i(-j)};\alpha)
+ \Biggr\},
+ \end{eqnarray*}
+
+ \vspace{-0.6cm}
+ \begin{equation*}
+  \widehat{Y}_i^{DR}(\alpha)=N_i^{-1}\sum_{j=1}^{N_i}\left\{
+ \frac{\{Y_{ij}(A_i)-m_{ij}(A_i,X_i;\hat\beta)\}}{{f}(A_i|X_i;\hat\gamma)}\pi(A_i;\alpha)+
+  \sum_{a_i}m_{ij}(a_i,X_i;\hat\beta)\pi(a_i;\alpha)\right\}.
+\end{equation*}
+
+
+\noindent The summation $ \sum_{a_i}m_{ij}(a_i,X_i;\hat\beta)\pi(a_i;\alpha)$ in the proposed bias correction DR estimators may be time consuming to calculate. However, a Monte Carlo approximation could be made by sampling the treatment $A=a_i$ from a Bernounlli distribution with probability $\alpha$ and calculate $m_{ij}(a_i,X_i;\hat\beta)$ with the newly sampled treatment, which will be an unbiased estimator for $\sum_{a_i}m_{ij}(a_i,X_i;\hat\beta)\pi(a_i;\alpha)$. In theory, one could carry out as many Bernoulli samples so that such approximation has small variability.
+
+Doubly robust causal effect estimators can be defined similarly as the IPW estimators in Section \ref{subsec: IPW_and_reg_estimator}. For example, define $\widehat{\textsc{de}}^{DR}(\alpha)=\widehat{Y}^{DR}(1,\alpha)-\widehat{Y}^{DR}(0,\alpha)$ to be the DR estimator for direct effect. 
+
+
+We assume under certain regularity conditions, there exists $\gamma^{*}$ such that $\hat{\gamma}\xrightarrow{p}\gamma^{*}$ as $k\rightarrow\infty$, that is the estimator $\hat{\gamma}$ will converge in probability to some constant no matter whether the propensity model is correct or not. We also assume under certain regularity conditions, there exist $\beta^{*}$ such that $\hat{\beta}\xrightarrow{p}\beta^{*}$ as $k\rightarrow\infty$. Let $\gamma_0$ and $\beta_0$ denote the true parameter value of the parameters in the propensity score and outcome regression models. If the propensity score (or outcome regression model) is correctly specified, then we have $\gamma^{*}=\gamma_0$ (or $\beta^{*}=\beta_0$).
+
+Let $G^{DR}_{a\alpha}(O_i;\mu,\beta,\gamma) =\widehat{Y}_i^{DR}(a;\alpha)- \mu$ and let $G^{DR}(O_i;\beta;\gamma)$ denote the score functions for $\beta$ and $\gamma$. Note that $\mu_{a\alpha}$ is the solution to $\int G^{DR}_{a\alpha}(o_i;\mu_{a\alpha},\beta,\gamma) dF(o_i) = 0$ for any $(\beta,\gamma)$, and $(\beta,\gamma)$ is the solution to $\int G^{DR}(O_i;\beta,\gamma)dF(O_i;\beta,\gamma)=0$. Let $\theta=(\mu_{0\alpha},\mu_{1\alpha},\beta,\gamma)$, thus $\theta$ is the solution to the vector equation $\int G^{D, DR}_{\alpha}(o_i;\theta) dF(y,a,x) = 0$ where $G^{D,DR}_{\alpha}(y,a,x;\theta)=(G^{DR}_{0\alpha}(o_i;\mu_{0\alpha},\beta,\gamma),G^{DR}_{1\alpha}(o_i;\mu_{1\alpha},\beta,\gamma),G^{DR}(o_i;\beta,\gamma))^T$. Let $\hat\theta^{DR}=(\hat Y^{DR}(0,\alpha),\hat Y^{DR}(1,\alpha),\hat\beta,\hat\gamma)$, thus $\hat \theta$ is the solution to the estimating equation $\sum_{v=1}^m G^{D,DR}_{\alpha}(o_i;\theta)=0$. 
+
+The following proposition shows the DR estimators are doubly robust.
+
+%, that is, $\beta^{\ast}=\beta_0$ or $\gamma^{\ast}=\gamma_0$
+
+\begin{proposition}\label{thm: DR_CAN}
+If either $f(A_i|X_i;\gamma)$ or $m(A_i,X_i;\beta)$ is correctly specified, then \emph{$k^{1/2}\{\widehat{\textsc{de}}^{\text{DR}}(\alpha)-\overline{\textsc{de}}(\alpha)\}$} converges in distribution to $N(0,\Sigma_0^{D})$ as $k \to \infty$ where 
+\[
+\Sigma^{D} = \tau U^{-1} V U^{-T}\tau^T,
+\]
+$U=-E\{\partial G_{\alpha}^{D,DR}(O_i;\theta)/\partial \theta\}$ and $V=E\{G_{\alpha}^{D,DR}(O_i;\theta)^{\otimes 2}\}$ and $\tau=(1,-1, 0,\ldots,0)$.
+\end{proposition}
+
+%The proof of Proposition \ref{thm: DR_y_a_alpha} is given in the Appendix. It can also be concluded from the proof that $\sigma^{DR}(a,\alpha)$ and $\sigma^{DR}(\alpha)$ stay the same whether $\gamma$ and $\beta$ are known or estimated.To estimate the variance, note that $\psi_i(\widehat{Y}^{DR}(a,\alpha),\hat\gamma,\hat\beta)=\widehat{Y}_i^{DR}(a,\alpha)-\widehat{Y}^{DR}(a,\alpha)$, thus, $(\hat\sigma^{DR}(a,\alpha))^2=m^{-1}\sum_{i=1}^m(\widehat{Y}_i^{DR}(a,\alpha)-\widehat{Y}^{DR}(a,\alpha))^2$ is a consistent estimator for $(\sigma^{DR}(a,\alpha))^2$. Similarly, $(\hat\sigma^{DR}(\alpha))^2=m^{-1}\sum_{i=1}^m(\widehat{Y}_i^{DR}(\alpha)-\widehat{Y}^{DR}(\alpha))^2$ estimates $(\sigma^{DR}(\alpha))^2$ consistently.
+
+%Doubly robust causal effect estimators can be defined similarly as the IPW estimators in Section \ref{subsec: IPW_and_reg_estimator}. For example, define $\widehat{\textsc{de}}^{DR}(\alpha)=\widehat{Y}^{DR}(1,\alpha)-\widehat{Y}^{DR}(0,\alpha)$ to be the DR estimator for direct effect. And it follows from Proposition \ref{thm: DR_y_a_alpha} that $\widehat{\textsc{de}}^{DR}(\alpha)$, $\widehat{\textsc{ie}}^{DR}(\alpha_1,\alpha_0)$, $\widehat{\textsc{te}}^{DR}(\alpha_1,\alpha_0)$ and $\widehat{\textsc{oe}}^{DR}(\alpha_1,\alpha_0)$ are consistent estimators for the corresponding causal effects when either the propensity or the potential outcome model is correct. Thus, these estimators are doubly robust as well.
+
+
+%\begin{proposition}\label{thm: DR_CD}
+%If either $\gamma^{*}=\gamma_0$ or $\beta^{*}=\beta_0$ hold, then
+
+%(a) $\sqrt{m}\{\widehat{\textsc{de}}^{DR}(\alpha)-\overline{DE}(\alpha)\}/\sigma^{DR}_{D}\xrightarrow{d}N(0,1)$ as $m\rightarrow \infty$, where $(\sigma^{DR}_{D})^2=m^{-1}\sum_{i=1}^m\{\psi_i(m(1,\alpha),\gamma^{*},\beta^{*})-\psi_i(m(0,\alpha),\gamma^{*},\beta^{*})\}^2$
+
+%(b) $\sqrt{m}\{\widehat{\textsc{ie}}^{DR}(\alpha_1,\alpha_0)-\overline{IE}(\alpha_1,\alpha_0)\}/\sigma^{DR}_{I}\xrightarrow{d}N(0,1)$ as $m\rightarrow \infty$, where $(\sigma^{DR}_{I})^2=m^{-1}\sum_{i=1}^m
+%\{\psi_i(m(0,\alpha_1),\gamma^{*},\beta^{*})-\psi_i(m(0,\alpha_0),\gamma^{*},\beta^{*})\}^2$
+
+%(c) $\sqrt{m}\{\widehat{\textsc{te}}^{DR}(\alpha_1,\alpha_0)-\overline{TE}(\alpha_1,\alpha_0)\}/\sigma^{DR}_{T}\xrightarrow{d}N(0,1)$ as $m\rightarrow \infty$, where $(\sigma^{DR}_{T})^2=m^{-1}\sum_{i=1}^m
+%\{\psi_i(m(1,\alpha_1),\gamma^{*},\beta^{*})-\psi_i(m(0,\alpha_0),\gamma^{*},\beta^{*})\}^2$
+
+%(d) $\sqrt{m}\{\widehat{\textsc{oe}}^{DR}(\alpha_1,\alpha_0)-\overline{OE}(\alpha_1,\alpha_0))\}/\sigma^{DR}_{O}\xrightarrow{d}N(0,1)$ as $m\rightarrow \infty$, where $(\sigma^{DR}_{O})^2=m^{-1}\sum_{i=1}^m
+%\{\varphi_i(m(\alpha_1),\gamma^{*},\beta^{*})-\varphi_i(m(\alpha_0),\gamma^{*},\beta^{*})\}^2$
+%\end{proposition}
+
+A consistent variance estimator of $\widehat{\textsc{de}}^{DR}(\alpha)$ can be constructed by plug in the parameter estimates in $\Sigma^D$. Consistent variance estimators of other DR causal effect estimators can be constructed similarly.
+
+
+\subsection{Regression estimation with inverse-propensity weighted coefficients}\label{subsec: DR_WLS}
+
+
+The DR estimator introduced in the previous subsection repairs bias when the outcome model is wrong by adding the estimated population mean residual. Analogous to the weighted least squares estimator in \citet{kang2007demystifying} with no interference, we can use the weighted estimating equation to obtain the nuisance parameters in the outcome regression model and thus gain DR property in the interference problem. For notational connivence, let $L_{ij}=\{1,A_{i(-j)},X_i\}$ denote the row vector of all the regressors including intercept in the potential outcome regression model when $A_{ij}=a$, which for notational convenience we rewrite as $m_{ij}(a,A_{i(-j)},X_i;\beta)=m_{ij}(a,L_i;\beta)$. Here, we do not include $A_{ij}$ in $L_{ij}$ since the potential outcome is for when $A_{ij}=a$ so that the coefficient for $A_{ij}$ is absorbed in the intercept in this model. Let $L_i=(L_{i1}^T,\ldots,L_{iN_i}^T)^T$, $Y_i=(Y_{i1},\ldots,Y_{iN_i})$ and $ m_i=(m_{i1},\ldots,m_{iN_i})$. We have $$G^{reg}(O_i;\beta)=L_i^T\Lambda_i(A_i,X_i,\omega_{i})\{Y_i- m_i(a,L_i;\beta)\},$$ 
+where  $\Lambda_i(A_i,X_i,\omega_{i})=\text{diag}\biggl\{1(A_{i1}=a)\omega_{i1}(L_{i}),\ldots,1(A_{iN_i}=a)\omega_{iN_i}(L_{i})\biggr\}$ for any user specified vector-valued  function $\omega_{i}=(\omega_{i1},\ldots,\omega_{iN_i})$ and diag is the diagonoal matrix. Specifically, $\omega_{ij}=1$ corresponds to the estimating equation of standard least square estimate. Alternatively, we use $$G^{reg\_WLS}(O_i;\alpha,\beta,\gamma)=L_i^T\Lambda_i(A_i,X_i,\omega_{i}^{WLS};\alpha,\gamma)\{Y_i- m_i(a,L_i;\beta)\},$$ where
+%$$W^{WLS}(A_i,X_i;\alpha,\hat\gamma)=\text{diag}\biggl\{\frac{1(A_{i1}=a)}{{f}(A_i|X_i;\hat\gamma)}
+%  ,\ldots,\frac{1(A_{iN_i}=a)}{{f}(A_i|X_i;\hat\gamma)}
+%  \biggr\}.$$
+$$\omega_i^{WLS}(L_i;\alpha,\gamma)=\biggl\{\frac{\pi(A_{i(-1)};\alpha)}{{f}(a,A_{i(-1)}|X_i;\gamma)}
+  ,\ldots,\frac{\pi(A_{i(-N_i)};\alpha)}{{f}(a,A_{i(-N_i)}|X_i;\gamma)}
+  \biggr\}$$
+  
+\noindent is the weight we intentionally choose. As we will see shortly, this construction could yield another doubly robust estimator $\widehat{Y}_i^{DR\_WLS}(a,\alpha)$, where
+
+\vspace{-0.8cm}
+\begin{eqnarray*}\label{eq: DR_WLS_estimator}
+  \widehat{Y}_i^{DR\_WLS}(a,\alpha)&=&N_i^{-1}\sum_{j=1}^{N_i}\Biggl\{\sum_{a_{i(-j)}}m_{ij}(a,a_{i(-j)},X_i;\hat\beta^{WLS})\pi(a_{i(-j)};\alpha)
+ \Biggr\},
+ \end{eqnarray*}
+
+\noindent and $\hat\beta^{WLS}=\hat\beta^{WLS}(\alpha)$ is obtained by solving 
+
+\begin{equation}\label{eq: ee_DR_WLS}
+\mathds{P}_kG^{reg\_WLS}(A_i,X_i;\alpha,\beta,\hat\gamma)=0.
+\end{equation}
+
+\noindent and $\mathds{P}_k=(\sum_{i=1}^k)/k$ is the empirical expectation. We can define $\widehat{Y}_i^{DR\_WLS}(\alpha)$ similarly. We refer to $\widehat{Y}_i^{DR\_WLS}(a,\alpha)$ and $\widehat{Y}_i^{DR\_WLS}(\alpha)$ as weighted coefficients regression estimators. Also, the population level estimator and hence the causal effect estimators could be obtained from the group level estimator same as before. 
+
+%Let $G^{DR\_WLS}_{a\alpha}(Y_i,A_i, X_i;\mu) =\widehat{Y}_i^{DR\_WLS}(a;\alpha)- \mu$ and let $G^{reg\_WLS}(A_i,X_i;\beta)$ denote the score function for $\beta$. 
+
+The true parameter value $\beta$ and $\gamma$ are the solutions to $\int G^{reg\_WLS}(O_i;\beta,\gamma)dF(O_i;\beta,\gamma)=0$ and $\int G^{ipw}(A_i,X_i;\gamma)dF(A_i,X_i;\gamma)=0$ respectively, where  $G^{ipw}(A_i,X_i;\gamma)$ is the score function for the nuisance parameter $\gamma$. Additionally, $\mu_{a\alpha}$ is the solution to $\int G^{DR\_WLS}_{a\alpha}(o_i;\mu_{a\alpha},\beta,\gamma) dF(o_i;\beta,\gamma) = 0$, where $G^{DR\_WLS}_{a\alpha}(O_i;\mu,\beta,\gamma) =\widehat{Y}_i^{DR\_WLS}(a;\alpha,\beta,\gamma)- \mu$.  Thus $\theta=(\mu_{0\alpha},\mu_{1\alpha},\beta,\gamma)$ is the solution to the vector equation $\int G^{ D, DR\_WLS}_{\alpha}(o_i;\theta) dF(o_i) = 0$, where $$G^{ D,DR\_WLS}_{\alpha}(o_i;\theta) = \{G^{DR\_WLS}_{0\alpha}(o_i;\mu_{0\alpha},\beta,\gamma),G^{DR\_WLS}_{1\alpha}(o_i;\mu_{1\alpha},\beta,\gamma),G^{reg\_WLS}(o_i;\beta,\gamma),G^{ipw}(a_i,x_i;\gamma)\}^T.$$ Thus, $\hat \theta^{DR\_WLS}=\{\hat Y^{DR\_WLS}(0,\alpha),\hat Y^{DR\_WLS}(1,\alpha),\hat\beta,\hat\gamma\}$ is the solution to the estimating equation $\mathds{P}_k G^{D,DR\_WLS}_{\alpha}(o_i;\theta)=0$. We have the following proposition to show the DR property of the weighted estimators.
+
+
+\begin{proposition}\label{prop: DR_WLS}
+If either $f(A_i|X_i;\gamma)$ or $m(A_i,X_i;\beta)$ is correctly specified and \eqref{eq: ee_DR_WLS} has a unique solution, then \emph{$k^{1/2}\{\widehat{\textsc{de}}^{\text{DR\_WLS}}(\alpha)-\overline{\textsc{de}}(\alpha)\}$} converges in distribution to $N(0,\Sigma_0^{D})$ as $k \to \infty$ where 
+\[
+\Sigma^{D} = \tau U^{-1} V U^{-T}\tau^T,
+\]
+$U=-E\{\partial G_{\alpha}^{D,DR\_WLS}(O_i;\theta)/\partial \theta\}$ and $V=E\{G_{\alpha}^{D,DR\_WLS}(O_i;\theta)^{\otimes 2}\}$, $\tau=(1,-1, 0,\ldots,0)$ and\\ $G^{D,DR\_WLS}_{\alpha}(o;\theta)=\{G^{DR\_WLS}_{0\alpha}(o_i;\mu_{0\alpha},\beta,\gamma),G^{DR\_WLS}_{1\alpha}(o_i;\mu_{1\alpha},\beta,\gamma),G^{reg\_WLS}(o_i;\beta,\gamma),G^{ipw}(a_i,x_i;\gamma)\}^T$.
+\end{proposition}
+
+
+
+\subsection{Regression estimation with propensity based covariates}
+From the exchangeability assumption that $f(Y_{i}(a_{i})|X_i)=f(Y_{i}(a_i)|X_i,A_i)$, we have 
+
+\vspace{-10mm}
+\begin{eqnarray*}
+\mu_{a\alpha}&=& \sum_{a_{i(-j)}}E Y(a,a_{i(-j)})\pi(a_{i(-j)};\alpha)\\
+&=& \sum_{a_{i(-j)}}E[E \{Y(a,a_{i(-j)})|X_i\}]\pi(a_{i(-j)};\alpha)\\
+&=& \sum_{a_{i(-j)}}E[E \{Y_i|A_i,X_i\}]\pi(a_{i(-j)};\alpha).
+\end{eqnarray*}
+
+Note that similar as in the non-interference case,
+
+\vspace{-6mm}\begin{eqnarray*}
+E\{A_i|f(a_i|X_i),Y_i(a_i)\}&=&E[E\{A_i|X_i,Y_i(a_i)\}|f(a_i|X_i),Y_i(a_i)]\\
+&=&E[f(a_i|X_i)|f(a_i|X_i),Y_i(a_i)]\\
+&=&f(a_i|X_i),
+\end{eqnarray*}
+
+\noindent that is, $A_i\indep Y_i(a_i)|f(a_i|X_i)$. Hence, it is sufficient to model $E \{Y_i|A_i,f(A_i|X_i)\}]$ since 
+
+\vspace{-10mm}\begin{eqnarray*}
+\mu_{a\alpha}&=& \sum_{a_{i(-j)}}E Y(a,a_{i(-j)})\pi(a_{i(-j)};\alpha)\\
+&=& \sum_{a_{i(-j)}}E[E \{Y(a,a_{i(-j)})|f(a_i|X_i)\}]\pi(a_{i(-j)};\alpha)\\
+&=& \sum_{a_{i(-j)}}E[E \{Y_i|A_i,f(a_i|X_i)\}]\pi(a_{i(-j)};\alpha).
+\end{eqnarray*}
+
+In the case of no interference, \citet{scharfstein1999adjusting} proposed to include the inverse propensity score as a single additional covariate in the outcome regression model to achieve double robustness. Here, we generalize the method of \citet{scharfstein1999adjusting} into interference setting. Let $\tilde L_{ij}=\{1,A_{i(-j)},X_i,\pi(A_{i(-j)};\alpha)/f(a, A_{i(-j)}|X_i;\hat\gamma)\}$ denote the row vector of all the regressors other than $A_{ij}$ in the outcome regression model for $Y_{ij}$. Let $\tilde L_i=(\tilde L_{i1}^T,\ldots,\tilde L_{iN_i}^T)^T$. We have
+
+$$G^{reg\_\pi\text{cov}}(O_i;\beta,\gamma)=\tilde L_i^T\Lambda_i(A_i,X_i,1)\{Y_i- m_i(a,\tilde L_i;\beta,\gamma)\},$$ 
+where  $\Lambda_i(A_i,X_i,1)=\text{diag}\biggl\{1(A_{i1}=a),\ldots,1(A_{iN_i}=a)\biggr\}$. This construction could yield another doubly robust estimator $\widehat{Y}_i^{DR\_\pi\text{cov}}(a,\alpha)$, where
+
+\vspace{-0.8cm}
+\begin{equation*}\label{eq: DR_picov_estimator}
+  \widehat{Y}_i^{DR\_\pi\text{cov}}(a,\alpha)=N_i^{-1}\sum_{j=1}^{N_i}\Biggl\{\sum_{a_{i(-j)}}m_{ij}(a,a_{i(-j)},X_i;\hat\beta^{\pi\text{cov}})\pi(a_{i(-j)};\alpha)
+ \Biggr\},
+ \end{equation*}
+
+\noindent and $\hat\beta^{\pi\text{cov}}=\hat\beta^{\pi\text{cov}}(\alpha)$ is obtained by solving 
+
+\begin{equation}\label{eq: ee_DR_picov}
+\mathds{P}_kG^{reg\_\pi\text{cov}}(A_i,X_i;\alpha,\beta,\hat\gamma)=0.
+\end{equation}
+
+
+
+The DR property of $\widehat{Y}_i^{DR\_\pi\text{cov}}(a,\alpha)$ can be achieved similar as in Section \ref{subsec: DR_WLS} by noting estimating equation \eqref{eq: ee_DR_WLS} is also contained in $\mathds{P}_kG^{reg\_\pi\text{cov}}(O_i;\beta)=0$ and that when the outcome regression model is correct, adding the weighted propensity score $\pi(a_{i(-j)};\alpha)/f(a, A_{i(-j)}|X_i;\hat\gamma)$ is just overfitting and its coefficient would be 0. Now we formally state it. The true parameter value $\beta$ and $\gamma$ are the solutions to $\int G^{reg\_\pi\text{cov}}(O_i;\beta,\gamma)dF(O_i;\beta,\gamma)=0$ and $\int G^{ipw}(A_i,X_i;\gamma)dF(A_i,X_i;\gamma)=0$ respectively, where  $G^{ipw}(A_i,X_i;\gamma)$ is the score function for the nuisance parameter $\gamma$. Additionally, $\mu_{a\alpha}$ is the solution to $\int G^{DR\_\pi\text{cov}}_{a\alpha}(o_i;\mu_{a\alpha},\beta,\gamma) dF(o_i;\beta,\gamma) = 0$, where $G^{DR\_\pi\text{cov}}_{a\alpha}(O_i;\mu,\beta,\gamma) =\widehat{Y}_i^{DR\_\pi\text{cov}}(a;\alpha,\beta,\gamma)- \mu$.  Thus $\theta=(\mu_{0\alpha},\mu_{1\alpha},\beta,\gamma)$ is the solution to the vector equation $\int G^{ D, DR\_\pi\text{cov}}_{\alpha}(o_i;\theta) dF(o_i) = 0$, where $$G^{ D,DR\_\pi\text{cov}}_{\alpha}(o_i;\theta) = \{G^{DR\_\pi\text{cov}}_{0\alpha}(o_i;\mu_{0\alpha},\beta,\gamma),G^{DR\_\pi\text{cov}}_{1\alpha}(o_i;\mu_{1\alpha},\beta,\gamma),G^{reg\_\pi\text{cov}}(o_i;\beta,\gamma),G^{ipw}(a_i,x_i;\gamma)\}^T.$$ Thus, $\hat \theta^{DR\_\pi\text{cov}}=\{\hat Y^{DR\_\pi\text{cov}}(0,\alpha),\hat Y^{DR\_\pi\text{cov}}(1,\alpha),\hat\beta,\hat\gamma\}$ is the solution to the estimating equation $\mathds{P}_k G^{D,DR\_\pi\text{cov}}_{\alpha}(o_i;\theta)=0$. We could construct the propensity adjusted DR estimators for various causal effects and they achieve the DR and asymptotic normality as indicated in the following proposition. 
+
+\begin{proposition}\label{prop: DR_pi_cov}
+If either $f(A_i|X_i;\gamma)$ or $m(A_i,X_i;\beta)$ is correctly specified and \eqref{eq: ee_DR_WLS} has a unique solution, then \emph{$k^{1/2}\{\widehat{\textsc{de}}^{\text{DR\_}\pi\text{cov}}(\alpha)-\overline{\textsc{de}}(\alpha)\}$} converges in distribution to $N(0,\Sigma_0^{D})$ as $k \to \infty$ where 
+\[
+\Sigma^{D} = \tau U^{-1} V U^{-T}\tau^T,
+\]
+$U=-E\{\partial G_{\alpha}^{D,DR\_\pi\text{cov}}(O_i;\theta)/\partial \theta\}$ and $V=E\{G_{\alpha}^{D,DR\_\pi\text{cov}}(O_i;\theta)^{\otimes 2}\}$, $\tau=(1,-1, 0,\ldots,0)$ and \\$G^{D,DR\_\pi\text{cov}}_{\alpha}(o;\theta)=\{G^{reg}_{0\alpha}(o_i;\mu_{0\alpha},\beta,\gamma),G^{reg}_{1\alpha}(o_i;\mu_{1\alpha},\beta,\gamma),G^{DR\_\pi\text{cov}}(a_i,x_i;\beta,\gamma),G^{ipw}(a_i,x_i;\gamma)\}^T$.
+\end{proposition}
+
+{\color{red}For the ease of computation, we could also use $\tilde L_{ij}=\{1,A_{i(-j)},X_i,\pi(A_{i(-j)};\alpha)/f(a, A_{i(-j)}|X_i;\hat\gamma,\hat b_i)\}$ denote the row vector of all the regressors other than $A_{ij}$ in the outcome regression model for $Y_{ij}$, where $\hat b_i$ is the estimated random effect for cluster $i$ in the mixed models. In that case, we do not need to integrate out the random effect. }% Let $\tilde L_i=(\tilde L_{i1}^T,\ldots,\tilde L_{iN_i}^T)^T$. 
+
+%
+%\subsection{Comparisons among DR estimators}
+%
+%\subsubsection{Boundedness}
+%\citet{robins2007comment} pointed out that with highly variable weights, boundedness is even more important than the unbiasedness. Some of our estimators are bounded while others are not. More specifically, $\widehat{Y}^{DR\_WLS}(a,\alpha)$ and $\widehat{Y}^{DR\_\pi cov}(a,\alpha)$ are bounded as long as the link function in the regression is chosen to be bounded. However, the $\widehat{Y}^{DR}(a,\alpha)$ is not bounded. 
+%
+%%However, we could modify it as:
+%%
+%%\vspace{-0.8cm}
+%%\begin{eqnarray*}\label{eq: DR_estimator}
+%%  \widehat{Y}_i^{DR\_haj}(a,\alpha)&=&\hat N_i^{-1}\sum_{j=1}^{N_i}\Biggl\{\frac{1(A_{ij}=a)\{Y_{ij}(A_i)-m_{ij}(A_i,X_i;\hat\beta)\}}{{f}(A_i|X_i;\hat\gamma)}
+%%  \pi(A_{i(-j)};\alpha)\\&&+
+%%  \sum_{a_{i(-j)}}m_{ij}(a,a_{i(-j)},X_i;\hat\beta)\pi(a_{i(-j)};\alpha)
+%% \Biggr\},
+%% \end{eqnarray*}
+%% 
+%% \noindent where $\hat N_i=\sum_{j=1}^{N_i}1(A_{ij}=a)\pi(A_{i(-j)};\alpha)/{f}(A_i|X_i;\hat\gamma)$. Note that when $m_{ij}$ is constant,  $\widehat{Y}_i^{DR\_haj}(a,\alpha)$ is similar to the hajek estimator proposed in \citet{liu2016inverse}. This estimator was also proposed by \citet{robins2007comment} in the situation without interference. Similar as the estimator in \citet{robins2007comment}, $|\widehat{Y}_i^{DR\_haj}(a,\alpha)|<\max_i |Y_i-m_i|+\max_i|m_i|$ (check this). Specifically, if the outcome is binary, then $|\widehat{Y}_i^{DR\_haj}(a,\alpha)|<2$.
+%% 
+%%\subsubsection{Finite sample bias} \citep{kang2007demystifying} states some estimators performs poorly when the propensity is very variable, I am wondering if we will observed some even worse case since the interference makes the weight even more variable.)
+%
+%\subsubsection{Efficiency} should be same efficient
+\section{Simulations}\label{sec: DR_simulation}
+
+Simulations were conducted to verify the consistency of the IPW, regression and DR robust estimators given in Sections \ref{subsec: IPW_and_reg_estimator} and \ref{subsec: DE_estimator} as well as to compare their efficiency and robustness when one or both of the component models are either correctly or incorrectly specified. 
+
+The simulation study was conducted in the following manner with $m = 100$ and $N_i = 30$. Covariates $X_{1ij}$ and $X_{2ij}$ were independently sampled from $N(0, 1)$ and $Bern(0.5)$ distributions respectively. Random variable $A_{ij}$ was generated from the mixed effect logistic distribution $\mbox{logit}\Pr(A_{ij}=1|X_{1i}, X_{2i}) = 0.1 + 0.2 |X_{1ij}| + 0.2 |X_{1ij}| X_{2ij} + b_i)$ where $b_{i} \sim N(0, 0.3)$. The observed outcome $Y_{ij}$ was generated from $Y_{ij}=m_{ij}+\varepsilon_{ij}$ where $\varepsilon_{ij} \sim N(0,1)$ and $m_{ij} = 2.0 + 2.0 A_{ij} + p(A_i) - 1.5 |X_{1ij}| + 2.0 X_{2ij} -3.0 |X_{1ij}| X_{2ij}$ with $p(A_i)$ the being proportion of treatment received among people in group $i$. 
+
+Using the same data, point and variance estimates were calculated from EQREFS for $\alpha_0 = 0.1, 0.5, \text{ and } 0.9$. The simulations were carried out 12,000 times for the scenario with both component models correctly specified in order to accurately represent an estimator's coverage to the second decimal. For the other scenarios where one or both of the component models was correctly specified, the simulations were carried out 700 times. The incorrectly specified models both excluded the $|X_{1ij}| X_{2ij}$ interaction term and include $X_{1ij}$ without the absolute value. (The Supplementary materials contains the code necessary to replicate the simulations??).
+
+The simulation result is presented in Figure \ref{fig:continuous}. As expected, when the $\pi$ model is correct, the IPW and the DR estimators have small bias while when the $\mu$ model is correct, the regression and DR estimators have small bias. Note that the DR estimator has a smaller variance than that of the IPW estimators when the $\pi$ model is correct; the DR estimator has a smaller variance than that of both the regression estimators when the $\mu$ model is correct. That is when one of the model is correct, the other model in DR estimator, although mis-specified, helps increase the efficiency. When both models are correct, the DR estimator has even smaller bias and variance. However, when both models are wrong, the DR estimator has as big or even bigger bias when using the IPW and regression estimators. This is also observed by Kang and Schafer (2007)\nocite{kang2007demystifying} who pointed out that `two wrong models are not better than one'.
+
+%\begin{figure}[h!]
+%\begin{subfigure}[b]{\textwidth}
+%%\centering
+%\includegraphics[width=\linewidth,height=4.5cm]{Dec10th2016_more_DR_boxplot_pi_tru_mu_tru.pdf}
+%\caption{ both outcome and propensity score models are correct}
+%\end{subfigure}%
+%
+%    \begin{subfigure}[b]{\textwidth}
+%%\centering
+%\includegraphics[width=\linewidth,height=4.5cm]{Dec10th2016_more_DR_boxplot_pi_tru_mu_mis.pdf}
+%\caption{only propensity score model is correct }
+%\end{subfigure}%
+%
+%    \begin{subfigure}[b]{\textwidth}
+%%\centering
+%\includegraphics[width=\linewidth,height=4.5cm]{Dec10th2016_more_DR_boxplot_pi_mis_mu_tru.pdf}
+%\caption{only outcome model is correct}
+%\end{subfigure}%
+%
+%    \begin{subfigure}[b]{\textwidth}
+%%\centering
+%\includegraphics[width=\linewidth,height=4.5cm]{Dec10th2016_more_DR_boxplot_pi_mis_mu_mis.pdf}
+%\caption{neither model is correct}
+%\end{subfigure}%
+%\vspace{-3mm}
+%\caption{Comparisons between the proposed estimators and existing multiple robust  estimators (Han's, CY's and Chan's)
+%  for a continuous outcome.} \label{fig:continuous}
+%\end{figure}
+
+\vspace{-0.4cm}
+\section{Application}\label{sec: DR_dia}
+A field cholera vaccine trial was carried out  in Matlab, Bangladesh in the late 1900s \citep{clemens1988field}. All children (2-15 yrs old) and women ($>$15 yrs old) were randomized with equal probability to one of three treatments: (1) B subunit-killed whole-cell oral cholera vaccine, (2) killed whole-cell-only cholera vaccine, or (3) {\it E. coli} K12 placebo. Although the treatments were randomized, not all the eligible individuals participated. Among all the 121,982 eligible individuals, 49,300 individuals received at least two doses of vaccines. At the end of first year, 4.52 cases per 1000 people was observed as the risk of cholera among the total eligible study population. We assume there is no unmeasured confounding for the relationship between participation and having cholera. In the original vaccine trial, the vaccines were estimated to lower the cholera incidence in vaccinated individuals by 62\% for the vaccine with B subunit and 53\% for the vaccine without B subunit at one year of follow-up \citep{clemens1988field}. 
+
+It has been found that the vaccine efficacy was associated with the vaccine coverage in the clusters \citep{ali2005herd,root2011role}. \citet{PerezHeydrich2014interference} utilized inverse-probability weighted (IPW) estimators of the treatment effects in the presence of interference to assess the direct, indirect, total and overall causal effect of cholera vaccines. Here, we demonstrate our proposed DR estimators and compared to those weighting estimators in \citet{PerezHeydrich2014interference}.
+
+
+%A Field individually-randomized placebo-controlled trial was conducted in Matlab, Bangladesh between 1985-88 to assess the e cacy of two oral cholera vaccines \citep{clemens1988field}. All children (2-15 yrs old) and women ($>$15 yrs old) were randomly assigned with equal probability to one of three treatment assignments: (1) B subunit-killed whole-cell oral cholera vaccine, (2) killed whole-cell-only cholera vaccine, or (3) E. coli K12 placebo. Although all women and children were randomized, only a subset participated in the trial. Of the total eligible sample population (N = 121,982), 49,300 women and children received two or more doses of vaccine. Surveillance of the Matlab population for diarrhea was conducted at three diarrheal treatment centers, and data for all eligible individuals were obtained from the International Centre for Diarrhoeal Disease Research, Bangladesh. Cholera cases were defined according to the following criteria: Vibrio cholerae 01 isolation from fecal samples, presentation of non-bloody diarrhea, and registration at a treatment center upon presentation of symptoms. Risk of cholera among the total eligible study population was 4.52 cases per 1000 people in the first year of follow-up. In the original vaccine trial, e cacy (defined as percent reduction in cholera incidence in vaccinated individuals compared to placebo recipients) was estimated to be 62\% for the vaccine with B subunit and 53\% for the vaccine without B subunit at one year of follow-up (Clemens et al. 1988).
+
+
+
+\vspace{-.3cm}
+\section{Discussion}\label{sec: DR_discussion}
+\vspace{3mm}
+
+So far, we have proposed to extend the doubly robust estimators in the presence of partial interference. The DR estimators of various causal effects were proposed and showed to be consistent and asymptotically normally distributed. Tsiatis (2006)\nocite{tsiatis2006semiparametric} proposed DR estimator that achieved the semiparametric efficiency bound. How these results can be generated in the presence of interference is left for future work.
+
+\vspace{-.3cm}
+\section{Appendex}
+\vspace{3mm}
+
+\subsection*{Proof of Proposition \ref{thm: DR_CAN}}
+
+We first show that $E\{G^{DR}_{a\alpha}(o_i;\mu_{a\alpha},\beta^{*},\gamma^{*})\}=0$ and thus $E\{G^{D,DR}_{\alpha}(y,a,x;\theta^{*})\}=0$ when either propensity score or outcome regression is correctly specified.
+
+%$G^{D,DR}_{\alpha}(y,a,x;\theta)=(G^{DR}_{0\alpha}(o_i;\mu_{0\alpha},\beta,\gamma),G^{DR}_{1\alpha}(o_i;\mu_{1\alpha},\beta,\gamma),G^{DR}(o_i;\beta,\gamma))^T$
+
+%\vspace{-.2cm}
+If $\gamma^{*}=\gamma_0$, then ${f}(A_i|X_i;\gamma^{*})=f(A_i|X_i;\gamma_0)$ and thus
+
+
+\vspace{-0.4cm}
+\begin{equation*}
+% \nonumber to remove numbering (before each equation)
+  E\Biggl\{\frac{1(A=a)Y(A_i)}{{f}(A_i|X_i;\gamma^{*})}\pi(A_{i(-j)};\alpha_0)\Biggr\}=m(a,\alpha_0).
+\end{equation*}
+
+\vspace{-0.3cm}
+\noindent Also note that
+
+
+\vspace{-1cm}
+\begin{eqnarray*}
+&&  E\Biggl\{\sum_{a_{i(-j)}}m(a_i,X_i;\beta^{*})\pi(a_{i(-j)};\alpha_0)
+  -
+  \frac{1(A=a)m(A_i,X_i;\beta^{*})}{f(A_i|X_i;\gamma^{*})}\pi(A_{i(-j)};\alpha_0)\Biggr\}\\
+&=&  E\Biggl\{\sum_{a_{i(-j)}}m(a_i,X_i;\beta^{\ast})\pi(a_{i(-j)};\alpha_0)\Biggr\}
+  - E\Biggl\{\sum_{a_{i(-j)}}\frac{m(a,a_{i(-j)},X_i;\beta^{\ast})}{{f}(a,a_{i(-j)}|X_i;\gamma_0)}
+  \pi(a_{i(-j)};\alpha_0)\Pr(a,a_{i(-j)}|X_i)\Biggr\}\\
+&=&  E\Biggl\{\sum_{a_{i(-j)}}m(a_i,X_i;\beta^{\ast})\pi(a_{i(-j)};\alpha_0)\Biggr\}
+  - E\Biggl\{\sum_{a_{i(-j)}}m(a,a_{i(-j)},X_i;\beta^{\ast})
+  \pi(a_{i(-j)};\alpha_0)\Biggr\}
+=0,
+  \end{eqnarray*}
+
+\noindent which leads to $G^{DR}_{0\alpha}(o_i;\mu_{0\alpha},\beta_0,\gamma_0)\xrightarrow{p}0$.
+
+%\vspace{-.3cm}
+If $\beta^{*}=\beta_0$ then $m(a_i,X_i;\beta^{*})=m(a_i,X_i;\beta_0)$  and thus
+
+\vspace{-.4cm}
+\begin{equation*}
+ E\Biggl\{\sum_{a_{i(-j)}}m(a,a_{i(-j)},X_i;\beta^{*})\pi(a_{i(-j)};\alpha_0)\Biggr\}=m(a,\alpha_0).
+\end{equation*}
+
+\vspace{-.4cm}
+\noindent Also note that
+
+\vspace{-1cm}
+\begin{eqnarray*}
+% \nonumber to remove numbering (before each equation)
+  E\Biggl\{\frac{1(A_{ij}=a)\{Y(A_i)-m(A_i,X_i;\hat\beta)\}}{{f}(A_i|X_i;\gamma^{*})}\pi(A_{i(-j)};\alpha_0)\Biggr\}
+=0,
+\end{eqnarray*}
+
+
+\noindent which also leads to $E\{G^{DR}_{0\alpha}(o_i;\mu_{0\alpha},\beta^{*},\gamma^{*})\}=0$. The asymptotic normality follows directly from the M-estimation theory, thus completing the proof.
+
+\subsection*{Proof of Proposition \ref{prop: DR_WLS}}
+
+%\begin{proof}
+We only show the consistency of $\widehat{\textsc{de}}^{\text{DR\_WLS}}(\alpha)$ here, the asymptotic normality could be obtained by M-estimator theory. If $\gamma^{*}=\gamma_0$, the $j^{th}$ element of $E\{G^{reg\_\pi\text{cov}}(A_i,X_i;\alpha,\beta^{*},\gamma^{*})\}=0$ is
+
+\begin{eqnarray*}
+%&&E\Biggl\{\frac{1(A_{ij}=a)\{Y_{ij}(A_i)-m_{ij}(A_i,X_i;\hat\beta^{WLS})\}}{{f}(A_i|X_i;\hat\gamma)}
+%  \pi(A_{i(-j)};\alpha)\biggr\}\\
+%  &\xrightarrow{p}&
+  &&E\Biggl\{\frac{1(A_{ij}=a)\{Y_{ij}(A_i)-m_{ij}(A_i,X_i;\beta^{\ast})\}}{{f}(A_i|X_i;\gamma^{*})}
+  \pi(A_{i(-j)};\alpha)\biggr\}\\
+    &=&E\Biggl\{\sum_{a_{i(-j)}}\frac{\{Y_{ij}(a,a_{i(-j)})-m_{ij}(a,a_{i(-j)},X_i;\beta^{\ast})\}}{{f}(a_i|X_i;\gamma_0)}
+  \pi(a_{i(-j)};\alpha){f}(a_i|X_i;\gamma_0)\biggr\}\\
+      &=&E\Biggl\{\sum_{a_{i(-j)}}\{Y_{ij}(a,a_{i(-j)})-m_{ij}(a,a_{i(-j)},X_i;\beta^{\ast})\}
+  \pi(a_{i(-j)};\alpha)\biggr\}\\
+  &=&\mu_{a\alpha}-E\Biggl\{\sum_{a_{i(-j)}}\{m_{ij}(a,a_{i(-j)},X_i;\beta^{\ast})\}
+  \pi(a_{i(-j)};\alpha)\biggr\}.
+\end{eqnarray*}
+
+Thus, 
+
+\begin{eqnarray*}
+ \widehat{Y}_i^{DR\_WLS}(a,\alpha)&=&N_i^{-1}\sum_{j=1}^{N_i}\Biggl\{\sum_{a_{i(-j)}}m_{ij}(a,a_{i(-j)},X_i;\hat\beta^{WLS})\pi(a_{i(-j)};\alpha)
+ \Biggr\}\\
+ &\xrightarrow{p}&E\Biggl\{\sum_{a_{i(-j)}}\{m_{ij}(a,a_{i(-j)},X_i;\beta^{\ast})\}
+  \pi(a_{i(-j)};\alpha)\biggr\}\\
+  &=&\mu_{a\alpha}.
+\end{eqnarray*}
+
+\noindent Thus, $f(A_i|X_i;\gamma)$ is correctly specified, $\widehat{\textsc{de}}^{\text{DR\_WLS}}(\alpha)\xrightarrow{p}\overline{\textsc{de}}(\alpha)$.
+
+When $m(A_i,X_i;\beta)$ is correctly specified, $m_{ij}(a,a_{i(-j)},X_i;\beta_0)=E\{Y_{ij}(a,a_{i(-j)})|X_i\}$. Note
+
+\begin{eqnarray*}
+%&&E\Biggl\{\frac{1(A_{ij}=a)\{Y_{ij}(A_i)-m_{ij}(A_i,X_i;\hat\beta^{WLS})\}}{{f}(A_i|X_i;\hat\gamma)}
+  %\pi(A_{i(-j)};\alpha)\biggr\}\\
+  %&\xrightarrow{p}&
+  &&E\Biggl\{\frac{1(A_{ij}=a)\{Y_{ij}(A_i)-m_{ij}(A_i,X_i;\beta_0)\}}{{f}(A_i|X_i;\gamma^{\ast})}
+  \pi(A_{i(-j)};\alpha)\biggr\}\\
+    &=&E\Biggl\{\sum_{a_{i(-j)}}\frac{\{Y_{ij}(a,a_{i(-j)})-m_{ij}(a,a_{i(-j)},X_i;\beta_0)\}}{{f}(a_i|X_i;\gamma^{\ast})}
+  \pi(a_{i(-j)};\alpha){f}(a_i|X_i;\gamma_0)\biggr\}\\
+    &=&\sum_{a_{i(-j)}}E\Biggl\{\frac{\bigl\{E\{Y_{ij}(a,a_{i(-j)})|X_i\}-m_{ij}(a,a_{i(-j)},X_i;\beta_0)\bigr\}}{{f}(a_i|X_i;\gamma^{\ast})}
+  {f}(a_i|X_i;\gamma_0)\biggr\}\pi(a_{i(-j)};\alpha)\\
+  &=&0.
+\end{eqnarray*}
+
+\noindent Assuming that \eqref{eq: ee_DR_WLS} has a unique solution, thus $\beta^{WLS}\xrightarrow{p}\beta_0$ and 
+
+\begin{eqnarray*}
+ \widehat{Y}_i^{DR\_WLS}(a,\alpha)&=&N_i^{-1}\sum_{j=1}^{N_i}\Biggl\{\sum_{a_{i(-j)}}m_{ij}(a,a_{i(-j)},X_i;\hat\beta^{WLS})\pi(a_{i(-j)};\alpha)
+ \Biggr\}\\
+ &\xrightarrow{p}&E\Biggl\{\sum_{a_{i(-j)}}\{m_{ij}(a,a_{i(-j)},X_i;\beta_0)\}
+  \pi(a_{i(-j)};\alpha)\biggr\}\\
+  &=&\mu_{a\alpha}.
+\end{eqnarray*}
+
+Thus, when either $f(A_i|X_i;\gamma)$ or $m(A_i,X_i;\beta)$ is correctly specified, $\widehat{\textsc{de}}^{\text{DR\_WLS}}(\alpha)\xrightarrow{p}\overline{\textsc{de}}(\alpha)$.
+
+%\end{proof}
+
+\section*{Acknowledgments}
+
+The authors thank xxx
+
+{\it Conflict of Interest}: None declared.
+
+
+
+\bibliographystyle{apsr}
+%\bibliography{REF FILE}
+\bibliography{/Users/Lan/Sync/Lan/study/statistics/biostatistics/research/bibliography/mybib}
+
+%\newpage
+
+%\newpage
+%\begin{table}[ht]
+%\begin{center}
+%\caption{Empirical Bias, empirical standard error (ESE) and the average estimated standard error (ASE) of IPW, regression and Doubly Robust estimators for a continuous outcome with different $\alpha$, $N_i=4$ and $k=500$}
+%\begin{tabular}{rrrrrrrrrrrr}\label{tb: DR_n1000}
+%\\
+%\hline
+%  &\multicolumn{3}{c}{}&&\multicolumn{3}{c}{$\alpha$}&&\multicolumn{3}{c}{}\\
+%  &\multicolumn{3}{c}{0.1}&&\multicolumn{3}{c}{0.5}&&\multicolumn{3}{c}{0.9}\\
+%\hline
+%$\pi\_tru\ \mu\_mis$& Bias &ESE & ASE&& Bias &ESE & ASE&& Bias &ESE & ASE\\
+%\cmidrule{2-4}\cmidrule{6-8}\cmidrule{10-12}
+% $\hat{Y}^{ipw}(1,\alpha_0)$ & 0.032 & 0.77 & 0.80 && 0.066 & 0.29 & 0.31&& 0.198 & 0.38 & 0.42 \\
+% $\hat{Y}^{reg}(1,\alpha_0)$ & 0.284 & 0.71 & 0.17 && 0.220 & 0.40 & 0.11 && 0.157 & 0.27 & 0.14 \\
+%  $\hat{Y}^{DR}(1,\alpha_0)$ & 0.013 & 0.55 & 0.55 && 0.004 & 0.19 & 0.19 && 0.007 & 0.19 & 0.18 \\
+%  \hline
+%  $\pi\_mis\ \mu\_tru$& Bias &ESE & ASE&& Bias &ESE & ASE&& Bias &ESE & ASE\\
+%\cmidrule{2-4}\cmidrule{6-8}\cmidrule{10-12}
+%  $\hat{Y}^{ipw}(1,\alpha_0)$ & 0.706 & 0.70 & 0.83 && 0.139 & 3.05 & 4.37 && 0.756 & 2.29 & 3.10 \\
+%  $\hat{Y}^{reg}(1,\alpha_0)$ & 0.004 & 0.14 & 0.10 && 0.002 & 0.09 & 0.08 && 0.001 & 0.11 & 0.10 \\
+%  $\hat{Y}^{DR}(1,\alpha_0)$ & 0.005 & 0.20 & 0.20 && 0.010 & 0.23 & 0.23 && 0.000 & 0.19 & 0.19 \\
+%  \hline
+%  $\pi\_tru\ \mu\_tru$& Bias &ESE & ASE&& Bias &ESE & ASE&& Bias &ESE & ASE\\
+%\cmidrule{2-4}\cmidrule{6-8}\cmidrule{10-12}
+% $\hat{Y}^{DR}(1,\alpha_0)$  & 0.006 & 0.17 & 0.17 && 0.001 & 0.09 & 0.09 && 0.003 & 0.11 & 0.11 \\
+%   \hline
+%  $\pi\_mis\ \mu\_mis$& Bias &ESE & ASE&& Bias &ESE & ASE&& Bias &ESE & ASE\\
+%\cmidrule{2-4}\cmidrule{6-8}\cmidrule{10-12}
+%  $\hat{Y}^{DR}(1,\alpha_0)$ & 0.501 & 0.76 & 0.79 && 0.246 & 2.07 & 2.08 && 0.094 & 1.29 & 1.28 \\
+%    \hline
+%\end{tabular}
+%\end{center}
+%\end{table}
+%
+%\clearpage
+
+\end{document}
+
