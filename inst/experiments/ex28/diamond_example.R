@@ -1,13 +1,45 @@
+################################ Program Description ###
+# This program will show you how to 'automate' 
+# many R scripts at once onto the BIOS computing clusters 
+# (Diamond or Sapphire)
+################################ Program Description ###
 
-##  Originally created 2016-01-27 by Brian Barkley bribark@live.unc.edu
 
+## Let's say you have a function that you want to run, 
+##  and it is called myfun(). Let's say myfun() is saved 
+##  in the script myprog.R. Let's say myfun() takes a few
+##  objects as input. 
+##
+## For the sake of argument, we will say myfun() has three
+##  major steps:
+##    a) myfun() first generates a simulated dataset
+##    b) myfun() executes a statistical method on the dataset
+##    c) myfun() saves output from the method to a file
+##
+## Note that if you run X=15 scripts then you will have
+##  X=15 many sets of output. You will likely need to go back
+##  and aggregate all those outputs together which I'll show.
+
+## Created 2016-01-27 by Brian Barkley bribark@live.unc.edu
+## 
+## There are many ways to do this, and this is just one that seems to work.
+## If you have better ideas, I would love to hear them! Please email me.
+##
+## Sorry for any typos or mistakes
+
+# The last section is left uncommented so you have to read it!
+
+#
+##
 ### Step 1A: First, set up some stuff for bookkeeping ####---------------
 
 ## This section helps me to save all my functions to 
 ##  the same directory.
-# base_dir <- 'pine/scr/s/b/saulb/'
+base_dir <- 'home/users/saulb/'
+# base_dir <- 'temp/'
 Today <- Sys.Date()
-ScriptDumpToday <- paste(Today, "/", sep="")
+ScriptDumpToday <- paste(base_dir, 'drsims/', Today, "/", sep="")
+# ScriptDumpToday <- paste(getwd(), '/inst/experiments/ex28/', Today, "/", sep="")
 dir.create(ScriptDumpToday, showWarnings=T)
 ScriptDump <- function(file_name){
   ##This function date stamps the file_name
@@ -16,8 +48,8 @@ ScriptDump <- function(file_name){
 
 ### Step 1B: Set up whatever variables you want to input #### ------
 
-num_scripts <- 2
-outdir <- paste0("results/", Today, '/')
+num_scripts <- 1
+outdir <- paste0("home/users/saulb/Results/", Today, '/')
 # outdir <- paste0(getwd(), '/inst/experiments/ex28/temp/')
 dir.create(outdir, showWarnings=T)
 
@@ -52,7 +84,7 @@ for (script_num in 1:(num_scripts)) {
       "#SBATCH --mail-type=FAIL \n",
       "#SBATCH --mail-user=saulb@live.unc.edu \n",
       "#SBATCH --job-name=NAME-", script_num, '\n',
-      "srun R CMD BATCH ", R_script_out, " ", R_file_out, "\n",
+      "srun R312 CMD BATCH ", R_script_out, " ", R_file_out, "\n",
       file=L_file_out)
 }
 
@@ -63,7 +95,7 @@ B_file_out <- ScriptDump('ScriptAll.sh')
 
 ## Open it
 cat("#!/bin/bash -l \n",
-    "echo \"This script can make the other scripts run\"\n",
+    "echo \"This script can make the other scripts run\"",
     "#SBATCH --mail-type=ALL \n",
     "#SBATCH --mail-user=saulb@live.unc.edu \n",
     "#SBATCH --job-name=BIGBASH \n\n", file=B_file_out)
