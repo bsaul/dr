@@ -1,3 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^\archive.*$
+^archive.*$
+^inst/drafts.*$
+^inst/experiments.*$
+^inst/dev.*$
+^inst/notes.*$
