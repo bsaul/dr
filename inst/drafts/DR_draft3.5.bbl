@@ -1,3 +1,88 @@
 \begin{thebibliography}{xx}
 
+\harvarditem[Ali et~al.]{Ali, Emch, von Seidlein, Yunus, Sack, Rao, Holmgren
+  \harvardand\ Clemens}{2005}{ali2005herd}
+Ali, M., M. Emch, L. von Seidlein, M. Yunus, D.A. Sack, M. Rao, J. Holmgren
+  \harvardand\ J.D. Clemens. 2005.
+\newblock ``Herd immunity conferred by killed oral cholera vaccines in
+  {B}angladesh: a reanalysis.'' {\em The Lancet} 366:44--49.
+
+\harvarditem[Clemens et~al.]{Clemens, Harris, Sack, Chakraborty, Ahmed,
+  Stanton, Khan, Kay, Huda, Khan et~al.}{1988}{clemens1988field}
+Clemens, J.D., J.R. Harris, D.A. Sack, J. Chakraborty, F. Ahmed, B.F. Stanton,
+  M.U. Khan, B.A. Kay, N. Huda, M.R. Khan et~al. 1988.
+\newblock ``Field trial of oral cholera vaccines in Bangladesh: results of one
+  year of follow-up.'' {\em The Journal of infectious diseases} 158:60--69.
+
+\harvarditem{Halloran \harvardand\ Struchiner}{1995}{halloran1995causal}
+Halloran, M.E. \harvardand\ C.J. Struchiner. 1995.
+\newblock ``Causal Inference in Infectious Diseases.'' {\em Epidemiology}
+  6:142--151.
+
+\harvarditem{Hudgens \harvardand\ Halloran}{2008}{hudgens2008toward}
+Hudgens, M.G. \harvardand\ M.E. Halloran. 2008.
+\newblock ``Toward causal inference with interference.'' {\em Journal of the
+  American Statistical Association} 103:832--842.
+
+\harvarditem{Kang \harvardand\ Schafer}{2007}{kang2007demystifying}
+Kang, J.D.Y. \harvardand\ J.L. Schafer. 2007.
+\newblock ``Demystifying double robustness: a comparison of alternative
+  strategies for estimating a population mean from incomplete data.'' {\em
+  Statistical Science} 22:523--539.
+
+\harvarditem{Lunceford \harvardand\
+  Davidian}{2004}{lunceford2004stratification}
+Lunceford, J.K. \harvardand\ M. Davidian. 2004.
+\newblock ``Stratification and weighting via the propensity score in estimation
+  of causal treatment effects: a comparative study.'' {\em Statistics in
+  Medicine} 23:2937--2960.
+
+\harvarditem{Manski}{2013}{manski2013identification}
+Manski, C.~F. 2013.
+\newblock ``Identification of treatment response with social interactions.''
+  {\em The Econometrics Journal} 16:S1--S23.
+
+\harvarditem[Perez-Heydrich et~al.]{Perez-Heydrich, Hudgens, Halloran, Clemens,
+  Ali \harvardand\ Emch}{2014}{PerezHeydrich2014interference}
+Perez-Heydrich, C., M.~G. Hudgens, M.~E. Halloran, J.~D. Clemens, M. Ali
+  \harvardand\ M.~E. Emch. 2014.
+\newblock ``Assessing effects of cholera vaccination in the presence of
+  interference.'' {\em Biometrics} 70:731--741.
+
+\harvarditem[Root et~al.]{Root, Giebultowicz, Ali, Yunus \harvardand\
+  Emch}{2011}{root2011role}
+Root, E.D., S. Giebultowicz, M. Ali, M. Yunus \harvardand\ M. Emch. 2011.
+\newblock ``The role of vaccine coverage within social networks in cholera
+  vaccine efficacy.'' {\em PloS one} 6:e22971.
+
+\harvarditem{Rubin}{1980}{rubin1980randomization}
+Rubin, D.B. 1980.
+\newblock ``Comment on ``{R}andomization Analysis of Experimental Data: The
+  {F}isher Randomization Test," by {D}. {B}asu.'' {\em Journal of the American
+  Statistical Association} 75:591--593.
+
+\harvarditem[Scharfstein, Rotnitzky \harvardand\ Robins]{Scharfstein, Rotnitzky
+  \harvardand\ Robins}{1999}{scharfstein1999adjusting}
+Scharfstein, D.O., A. Rotnitzky \harvardand\ J.M. Robins. 1999.
+\newblock ``Adjusting for nonignorable drop-out using semiparametric
+  nonresponse models.'' {\em Journal of the American Statistical Association}
+  94:1096--1120.
+
+\harvarditem{Sobel}{2006}{sobel2006randomized}
+Sobel, M.E. 2006.
+\newblock ``What Do Randomized Studies of Housing Mobility Demonstrate?: Causal
+  Inference in the Face of Interference.'' {\em Journal of the American
+  Statistical Association} 101:1398--1407.
+
+\harvarditem{Tchetgen~Tchetgen \harvardand\
+  VanderWeele}{2012}{tchetgen2012causal}
+Tchetgen~Tchetgen, E.J. \harvardand\ T.J. VanderWeele. 2012.
+\newblock ``On causal inference in the presence of interference.'' {\em
+  Statistical Methods in Medical Research} 21:55--75.
+
+\harvarditem{Tsiatis}{2006}{tsiatis2006semiparametric}
+Tsiatis, A.A. 2006.
+\newblock {\em Semiparametric {T}heory and {M}issing {D}ata}.
+\newblock Springer.
+
 \end{thebibliography}

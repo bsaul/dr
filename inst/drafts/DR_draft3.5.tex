@@ -1,7 +1,7 @@
-\documentclass[oupdraft]{bio}
+\documentclass[oupdraft]{biostatistics}
 %\documentclass[12pt]{article}
-\usepackage[colorlinks=true, urlcolor=citecolor, linkcolor=citecolor, citecolor=citecolor]{hyperref}
-
+\usepackage[colorlinks=true, urlcolor=cyan, linkcolor=red, citecolor=red]{hyperref}
+\graphicspath{ {figures/} }
 \newcommand{\vsmin}{\vspace{-2.5mm}}
 \newcommand{\vsadd}{\vspace{0.6mm}}
 \newcommand{\he}{3.8cm}
@@ -350,9 +350,21 @@ Simulations were conducted to verify the consistency of the IPW, regression and 
 
 The simulation study was conducted in the following manner with $m = 100$ and $N_i = 30$. Covariates $X_{1ij}$ and $X_{2ij}$ were independently sampled from $N(0, 1)$ and $Bern(0.5)$ distributions respectively. Random variable $A_{ij}$ was generated from the mixed effect logistic distribution $\mbox{logit}\Pr(A_{ij}=1|X_{1i}, X_{2i}) = 0.1 + 0.2 |X_{1ij}| + 0.2 |X_{1ij}| X_{2ij} + b_i)$ where $b_{i} \sim N(0, 0.3)$. The observed outcome $Y_{ij}$ was generated from $Y_{ij}=m_{ij}+\varepsilon_{ij}$ where $\varepsilon_{ij} \sim N(0,1)$ and $m_{ij} = 2.0 + 2.0 A_{ij} + p(A_i) - 1.5 |X_{1ij}| + 2.0 X_{2ij} -3.0 |X_{1ij}| X_{2ij}$ with $p(A_i)$ the being proportion of treatment received among people in group $i$. 
 
-Using the same data, point and variance estimates were calculated from EQREFS for $\alpha_0 = 0.1, 0.5, \text{ and } 0.9$. The simulations were carried out 12,000 times for the scenario with both component models correctly specified in order to accurately represent an estimator's coverage to the second decimal. For the other scenarios where one or both of the component models was correctly specified, the simulations were carried out 700 times. The incorrectly specified models both excluded the $|X_{1ij}| X_{2ij}$ interaction term and include $X_{1ij}$ without the absolute value. (The Supplementary materials contains the code necessary to replicate the simulations??).
+Using the same data, point and variance estimates were calculated from EQREFS for $\alpha_0 = 0.1, 0.5, \text{ and } 0.9$. The simulations were carried out 13,000 times for the scenario with both component models correctly specified in order to accurately represent an estimator's coverage to the second decimal. For the other scenarios where one or both of the component models was misspecified, the simulations were carried out 700 times. The incorrectly specified models both excluded the $|X_{1ij}| X_{2ij}$ interaction term and include $X_{1ij}$ without the absolute value. (The Supplementary materials contains the code necessary to replicate the simulations??).
 
-The simulation result is presented in Figure \ref{fig:continuous}. As expected, when the $\pi$ model is correct, the IPW and the DR estimators have small bias while when the $\mu$ model is correct, the regression and DR estimators have small bias. Note that the DR estimator has a smaller variance than that of the IPW estimators when the $\pi$ model is correct; the DR estimator has a smaller variance than that of both the regression estimators when the $\mu$ model is correct. That is when one of the model is correct, the other model in DR estimator, although mis-specified, helps increase the efficiency. When both models are correct, the DR estimator has even smaller bias and variance. However, when both models are wrong, the DR estimator has as big or even bigger bias when using the IPW and regression estimators. This is also observed by Kang and Schafer (2007)\nocite{kang2007demystifying} who pointed out that `two wrong models are not better than one'.
+The simulation result is presented in Figure \ref{fig:simulation_results_0}. As expected, when the $\pi$ model is correct, the IPW and the DR estimators have small bias while when the $\mu$ model is correct, the regression and DR estimators have small bias. Note that the DR estimator has a smaller variance than that of the IPW estimators when the $\pi$ model is correct; the DR estimator has a smaller variance than that of both the regression estimators when the $\mu$ model is correct. That is when one of the model is correct, the other model in DR estimator, although mis-specified, helps increase the efficiency. When both models are correct, the DR estimator has even smaller bias and variance. However, when both models are wrong, the DR estimator has as big or even bigger bias when using the IPW and regression estimators. This is also observed by Kang and Schafer (2007)\nocite{kang2007demystifying} who pointed out that `two wrong models are not better than one'.
+
+\begin{figure}[h!]
+\centering
+\label{fig:simulation_results_0}
+\includegraphics{ex27_y_0_5.pdf}
+\end{figure}
+
+\begin{figure}[h!]
+\centering
+\label{fig:simulation_results_1}
+\includegraphics{ex27_y_1_5.pdf}
+\end{figure}
 
 %\begin{figure}[h!]
 %\begin{subfigure}[b]{\textwidth}
@@ -385,10 +397,13 @@ The simulation result is presented in Figure \ref{fig:continuous}. As expected, 
 
 \vspace{-0.4cm}
 \section{Application}\label{sec: DR_dia}
-A field cholera vaccine trial was carried out  in Matlab, Bangladesh in the late 1900s \citep{clemens1988field}. All children (2-15 yrs old) and women ($>$15 yrs old) were randomized with equal probability to one of three treatments: (1) B subunit-killed whole-cell oral cholera vaccine, (2) killed whole-cell-only cholera vaccine, or (3) {\it E. coli} K12 placebo. Although the treatments were randomized, not all the eligible individuals participated. Among all the 121,982 eligible individuals, 49,300 individuals received at least two doses of vaccines. At the end of first year, 4.52 cases per 1000 people was observed as the risk of cholera among the total eligible study population. We assume there is no unmeasured confounding for the relationship between participation and having cholera. In the original vaccine trial, the vaccines were estimated to lower the cholera incidence in vaccinated individuals by 62\% for the vaccine with B subunit and 53\% for the vaccine without B subunit at one year of follow-up \citep{clemens1988field}. 
+A cholera vaccine trial was carried out in Matlab, Bangladesh in the late 1980s \citep{clemens1988field}. All children (2-15 yrs old) and women ($>$15 yrs old) were randomized with equal probability to one of three treatments: one of two types of cholera vaccine or a placebo. In our analysis, as in \citet{PerezHeydrich2014interference}, we do not distinguish the cholera vaccines. Although the treatments were randomized, not all the eligible individuals participated. Those who did not participate in the randomized trial were followed for the primary outcome and included in the analysis, hence the study contains an observational component.
 
-It has been found that the vaccine efficacy was associated with the vaccine coverage in the clusters \citep{ali2005herd,root2011role}. \citet{PerezHeydrich2014interference} utilized inverse-probability weighted (IPW) estimators of the treatment effects in the presence of interference to assess the direct, indirect, total and overall causal effect of cholera vaccines. Here, we demonstrate our proposed DR estimators and compared to those weighting estimators in \citet{PerezHeydrich2014interference}.
+Among the 121,982 eligible individuals, 49,300 individuals received at least two doses of vaccines. At the end of first year, 4.52 cases per 1000 people was observed as the risk of cholera among the total eligible study population. Non-causal analyses found that vaccine efficacy was associated with the vaccine coverage in the clusters \citep{ali2005herd,root2011role}. \citet{PerezHeydrich2014interference} utilized inverse-probability weighted (IPW) estimators of the causal treatment effects in the presence of interference to assess the direct, indirect, total and overall causal effect of cholera vaccines. Here, we demonstrate our proposed DR estimators and compare to the IPW estimator \citet{PerezHeydrich2014interference}.
 
+\citet{PerezHeydrich2014interference} used a spatial clustering algorithm to group individuals into 700 groups. This resulted in 15 groups with more than 1000 individuals. These groups cause significant computational burden for the outcome-based estimator. Since our primary purpose is a comparison of estimators, we excluded these large groups from the analysis. This resulted in XXXXX individuas in XXX groups. Our treatment model uses the same covariates (age in decades, distance from river, and both of these squared) and form (logistic-normal) as in \citet{PerezHeydrich2014interference}. Our outcome model(s) use the same covariates.
+
+Figure \ref{} compares the four estimators. DESCRIBE results: blah, blah. 
 
 %A Field individually-randomized placebo-controlled trial was conducted in Matlab, Bangladesh between 1985-88 to assess the e cacy of two oral cholera vaccines \citep{clemens1988field}. All children (2-15 yrs old) and women ($>$15 yrs old) were randomly assigned with equal probability to one of three treatment assignments: (1) B subunit-killed whole-cell oral cholera vaccine, (2) killed whole-cell-only cholera vaccine, or (3) E. coli K12 placebo. Although all women and children were randomized, only a subset participated in the trial. Of the total eligible sample population (N = 121,982), 49,300 women and children received two or more doses of vaccine. Surveillance of the Matlab population for diarrhea was conducted at three diarrheal treatment centers, and data for all eligible individuals were obtained from the International Centre for Diarrhoeal Disease Research, Bangladesh. Cholera cases were defined according to the following criteria: Vibrio cholerae 01 isolation from fecal samples, presentation of non-bloody diarrhea, and registration at a treatment center upon presentation of symptoms. Risk of cholera among the total eligible study population was 4.52 cases per 1000 people in the first year of follow-up. In the original vaccine trial, e cacy (defined as percent reduction in cholera incidence in vaccinated individuals compared to placebo recipients) was estimated to be 62\% for the vaccine with B subunit and 53\% for the vaccine without B subunit at one year of follow-up (Clemens et al. 1988).
 
@@ -531,7 +546,7 @@ The authors thank xxx
 
 \bibliographystyle{apsr}
 %\bibliography{REF FILE}
-\bibliography{/Users/Lan/Sync/Lan/study/statistics/biostatistics/research/bibliography/mybib}
+\bibliography{mybib}
 
 %\newpage
 

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.5.22)  7 JUN 2017 13:48
+This is pdfTeX, Version 3.14159265-2.6-1.40.17 (TeX Live 2016) (preloaded format=pdflatex 2016.5.22)  9 JUN 2017 15:24
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -6,11 +6,7 @@ entering extended mode
 (./DR_draft3.5.tex
 LaTeX2e <2016/03/31>
 Babel <3.9r> and hyphenation patterns for 83 language(s) loaded.
-(./bio.cls
-
-LaTeX Warning: You have requested document class `bio',
-               but the document class provides `biostatistics'.
-
+(./biostatistics.cls
 Document Class: biostatistics 
 (/usr/local/texlive/2016/texmf-dist/tex/latex/amscls/amsthm.sty
 Package: amsthm 2015/03/04 v2.20.2
@@ -448,6 +444,8 @@ Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 LaTeX Info: Redefining \ref on input line 57.
 LaTeX Info: Redefining \pageref on input line 57.
 LaTeX Info: Redefining \nameref on input line 57.
+
+(./DR_draft3.5.out) (./DR_draft3.5.out)
 \@outlinefile=\write4
 \openout4 = `DR_draft3.5.out'.
 
@@ -473,30 +471,6 @@ LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <6> not available
 
 
 Package hyperref Warning: Ignoring empty anchor on input line 83.
-
-
-! LaTeX Error: Undefined color `citecolor'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.93 \newpage
-             
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-! LaTeX Error: Undefined color `citecolor'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.93 \newpage
-             
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
 
 
 Underfull \hbox (badness 10000) has occurred while \output is active
@@ -587,103 +561,6 @@ LaTeX Font Warning: Font shape `OMS/cmsy/m/n' in size <6.5> not available
 (Font)              size <6> substituted on input line 93.
 
 [1{/usr/local/texlive/2016/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
-
-Package natbib Warning: Citation `rubin1980randomization' on page 2 undefined o
-n input line 96.
-
-
-Package natbib Warning: Citation `sobel2006randomized' on page 2 undefined on i
-nput line 96.
-
-
-Package natbib Warning: Citation `sobel2006randomized' on page 2 undefined on i
-nput line 96.
-
-
-Package natbib Warning: Citation `manski2013identification' on page 2 undefined
- on input line 96.
-
-
-Package natbib Warning: Citation `lunceford2004stratification' on page 2 undefi
-ned on input line 100.
-
-
-! LaTeX Error: Undefined color `citecolor'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.103 follows. In Section \ref{sec: DR_notation}
-                                                 we introduce notation and d...
-
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-! LaTeX Error: Undefined color `citecolor'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.103 ...ction \ref{subsec: IPW_and_reg_estimator}
-                                                   and the DR estimators are...
-
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-! LaTeX Error: Undefined color `citecolor'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.103 ...sed in Section \ref{subsec: DE_estimator}
-                                                  . Results
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-! LaTeX Error: Undefined color `citecolor'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.104 ...ented in Section \ref{sec: DR_simulation}
-                                                  . The xx vaccine study is ...
-
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-! LaTeX Error: Undefined color `citecolor'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.105 in Section \ref{sec: DR_dia}
-                                  . Method will be illustrated in an applica...
-
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-! LaTeX Error: Undefined color `citecolor'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.106 ...earch in Section \ref{sec: DR_discussion}
-                                                  .
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
@@ -691,19 +568,6 @@ Overfull \vbox (6.83331pt too high) has occurred while \output is active []
 
 
 [2]
-
-Package natbib Warning: Citation `halloran1995causal' on page 3 undefined on in
-put line 116.
-
-
-Package natbib Warning: Citation `hudgens2008toward' on page 3 undefined on inp
-ut line 116.
-
-
-Package natbib Warning: Citation `tchetgen2012causal' on page 3 undefined on in
-put line 123.
-
-
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
@@ -711,11 +575,6 @@ Overfull \vbox (6.94444pt too high) has occurred while \output is active []
 
 
 [3]
-
-Package natbib Warning: Citation `tchetgen2012causal' on page 4 undefined on in
-put line 127.
-
-
 Overfull \hbox (22.16386pt too wide) in paragraph at lines 127--128
 \OML/cmm/m/it/10 N[] [][] \OT1/cmr/m/n/10 1(\OML/cmm/m/it/10 A[] \OT1/cmr/m/n/1
 0 = \OML/cmm/m/it/10 a\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 Y[]\OT1/cmr/m/n/10 (\OM
@@ -730,8 +589,30 @@ m/it/10 []\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 =f\OT1/cmr/m/n/10 (\OML/cmm/m/it/1
  []
 
 
-Package natbib Warning: Citation `PerezHeydrich2014interference' on page 4 unde
-fined on input line 140.
+Overfull \hbox (5.29591pt too wide) in paragraph at lines 140--142
+[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 a\OT1/cmr/m/n/10 ; \OML/cmm/m/it/10 \OT1/c
+mr/m/n/10 ) \OMS/cmsy/m/n/10 ^^@ \OML/cmm/m/it/10 ^^V$\OT1/cmr/m/n/10 . Also, n
+ote that $\OML/cmm/m/it/10 ^^M$ \OT1/cmr/m/n/10 is the so-lu-tion to $[] \OML/c
+mm/m/it/10 G[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 A[]; X[]\OT1/cmr/m/n/10 ; \OML/
+cmm/m/it/10 ^^M\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 dF\OT1/cmr/m/n/10 (\OML/cmm/m/
+it/10 A[]; X[]\OT1/cmr/m/n/10 ; \OML/cmm/m/it/10 ^^M\OT1/cmr/m/n/10 ) = 0$, whe
+re $\OML/cmm/m/it/10 G[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 A[]; X[]\OT1/cmr/m/n/
+10 ; \OML/cmm/m/it/10 ^^M\OT1/cmr/m/n/10 )$
+ []
+
+
+Overfull \hbox (34.54745pt too wide) in paragraph at lines 140--142
+\OT1/cmr/m/n/10 tor equa-tion $[] \OML/cmm/m/it/10 G[]\OT1/cmr/m/n/10 (\OML/cmm
+/m/it/10 o[]\OT1/cmr/m/n/10 ; \OML/cmm/m/it/10 ^^R\OT1/cmr/m/n/10 )\OML/cmm/m/i
+t/10 dF\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 o[]\OT1/cmr/m/n/10 ) = 0$ where $\OML/
+cmm/m/it/10 G[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 o[]\OT1/cmr/m/n/10 ; \OML/cmm/
+m/it/10 ^^R\OT1/cmr/m/n/10 ) = \OMS/cmsy/m/n/10 f\OML/cmm/m/it/10 G[]\OT1/cmr/m
+/n/10 (\OML/cmm/m/it/10 o[]\OT1/cmr/m/n/10 ; \OML/cmm/m/it/10 ^^V[]; ^^M\OT1/cm
+r/m/n/10 )\OML/cmm/m/it/10 ; G[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 o[]\OT1/cmr/m
+/n/10 ; \OML/cmm/m/it/10 ^^V[]; ^^M\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ; G[]\OT1/
+cmr/m/n/10 (\OML/cmm/m/it/10 a[]; x[]\OT1/cmr/m/n/10 ; \OML/cmm/m/it/10 ^^M\OT1
+/cmr/m/n/10 )\OMS/cmsy/m/n/10 g[]$\OT1/cmr/m/n/10 .
+ []
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -752,19 +633,6 @@ cmr/m/n/10 ; \OML/cmm/m/it/10 ^^L\OT1/cmr/m/n/10 ) =
  []
 
 
-! LaTeX Error: Undefined color `citecolor'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.162 ...ction \ref{subsec: IPW_and_reg_estimator}
-                                                  , we have shown that in an...
-
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
@@ -772,20 +640,6 @@ Overfull \vbox (6.94444pt too high) has occurred while \output is active []
 
 
 [5]
-
-! LaTeX Error: Undefined color `citecolor'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.184 ...ction \ref{subsec: IPW_and_reg_estimator}
-                                                  . For example, define $\wi...
-
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
 Overfull \hbox (28.92705pt too wide) in paragraph at lines 189--190
 [] \OML/cmm/m/it/10 G[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 o[]\OT1/cmr/m/n/10 ; \
 OML/cmm/m/it/10 ^^R\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 dF\OT1/cmr/m/n/10 (\OML/cm
@@ -812,13 +666,9 @@ Overfull \vbox (6.83331pt too high) has occurred while \output is active []
 
 
 [6]
-
-Package natbib Warning: Citation `kang2007demystifying' on page 7 undefined on 
-input line 229.
-
 LaTeX Font Info:    Try loading font information for U+dsrom on input line 249.
 
-(/usr/local/texlive/2016/texmf-dist/tex/latex/doublestroke/Udsrom.fd
+ (/usr/local/texlive/2016/texmf-dist/tex/latex/doublestroke/Udsrom.fd
 File: Udsrom.fd 1995/08/01 v0.1 Double stroke roman font definitions
 )
 Overfull \vbox (6.94444pt too high) has occurred while \output is active []
@@ -836,19 +686,6 @@ t/10 ; G[]\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 o[]\OT1/cmr/m/n/10 ; \OML/cmm/m/it/
 t/10 a[]; x[]\OT1/cmr/m/n/10 ; \OML/cmm/m/it/10 ^^M\OT1/cmr/m/n/10 )\OMS/cmsy/m
 /n/10 g[][]
  []
-
-
-! LaTeX Error: Undefined color `citecolor'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.260 ...ectly specified and \eqref{eq: ee_DR_WLS}
-                                                   has a unique solution, th...
-
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
 
 
 Overfull \hbox (6.35876pt too wide) in paragraph at lines 263--265
@@ -871,41 +708,6 @@ Overfull \vbox (6.83331pt too high) has occurred while \output is active []
 
 
 [8]
-
-Package natbib Warning: Citation `scharfstein1999adjusting' on page 9 undefined
- on input line 295.
-
-
-Package natbib Warning: Citation `scharfstein1999adjusting' on page 9 undefined
- on input line 295.
-
-
-! LaTeX Error: Undefined color `citecolor'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.314 ...imilar as in Section \ref{subsec: DR_WLS}
-                                                   by noting estimating equa...
-
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-! LaTeX Error: Undefined color `citecolor'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.314 ...estimating equation \eqref{eq: ee_DR_WLS}
-                                                   is also contained in $\ma...
-
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
 Overfull \vbox (6.94444pt too high) has occurred while \output is active []
 
 
@@ -920,45 +722,6 @@ it/10 ^^R\OT1/cmr/m/n/10 ) =
  []
 
 
-! LaTeX Error: Undefined color `citecolor'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.317 ...ectly specified and \eqref{eq: ee_DR_WLS}
-                                                   has a unique solution, th...
-
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-! LaTeX Error: Undefined color `citecolor'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.349 ...tions \ref{subsec: IPW_and_reg_estimator}
-                                                   and \ref{subsec: DE_estim...
-
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-! LaTeX Error: Undefined color `citecolor'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.349 ...estimator} and \ref{subsec: DE_estimator}
-                                                   as well as to compare the...
-
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
 Overfull \hbox (20.41745pt too wide) in paragraph at lines 353--354
 []\OT1/cmr/m/n/10 Using the same data, point and vari-ance es-ti-mates were cal
 -cu-lated from EQREFS for $\OML/cmm/m/it/10 [] \OT1/cmr/m/n/10 = 0[]1\OML/cmm/
@@ -971,40 +734,40 @@ Overfull \vbox (6.83331pt too high) has occurred while \output is active []
 
 [10]
 
-LaTeX Warning: Reference `fig:continuous' on page 11 undefined on input line 35
-5.
+Package caption Warning: \label without proper reference on input line 359.
+See the caption package documentation for explanation.
 
 
-Package natbib Warning: Citation `kang2007demystifying' undefined on input line
- 355.
+LaTeX Warning: Reference `fig:simulation_results_0' on page 11 undefined on inp
+ut line 355.
+
+<figures/ex27_y_0_5.pdf, id=174, 614.295pt x 361.35pt>
+File: figures/ex27_y_0_5.pdf Graphic file (type pdf)
+
+<use figures/ex27_y_0_5.pdf>
+Package pdftex.def Info: figures/ex27_y_0_5.pdf used on input line 360.
+(pdftex.def)             Requested size: 614.29349pt x 361.34912pt.
+
+Overfull \hbox (159.04938pt too wide) in paragraph at lines 360--361
+ [][] 
+ []
 
 
-Package natbib Warning: Citation `clemens1988field' on page 11 undefined on inp
-ut line 388.
+LaTeX Warning: `!h' float specifier changed to `!ht'.
+
+<figures/ex27_y_1_5.pdf, id=175, 614.295pt x 361.35pt>
+File: figures/ex27_y_1_5.pdf Graphic file (type pdf)
+
+<use figures/ex27_y_1_5.pdf>
+Package pdftex.def Info: figures/ex27_y_1_5.pdf used on input line 366.
+(pdftex.def)             Requested size: 614.29349pt x 361.34912pt.
+
+Overfull \hbox (159.04938pt too wide) in paragraph at lines 366--367
+ [][] 
+ []
 
 
-Package natbib Warning: Citation `clemens1988field' on page 11 undefined on inp
-ut line 388.
-
-
-Package natbib Warning: Citation `ali2005herd' on page 11 undefined on input li
-ne 390.
-
-
-Package natbib Warning: Citation `root2011role' on page 11 undefined on input l
-ine 390.
-
-
-Package natbib Warning: Citation `PerezHeydrich2014interference' on page 11 und
-efined on input line 390.
-
-
-Package natbib Warning: Citation `PerezHeydrich2014interference' on page 11 und
-efined on input line 390.
-
-
-Package natbib Warning: Citation `tsiatis2006semiparametric' undefined on input
- line 401.
+LaTeX Warning: `!h' float specifier changed to `!ht'.
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -1015,85 +778,45 @@ Overfull \vbox (6.94444pt too high) has occurred while \output is active []
 
 [11]
 
-! LaTeX Error: Undefined color `citecolor'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.407 ...*{Proof of Proposition \ref{thm: DR_CAN}}
-                                                  
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-! LaTeX Error: Undefined color `citecolor'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.464 ...{Proof of Proposition \ref{prop: DR_WLS}}
-                                                  
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
-
-
-Underfull \vbox (badness 3657) has occurred while \output is active []
-
-
-Overfull \vbox (6.83331pt too high) has occurred while \output is active []
-
-
-[12]
-
-! LaTeX Error: Undefined color `citecolor'.
-
-See the LaTeX manual or LaTeX Companion for explanation.
-Type  H <return>  for immediate help.
- ...                                              
-                                                  
-l.510 ...ndent Assuming that \eqref{eq: ee_DR_WLS}
-                                                   has a unique solution, th...
-
-You're in trouble here.  Try typing  <return>  to proceed.
-If that doesn't work, type  X <return>  to quit.
+LaTeX Warning: Reference `' on page 12 undefined on input line 406.
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
 
+Overfull \vbox (6.83331pt too high) has occurred while \output is active []
+
+
+[12 <./figures/ex27_y_0_5.pdf>]
 Overfull \vbox (6.94444pt too high) has occurred while \output is active []
 
 
-[13] (./DR_draft3.5.bbl
+[13 <./figures/ex27_y_1_5.pdf>]
+Underfull \vbox (badness 1688) has occurred while \output is active []
 
-Package natbib Warning: Empty `thebibliography' environment on input line 3.
 
-) 
+Overfull \vbox (6.83331pt too high) has occurred while \output is active []
+
+
+[14] (./DR_draft3.5.bbl
+Overfull \vbox (6.83331pt too high) has occurred while \output is active []
+
+
+[15]) 
 AED: lastpage setting LastPage
 
 Overfull \vbox (6.83331pt too high) has occurred while \output is active []
 
 
-[14]
+[16]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 589.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 589.
+ (./DR_draft3.5.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 589.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 589.
+Package rerunfilecheck Info: File `DR_draft3.5.out' has not changed.
+(rerunfilecheck)             Checksum: BD05204C9F55194C456A64465B08C2FC;741.
 
-Package natbib Warning: There were undefined citations.
-
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 574.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 574.
-(./DR_draft3.5.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 574.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 574.
-
-
-Package rerunfilecheck Warning: File `DR_draft3.5.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `DR_draft3.5.out':
-(rerunfilecheck)             Before: <no file>
-(rerunfilecheck)             After:  BD05204C9F55194C456A64465B08C2FC;741.
 
 LaTeX Font Warning: Size substitutions with differences
 (Font)              up to 1.75pt have occurred.
@@ -1104,13 +827,13 @@ LaTeX Warning: There were undefined references.
  )
 (\end occurred when \ifx on line 57 was incomplete) 
 Here is how much of TeX's memory you used:
- 8170 strings out of 493014
- 119113 string characters out of 6133351
- 220246 words of memory out of 5000000
- 11559 multiletter control sequences out of 15000+600000
+ 8246 strings out of 493014
+ 120955 string characters out of 6133351
+ 222266 words of memory out of 5000000
+ 11610 multiletter control sequences out of 15000+600000
  18780 words of font info for 72 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 36i,16n,43p,1922b,405s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 36i,16n,43p,1922b,421s stack positions out of 5000i,500n,10000p,200000b,80000s
 pdfTeX warning (dest): name{
 page.} has been referenced but does not exist, replaced by a fixed one
 
@@ -1137,10 +860,10 @@ st/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2016/texmf-dist
 fonts/type1/public/amsfonts/cm/cmti7.pfb></usr/local/texlive/2016/texmf-dist/fo
 nts/type1/public/amsfonts/cm/cmti9.pfb></usr/local/texlive/2016/texmf-dist/font
 s/type1/public/doublestroke/dsrom10.pfb>
-Output written on DR_draft3.5.pdf (14 pages, 300332 bytes).
+Output written on DR_draft3.5.pdf (16 pages, 467141 bytes).
 PDF statistics:
- 207 PDF objects out of 1000 (max. 8388607)
- 166 compressed objects within 2 object streams
- 36 named destinations out of 1000 (max. 500000)
- 1 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 329 PDF objects out of 1000 (max. 8388607)
+ 281 compressed objects within 3 object streams
+ 54 named destinations out of 1000 (max. 500000)
+ 99 words of extra memory for PDF output out of 10000 (max. 10000000)
 
