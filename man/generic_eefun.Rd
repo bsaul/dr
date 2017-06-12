@@ -2,12 +2,12 @@
 % Please edit documentation in R/eefuns.R
 \name{generic_eefun}
 \alias{generic_eefun}
-\title{Estimating equations for IPW, OTC, and DBR estimators}
+\title{Estimating equations for IPW, OTC, DBR, and WLS_DBR estimators}
 \usage{
-generic_eefun(data, models, randomization, estimator_type,
+generic_eefun(data, models, randomization = 1, estimator_type,
   regression_type = "none", hajek = FALSE)
 }
 \description{
-Estimating equations for IPW, OTC, and DBR estimators
+Estimating equations for IPW, OTC, DBR, and WLS_DBR estimators
 }
 
