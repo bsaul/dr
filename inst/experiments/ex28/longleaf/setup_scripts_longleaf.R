@@ -16,11 +16,15 @@ ScriptDump <- function(file_name){
 
 ### Step 1B: Set up whatever variables you want to input #### ------
 
-num_scripts <- 2
+basedir <- "/nas/longleaf/home/saulb"
+
+num_scripts <- 3
 outdir <- paste0("results/", Today, '/')
 # outdir <- paste0(getwd(), '/inst/experiments/ex28/temp/')
 dir.create(outdir, showWarnings=T)
-
+libloc <- paste0("'", basedir, '/Rlibs', "'")
+funsR  <- paste0("'", basedir, "/drsims/ex28_funs.R", "'")
+settingsR  <- paste0("'", basedir, "/drsims/ex28_settings.R", "'")
 ### Step 2: Create an R script for each Simulation #####---------
 for (script_num in 1:(num_scripts)) {
   ## Create a new .R file to write to
@@ -32,18 +36,19 @@ for (script_num in 1:(num_scripts)) {
   cat("#!/usr/bin/env Rscript \n",
       "library(dplyr) \n",
       seed, "\n",
-      # "library(dr, lib.loc='/Rlibs/') \n",
-      # "source() \n",
-      # "source() \n",
-      # "nsims <- 1 \n",
-      # "which_scenarios <- 9 \n",
-      # "allocations <- list(c(0.1, 0.5, 0.9)) \n",
-      # "estimates <- do_scenarios(nsims, which_scenarios, allocations, 
-      #                           all_model_args = margs,
-      #                           compute_se = TRUE,
-      #                           verbose    = FALSE,
-      #                           .parallel = FALSE) %>% bind_rows() \n",
-      "estimates <- data_frame(Y = rnorm(100)) \n",
+      "library(dr, lib.loc=", libloc, ") \n",
+      "source(", funsR, ") \n",
+      "source(", settingsR, ") \n",
+      "nsims <- 1 \n",
+      if(num_scripts > 700){ "margs <- margs[1] \n" },
+      "which_scenarios <- 9 \n",
+      "allocations <- list(c(0.1, 0.5, 0.9)) \n",
+      "estimates <- do_scenarios(nsims, which_scenarios, allocations, 
+                                 all_model_args = margs,
+                                 compute_se = TRUE,
+                                 verbose    = FALSE,
+                                 .parallel = FALSE) %>% bind_rows() \n",
+      # "estimates <- data_frame(Y = rnorm(100)) \n",
       "save(estimates, file = ", results_out, ") \n",
       "###endfile\n",
       file = R_script_out)
