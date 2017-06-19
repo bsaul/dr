@@ -12,7 +12,7 @@ make_eefun_wls <- function(t_model, wls_model, data, a, randomization = 1){
   n  <- length(Y)
   p_o <- length(coef(wls_model))
   p_t <- ncol(X_t) + 1
-  phi    <- as.numeric(summary(wls_model)$dispersion[1])
+  phi    <- suppressWarnings(as.numeric(summary(wls_model)$dispersion[1]))
   
   ## components for IPW estimator
   ip_fun <- weight_estimator(
