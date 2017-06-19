@@ -32,4 +32,3 @@ get_response <- function(formula, data){
 }
 Converts a matrix to a list
 }
-

@@ -9,4 +9,3 @@ make_dr_term1(X, inv_link)
 \description{
 Makes the first term in the DR estimator
 }
-

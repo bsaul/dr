@@ -9,4 +9,3 @@ pi_term(A)
 \description{
 pi term
 }
-

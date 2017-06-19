@@ -11,4 +11,3 @@ pcov_dbr_estimator(data, models, randomization, ...)
 Makes regression with propensity (DBR) estimators for group-level data
 (i.e.) regression based
 }
-

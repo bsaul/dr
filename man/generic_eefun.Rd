@@ -10,4 +10,3 @@ generic_eefun(data, models, randomization = 1, estimator_type,
 \description{
 Estimating equations for IPW, OTC, DBR, and WLS_DBR estimators
 }
-

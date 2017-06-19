@@ -9,4 +9,3 @@ make_ipw_vector(fulldata, models, group, randomization = 1, alpha)
 \description{
 Create vector of IP weights
 }
-

@@ -9,4 +9,3 @@ gen_data(m, ni, gamma, theta, beta)
 \description{
 Generate data
 }
-

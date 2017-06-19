@@ -9,4 +9,3 @@ est_step1(data, step0, model_args, allocations, randomization, ...)
 \description{
 Creates  estimator arguments and models
 }
-

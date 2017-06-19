@@ -9,4 +9,3 @@ extract_model_info(models, data, estimator_type, regression_type = "none")
 \description{
 Extract relevant information from list of models
 }
-

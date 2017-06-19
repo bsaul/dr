@@ -9,4 +9,3 @@ ipw_estimator(data, models, randomization, hajek = FALSE, ...)
 \description{
 Makes IPW estimator for group-level data
 }
-

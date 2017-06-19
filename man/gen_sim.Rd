@@ -9,4 +9,3 @@ gen_sim(nsims, ...)
 \description{
 Generate data
 }
-

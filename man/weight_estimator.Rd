@@ -9,4 +9,3 @@ weight_estimator(A, X, lower = -Inf, upper = Inf, randomization = 1)
 \description{
 IP weight estimator
 }
-

@@ -31,4 +31,3 @@ Evaluate a function on a dataframe
 \details{
 For use in dplyr
 }
-

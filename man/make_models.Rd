@@ -9,4 +9,3 @@ make_models(model_args, data)
 \description{
 Creates a list of models from model_args
 }
-

@@ -9,4 +9,3 @@ model_warnings(object)
 \description{
 Capture the model warnings from an object
 }
-

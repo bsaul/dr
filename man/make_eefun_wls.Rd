@@ -9,4 +9,3 @@ make_eefun_wls(t_model, wls_model, data, a, randomization = 1)
 \description{
 Estimating equations for WLS scores
 }
-

@@ -9,4 +9,3 @@ otc_estimator(data, models, randomization, ...)
 \description{
 Makes OTC (outcome based) estimator for group-level data
 }
-

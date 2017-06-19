@@ -9,4 +9,3 @@ est_step0(data, model_args, ...)
 \description{
 Creates treatment and outcome models
 }
-
