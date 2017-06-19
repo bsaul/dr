@@ -1,4 +1,4 @@
-
+  
 ##  Originally created 2016-01-27 by Brian Barkley bribark@live.unc.edu
 
 ### Step 1A: First, set up some stuff for bookkeeping ####---------------
@@ -31,12 +31,15 @@ for (script_num in 1:(num_scripts)) {
   R_script_out <- ScriptDump(paste('Rscript-',script_num, ".R", sep=""))
   L_file_out   <- ScriptDump(paste('BashScript-',script_num, ".sh", sep=""))
   R_file_out   <- ScriptDump(paste('Rscript-',script_num, ".Rout", sep=""))
-  results_out  <- paste0("'results", script_num, ".rda'")
+  results_out  <- paste0("'", outdir, "results", script_num, ".rda'")
   seed         <- paste0("set.seed(", script_num, ")")
   cat("#!/usr/bin/env Rscript \n",
       "library(dplyr) \n",
       seed, "\n",
       "library(dr, lib.loc=", libloc, ") \n",
+      "library(geepack, lib.loc=", libloc, ") \n",
+      "library(geex, lib.loc=", libloc, ") \n",
+      "library(rootSolve, lib.loc=", libloc, ") \n",
       "source(", funsR, ") \n",
       "source(", settingsR, ") \n",
       "nsims <- 1 \n",
@@ -57,7 +60,7 @@ for (script_num in 1:(num_scripts)) {
       "#SBATCH --mail-type=FAIL \n",
       "#SBATCH --mail-user=saulb@live.unc.edu \n",
       "#SBATCH --job-name=NAME-", script_num, '\n',
-      "srun R CMD BATCH ", R_script_out, " ", R_file_out, "\n",
+      "srun R CMD BATCH --vanilla ", R_script_out, " ", R_file_out, "\n",
       file=L_file_out)
 }
 
@@ -71,14 +74,15 @@ cat("#!/bin/bash -l \n",
     "echo \"This script can make the other scripts run\"\n",
     "#SBATCH --mail-type=ALL \n",
     "#SBATCH --mail-user=saulb@live.unc.edu \n",
-    "#SBATCH --job-name=BIGBASH \n\n", file=B_file_out)
+    "#SBATCH --job-name=BIGBASH \n\n", 
+    "module add r/3.3.1 \n", file=B_file_out)
 
 
 ## Now we make one line for each Bash script we want to run.
 for (script_num in 1:(num_scripts)) {
   #Write sbatch command
   Lscriptfile <-  ScriptDump(paste('BashScript-',script_num, ".sh", sep=""))
-  cat("sbatch ", Lscriptfile, "\n",sep="",file=B_file_out,append=TRUE)
+  cat("sbatch --time=00:45:00 ", Lscriptfile, "\n",sep="",file=B_file_out,append=TRUE)
 }
 
 

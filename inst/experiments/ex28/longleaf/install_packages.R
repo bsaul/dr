@@ -1,7 +1,7 @@
 ## Install packages necssary for running simulations on cluster ####
 
 print(getwd())
-packages <- c('rootSolve_1.7', 'geex_0.1.0', 'dr_0.1.0')
+packages <- c('geepack_1.2-1', 'rootSolve_1.7', 'geex_0.1.0', 'dr_0.1.0')
 
 basedir <- '/nas/longleaf/home/saulb/'
 

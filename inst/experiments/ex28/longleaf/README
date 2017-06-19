@@ -13,7 +13,7 @@ Rscipt install_packages.R --verbose
 
 1. Move ex28_funs.R, ex28_settings.R, setup_scripts_longleaf.R, run_setup_scripts_longleaf.sh to /drsims
 2. From command line:
-sbatch run_set_scripts_longleaf.sh
+sbatch run_setup_scripts_longleaf.sh
 
 3. Check that scripts are created.
 4. From command line:

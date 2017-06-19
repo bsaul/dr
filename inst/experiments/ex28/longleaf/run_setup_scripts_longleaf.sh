@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --output=attempt.out
+#SBATCH --output=setup.out
 #SBATCH --mail-type=ALL    
 #SBATCH --mail-user=saulb@live.unc.edu
 #SBATCH --job-name=Autom8
