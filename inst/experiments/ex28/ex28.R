@@ -10,7 +10,7 @@ library(doMC)
 registerDoMC(4)
 source('inst/experiments/ex28/ex28_funs.R')
 source('inst/experiments/ex28/ex28_settings.R')
-nsims <- 1
+nsims <- 700
 which_scenarios <- 9
 
 ## Compute estimates ##
@@ -18,10 +18,10 @@ allocations <- list(c(0.1, 0.5, 0.9))
 # allocations <- 0.5
 ptm <- proc.time()
 estimates <- do_scenarios(nsims, which_scenarios, allocations, 
-                          all_model_args = margs,
+                          all_model_args = margs[1],
                           compute_se = TRUE,
                           verbose    = FALSE,
-                          .parallel = FALSE) %>%
+                          .parallel = TRUE) %>%
    bind_rows()
 proc.time() - ptm
 
