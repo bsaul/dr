@@ -2,7 +2,10 @@
 #   Title: Analysis of cholera data with IPW, OTC, and DR estimators
 #  Author: B. Saul
 #    Date: 2016-05-20
-# Purpose: 
+# Purpose:
+#     Log:
+# 20170623 - running all but WLS estimator; will do seperately as I'm getting
+#            an error from the WLS estimator when estimating the variance
 #------------------------------------------------------------------------------#
 
 library(dplyr)
@@ -11,7 +14,7 @@ library(doMC)
 registerDoMC(4)
 # library(geex)
 # alphas <- .45
-alphas <- lapply(seq(.3, .6, by = .02), function(x) sort(c(.4, x)))
+ alphas <- lapply(seq(.3, .6, by = .02), function(x) sort(c(.4, x)))
 # alphas <- c(.4, .6)
 
 load( pipe( 'ssh saulb@diamond.bios.unc.edu "cat /home/groups/projects/mhudgens/emch/data/R_data/emch_analysis_data.Rdata"' ))
@@ -77,7 +80,7 @@ results <- lapply(seq_along(alphas), function(i){
     models      = models0,
     model_args  = analysis_model_args,
     randomization  = 2/3,
-    compute_se  = FALSE
+    compute_se  = TRUE
   ))
   if(is(attempt, 'try-error')){
     NULL

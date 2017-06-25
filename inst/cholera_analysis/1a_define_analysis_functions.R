@@ -92,7 +92,7 @@ estimate_cholera_parms_step1 <- function(data, models, model_args, allocations, 
                    theta   =  theta_wls,
                    hajek   = FALSE,
                    regtyp  = 'wls',
-                   skipit  = FALSE)
+                   skipit  = TRUE)
     # pcov_dbr = list(type   = 'pcov_dbr',
     #                 theta  = c(theta_t, theta_pcov_0, theta_pcov_1),
     #                 hajek  = FALSE,
@@ -153,7 +153,7 @@ estimate_cholera_parms_step2 <- function(data, allocations, models, model_args, 
           mats <- geex::compute_matrices(
             geex_list        = geexList,
             theta            = c(eargs$theta, target),
-            numDeriv_options = list(method = 'simple'),
+            derivFUN_control = list(method = 'simple'),
             models           = m,
             randomization    = randomization,
             estimator_type   = eargs$type,
