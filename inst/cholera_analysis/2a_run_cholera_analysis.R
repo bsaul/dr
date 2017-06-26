@@ -75,7 +75,7 @@ models0 <- estimate_cholera_parms_step0(
 
 results <- lapply(seq_along(alphas), function(i){
   attempt <- try(estimate_cholera_parms_step2(
-    data        = choleradt,
+    data        = choleradt %>% group_by(group)  %>% filter(n() < 65) %>% ungroup(),
     allocations = alphas[i],
     models      = models0,
     model_args  = analysis_model_args,
@@ -89,5 +89,5 @@ results <- lapply(seq_along(alphas), function(i){
   }
 })
 
-save(results, file = paste0('inst/cholera_analysis/cholera_results_dr_', Sys.Date(),'.rda'))
+save(results, file = paste0('inst/cholera_analysis/cholera_results_dr_wls_', Sys.Date(),'.rda'))
   

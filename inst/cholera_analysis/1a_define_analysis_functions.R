@@ -77,22 +77,22 @@ estimate_cholera_parms_step1 <- function(data, models, model_args, allocations, 
                hajek     = FALSE,
                theta     = theta_t,
                regtyp    = 'none',
-               skipit    = FALSE),
+               skipit    = TRUE),
     otc = list(type      = 'otc',
                hajek     = FALSE,
                theta     = theta_o,
                regtyp    = 'none',
-               skipit    = FALSE),
+               skipit    = TRUE),
     dbr = list(type      = 'dbr',
                hajek     = FALSE,
                theta     = c(theta_t, theta_o),
                regtyp    = 'none',
-               skipit    = FALSE),
+               skipit    = TRUE),
     wls_dbr = list(type    = 'wls_dbr',
                    theta   =  theta_wls,
                    hajek   = FALSE,
                    regtyp  = 'wls',
-                   skipit  = TRUE)
+                   skipit  = FALSE)
     # pcov_dbr = list(type   = 'pcov_dbr',
     #                 theta  = c(theta_t, theta_pcov_0, theta_pcov_1),
     #                 hajek  = FALSE,
@@ -161,6 +161,7 @@ estimate_cholera_parms_step2 <- function(data, allocations, models, model_args, 
             regression_type  = eargs$regtyp)
 
           Sigma <- try(geex::compute_sigma(mats$A, mats$B), silent = TRUE)
+          print(Sigma)
           if(is(Sigma, 'try-error')){
             Sigma <- NA
           }
