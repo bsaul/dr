@@ -44,11 +44,10 @@ make_eefun_wls <- function(t_model, wls_model, data, a, randomization = 1){
     if(family_link == 'gaussian_identity'){
       D <- X
       V <- phi * diag(1, nrow = n, ncol = n)
-    } else if(family_link == 'binomial_logit'){
+    } else if(family_link %in% c('binomial_logit', 'quasibinomial_logit')){
       D <- apply(X, 2, function(x) x * exp(lp)/((1+exp(lp))^2) )
       V <- phi * diag(f * (1 - f), ncol = length(f) )/length(f)
     }
-    
     t(D) %*% solve(V) %*% diag(W, nrow = n, ncol = n) %*% (r)
   }
 }
