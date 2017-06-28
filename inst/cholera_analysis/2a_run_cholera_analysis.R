@@ -75,7 +75,7 @@ models0 <- estimate_cholera_parms_step0(
 
 results <- lapply(seq_along(alphas), function(i){
   attempt <- try(estimate_cholera_parms_step2(
-    data        = choleradt %>% group_by(group)  %>% filter(n() < 65) %>% ungroup(),
+    data        = choleradt,
     allocations = alphas[i],
     models      = models0,
     model_args  = analysis_model_args,

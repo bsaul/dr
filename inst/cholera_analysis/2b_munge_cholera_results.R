@@ -7,7 +7,14 @@
 
 library(dplyr)
 
-# results2 <- results
+load('inst/cholera_analysis/cholera_results_dr_wls_2017-06-27.rda')
+results_wls <- results
+
+load('inst/cholera_analysis/cholera_results_dr_2017-06-25.rda')
+lapply(seq_along(results), function(i){
+  results[[i]][[1]]$wls_dbr <<- results_wls[[i]][[1]]$wls_dbr
+})
+
 # 
 # dr_results2 <- lapply(dr_results, function(x) x$dbr[[1]])
 # results$dbr <- dr_results2
@@ -16,7 +23,6 @@ library(dplyr)
 
 methods <- names(results[[1]][[1]])
 
-results[[1]][[1]]
 
 cholera_results <- lapply(seq_along(results), function(i){
   x <- results[[i]]
@@ -53,10 +59,10 @@ cholera_results <- lapply(seq_along(results), function(i){
       }
       est <- as.numeric(C %*% xxx$estimate * 1000)
       
-      # p <- ncol(xxx$vcov)
-      # Cvcov <- cbind(matrix(0, nrow = nrow(C), ncol = p- 4), C)
-      # std_err <- as.numeric(sqrt(diag(Cvcov %*% xxx$vcov %*% t(Cvcov))) * 1000)
-      std_err <- NA
+      p <- ncol(xxx$vcov)
+      Cvcov <- cbind(matrix(0, nrow = nrow(C), ncol = p- 4), C)
+      std_err <- as.numeric(sqrt(diag(Cvcov %*% xxx$vcov %*% t(Cvcov))) * 1000)
+      # std_err <- NA
       
       data_frame(
         method    = methods[m],
