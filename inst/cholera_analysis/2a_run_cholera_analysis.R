@@ -27,7 +27,6 @@ choleradt <- analysis_c %>%
 # %>%
 #   filter(group < 100)
 
-
 analysis_model_args <- list(
   t_model = 
     list(method = lme4::glmer,
