@@ -10,7 +10,7 @@ library(doMC)
 registerDoMC(4)
 source('inst/experiments/ex29/ex29_funs.R')
 source('inst/experiments/ex29/ex29_settings.R')
-nsims <- 700
+nsims <- 1
 which_scenarios <- 9
 
 ## Compute estimates ##

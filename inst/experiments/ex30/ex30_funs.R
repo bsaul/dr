@@ -44,7 +44,7 @@ est_step2 <- function(data, allocations, model_args, randomization, compute_se =
            mats <- geex::compute_matrices(
              geex_list        = geexList,
              theta            = c(eargs$theta, target),
-             numDeriv_options = list(method = 'simple'),
+             derivFUN_control = list(method = 'simple'),
              models           = m,
              randomization    = 1,
              estimator_type   = eargs$type,

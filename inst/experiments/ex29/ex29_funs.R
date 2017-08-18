@@ -41,15 +41,16 @@ est_step2 <- function(data, allocations, model_args, randomization, compute_se =
          ## END Point estimates ##
          ## BEGIN VCOV estimates ##
          if(compute_se){
+           geexList$outer_eeargs <- list(models           = m,
+                                        randomization    = 1,
+                                        estimator_type   = eargs$type,
+                                        hajek            = eargs$hajek,
+                                        regression_type  = eargs$regtyp)
+           geexList$inner_eeargs <- list(alpha = allocation)
            mats <- geex::compute_matrices(
              geex_list        = geexList,
              theta            = c(eargs$theta, target),
-             numDeriv_options = list(method = 'simple'),
-             models           = m,
-             randomization    = 1,
-             estimator_type   = eargs$type,
-             hajek            = eargs$hajek,
-             regression_type  = eargs$regtyp)
+             derivFUN_control = list(method = 'simple'))
 
            Sigma <- try(geex::compute_sigma(mats$A, mats$B), silent = TRUE)
            if(is(Sigma, 'try-error')){
