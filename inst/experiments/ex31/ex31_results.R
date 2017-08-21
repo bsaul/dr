@@ -22,24 +22,24 @@ library(gridExtra)
 
 ### Forest plots
 
-ggplot(
-  data = estimates %>% filter(alpha == 0.5, a == 0, model_spec == 'tcor_ocor') %>%
-    group_by(method) %>% arrange(estimate) %>% mutate(plotid = 1:n()),
-  aes(x = plotid,
-      y = estimate,
-      color = covered)) +
-  geom_hline(
-    yintercept = 1.106346
-  ) +
-  geom_point() +
-  geom_segment(
-    aes(xend = plotid,
-        y    = conf.low,
-        yend = conf.high)
-  ) + facet_grid(
-    method ~ .,
-    scale = 'free_y'
-  )
+# ggplot(
+#   data = estimates %>% filter(alpha == 0.5, a == 0, model_spec == 'tcor_ocor') %>%
+#     group_by(method) %>% arrange(estimate) %>% mutate(plotid = 1:n()),
+#   aes(x = plotid,
+#       y = estimate,
+#       color = covered)) +
+#   geom_hline(
+#     yintercept = 1.106346
+#   ) +
+#   geom_point() +
+#   geom_segment(
+#     aes(xend = plotid,
+#         y    = conf.low,
+#         yend = conf.high)
+#   ) + facet_grid(
+#     method ~ .,
+#     scale = 'free_y'
+#   )
 
 
 ### Level one
@@ -64,16 +64,22 @@ plot_one <- function(.sid, .model_spec, .method, .alpha, .a, .axis_labels = FALS
   }
   
   if(.method == 'ipw'){
-    color <- "#658b83"
+    # color <- "#658b83"
+    # color <- rgb(230, 159, 0, .6*255, max = 255)
+    color <- "#EFC583"
     method_lab <- 'IPW'
   } else if(.method == 'otc'){
-    color <- "#a4044d"     
+    # color <- "#a4044d"     
+    color <- rgb(86, 180, 233, max = 255)
     method_lab <- 'OTC'
   } else if(.method == 'dbr'){
-    color <- "#359721"
+    # color <- "#359721"
+    # color <- rgb(0, 114, 178, max = 255)
+    color <- rgb(204, 121, 167, max = 255)
     method_lab <- 'DBR'
   } else if(.method =='wls_dbr'){
-    color <- "#94d3bc"
+    # color <- "#94d3bc"
+    color <- rgb(213, 94, 0, max = 255)
     method_lab <- 'DBR\n(WLS)'
   } 
   # else if(.method =='pcov_dbrpcov'){
@@ -91,12 +97,14 @@ plot_one <- function(.sid, .model_spec, .method, .alpha, .a, .axis_labels = FALS
     ) +
     geom_violin(
       scale = 'width',
-      fill = color
+      fill = color,
+      size = .25,
+      color = 'grey50'
     ) +
     geom_point(data = summary_vals) + 
     scale_x_continuous(
       name = '',
-      expand = c(0,0)
+      expand = c(0,.1)
     ) + 
     scale_y_continuous(
       name   = '',
@@ -148,11 +156,22 @@ plot_one <- function(.sid, .model_spec, .method, .alpha, .a, .axis_labels = FALS
       color      = 'grey50'
     ) + 
     geom_text(
-      aes(label = round(coverage, 2), y = coverage),
+      aes(label = round(coverage, 2), y = coverage - .025),
       size = 2,
       vjust = 1,
       color = 'grey25'
-    ) +
+    ) +     
+    # geom_text(
+    #   aes(label = round(coverage, 2), y = coverage - .025),
+    #   size = 2.01,
+    #   vjust = 1,
+    #   color = 'grey25'
+    # ) + geom_text(
+    #   aes(label = round(coverage, 2), y = coverage - .025),
+    #   size = 2.01,
+    #   vjust = 1,
+    #   color = 'grey25'
+    # ) +
     scale_x_continuous(
       name = '',
       expand = c(0, 0)
@@ -187,6 +206,11 @@ plot_one <- function(.sid, .model_spec, .method, .alpha, .a, .axis_labels = FALS
   p3
   
 }
+
+grid.newpage()
+
+plot_one(9, 'tcor_ocor', .method = 'ipw', .5, 0) %>% grid.draw()
+
 
 ### Level 2: 
 plot_two <- function(.sid, .model_spec, .method_labels, .alpha, .a){
@@ -242,7 +266,8 @@ bias_plot_axes <- ggplot(
   ) + 
   scale_y_continuous(
     # name   = expression('-log'[10]*'(|bias|)'),
-    name   = expression('|Bias|'),
+    name   = '|Bias|',
+    # name   = '',
     breaks = -c(0, -1, -2, -3),
     labels = c(1, 0.1, 0.01, 0.001),
     expand = c(0, 0)
@@ -252,10 +277,10 @@ bias_plot_axes <- ggplot(
   theme(
     plot.title   = element_blank(),
     panel.spacing = unit(c(0, 0, 0, 0), 'cm'),
-    plot.margin  = unit(c(0, 0, 0, 0.65), 'cm'),
+    plot.margin  = unit(c(0, 0, 0, 0.9), 'cm'),
     axis.text.y  = element_text(size = 7, hjust = 1, angle = 0, debug = FALSE),
     axis.ticks.y = element_blank(),
-    axis.title.y = element_text(size = 7, hjust = 1, angle = 0, debug = FALSE),
+    axis.title.y = element_text(size = 7, hjust = 0.5, angle = 90, debug = FALSE),
     axis.text.x  = element_blank(),
     axis.ticks.x = element_blank(),
     axis.title.x = element_blank()
@@ -273,14 +298,15 @@ coverage_plot_axes <- ggplot(
     name ='Coverage',
     limits = c(0, 1),
     breaks = c(0, 0.95),
+    labels = c(0, 0.95),
     expand = c(0, 0)
   ) + 
   theme_void() + 
   theme(
-    plot.margin  = unit(c(0, 0, 0, 0.45), 'cm'),
+    plot.margin  = unit(c(0, 0, 0, 0.95), 'cm'),
     axis.text.y  = element_text(size = 7, hjust = 1, angle = 0, debug = FALSE),
     axis.ticks.y = element_blank(),
-    axis.title.y = element_text(size = 7, hjust = 1, angle = 0, debug = FALSE),
+    axis.title.y = element_text(size = 7, hjust = .5, angle = 90, debug = FALSE),
     axis.text.x  = element_blank(),
     axis.ticks.x = element_blank(),
     axis.title.x = element_blank()
@@ -304,6 +330,8 @@ axes_aligned <- arrangeGrob(
   widths = unit(.75, 'in'),
   heights = unit(c(.2, 3), 'in'))
 
+grid.newpage()
+grid.draw(axes_aligned)
 ### Level 4: Put it all together
 
 plot_four <- function(.sid, .alpha, .a){
@@ -346,19 +374,23 @@ plot_four <- function(.sid, .alpha, .a){
 ### Print results
 
 
+# y_1_5 <- arrangeGrob(
+#   textGrob(label = expression('Y(1, 0.5)')),
+#   plot_four(.sid = 9, .alpha = .5, .a  = 1),
+#   nrow = 2,
+#   heights = unit(c(.5, 3.5), 'in')
+# ) 
+
 y_1_5 <- arrangeGrob(
-  textGrob(label = expression('Y(1, 0.5)')),
   plot_four(.sid = 9, .alpha = .5, .a  = 1),
-  nrow = 2,
-  heights = unit(c(.5, 3.5), 'in')
-) 
+  nrow = 1, heights = unit(3.5, 'in'))
 
 grid.newpage()
 grid.draw(y_1_5)
 
 ggsave(filename = paste0('inst/experiments/ex31/figures/', 'y_1_5', '.pdf'),
        plot = y_1_5,
-       width = 8.5, height = 5)
+       width = 6.5, height = 3.6)
 
 y_0_5 <- arrangeGrob(
   textGrob(label = expression('Y(0, 0.5)')),
