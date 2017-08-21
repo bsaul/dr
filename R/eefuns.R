@@ -4,11 +4,13 @@
 #------------------------------------------------------------------------------#
 
 make_eefun_wls <- function(t_model, wls_model, data, a, randomization = 1){
-
+ 
   X  <- model.matrix(wls_model$formula, data = data)
-  Y  <- as.numeric(model.frame(geex::get_response_formula(wls_model), data = data)[[1]])
-  A  <- geex::get_response(A ~ 1, data = data)
-  X_t<- geex::get_design_matrix(geex::get_fixed_formula(t_model), data)
+  Y  <- as.numeric(model.frame(geex::grab_response_formula(wls_model), data = data)[[1]])
+  A  <- geex::grab_response(A ~ 1, data = data)
+  X_t<- geex::grab_design_matrix(data = data, 
+                                 rhs_formula = geex::grab_fixed_formula(t_model))
+  
   n  <- length(Y)
   p_o <- length(coef(wls_model))
   p_t <- ncol(X_t) + 1
@@ -68,12 +70,13 @@ generic_eefun <- function(
   comp <- extract_model_info(models = models, data = data, 
                              estimator_type = estimator_type,
                              regression_type = regression_type)
+  
   A <- comp$A
   p <- comp$p
   
   ## Create estimating equation functions for nontarget parameters
   if(estimator_type %in% c('ipw', 'dbr', 'wls_dbr')){
-    score_fun_t <- geex::make_eefun(
+    score_fun_t <- geex::grab_psiFUN(
       models$t_model, 
       data = data, 
       numderiv_opts = list(method = 'simple'))
@@ -82,7 +85,7 @@ generic_eefun <- function(
   }
   
   if(estimator_type %in% c('otc', 'dbr')){
-    score_fun_o <- geex::make_eefun(
+    score_fun_o <- geex::grab_psiFUN(
       models$o_model, 
       data = data)
     
@@ -103,7 +106,6 @@ generic_eefun <- function(
       make_eefun_wls(t_model = models$t_model, wls_model = x, 
                      data = data, a = 1, randomization = randomization)})
 
-    
     index_t <- 1:comp$p_t
     index_o_0 <- (comp$p_t + 1):(comp$p_t + comp$p_o_0)
     index_o_1 <- (comp$p_t + comp$p_o_0 + 1):(comp$p_t + comp$p_o_0 + comp$p_o_1)

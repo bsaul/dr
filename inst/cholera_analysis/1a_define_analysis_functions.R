@@ -125,7 +125,7 @@ estimate_cholera_parms_step2 <- function(data, allocations, models, model_args, 
       ## Estimate parameters for each allocation
 
       if(eargs$skip == FALSE){
-        geexList <- append(geexList, list(ee_args = list(alpha = allocation)))
+        # geexList <- append(geexList, list(ee_args = list(alpha = allocation)))
         p        <- length(eargs$theta)
         n_allocation <- length(allocation)
         make_estimator_fun <- match.fun(paste0(eargs$type, '_estimator'))
@@ -150,17 +150,31 @@ estimate_cholera_parms_step2 <- function(data, allocations, models, model_args, 
         ## END Point estimates ##
         ## BEGIN VCOV estimates ##
         if(compute_se){
-          mats <- geex::compute_matrices(
-            geex_list        = geexList,
-            theta            = c(eargs$theta, target),
-            derivFUN_control = list(method = 'simple'),
-            models           = m,
-            randomization    = randomization,
-            estimator_type   = eargs$type,
-            hajek            = eargs$hajek,
-            regression_type  = eargs$regtyp)
+          geexOut <- geex::m_estimate(
+            estFUN = generic_eefun,
+            data   = data,
+            units  = 'group',
+            roots  = c(eargs$theta, target),
+            compute_roots = FALSE,
+            outer_args = list(models           = m,
+                              randomization    = randomization,
+                              estimator_type   = eargs$type,
+                              hajek            = eargs$hajek,
+                              regression_type  = eargs$regtyp),
+            inner_args = list(alpha = allocation)
+          )
+          # mats <- geex::compute_matrices(
+          #   geex_list        = geexList,
+          #   theta            = c(eargs$theta, target),
+          #   derivFUN_control = list(method = 'simple'),
+          #   models           = m,
+          #   randomization    = randomization,
+          #   estimator_type   = eargs$type,
+          #   hajek            = eargs$hajek,
+          #   regression_type  = eargs$regtyp)
+          # Sigma <- try(geex::compute_sigma(mats$A, mats$B), silent = TRUE)
+          Sigma <- vcov(geexOut)
 
-          Sigma <- try(geex::compute_sigma(mats$A, mats$B), silent = TRUE)
           print(Sigma)
           if(is(Sigma, 'try-error')){
             Sigma <- NA
