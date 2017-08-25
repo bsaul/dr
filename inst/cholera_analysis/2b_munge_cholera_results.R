@@ -30,8 +30,7 @@ cholera_results <- lapply(seq_along(results), function(i){
     xx <- x[[j]]
     lapply(seq_along(xx), function(m){
       xxx <- xx[[m]]
-      print(xxx)
-      
+
       if(xxx$alpha[1] < 0.4){
         C <- matrix(
           c(1, 0, 0, 0,   # Y(0, alpha)
@@ -46,11 +45,14 @@ cholera_results <- lapply(seq_along(results), function(i){
         alpha2  <- xxx$alpha[1]
       } else {
         C <- matrix(
-          c(0, 1, 0, 0,   # Y(0, alpha)
-            0, 0, 0, 1,   # Y(1, alpha)
+          c(1, 0, 0, 0,   # Y(0, alpha1)
+            0, 1, 0, 0,   # Y(0, alpha2)
+            0, 0, 1, 0,   # Y(1, alpha1)          
+            0, 0, 0, 1,   # Y(1, alpha2)
             0, 1, 0, -1,
             1, -1, 0, 0,
-            1, 0, 0, -1),
+            1, 0, 0, -1
+            (1 - alpha1), -(1- alpha2), alpha1, -alpha2),
           byrow = TRUE, ncol = 4
         )
         
@@ -61,13 +63,14 @@ cholera_results <- lapply(seq_along(results), function(i){
       
       p <- ncol(xxx$vcov)
       Cvcov <- cbind(matrix(0, nrow = nrow(C), ncol = p- 4), C)
+      print(sqrt(diag(Cvcov %*% xxx$vcov %*% t(Cvcov))))
       std_err <- as.numeric(sqrt(diag(Cvcov %*% xxx$vcov %*% t(Cvcov))) * 1000)
       # std_err <- NA
       
       data_frame(
         method    = methods[m],
-        effect    = factor(c('Y0', 'Y1', 'de', 'ie', 'te'),
-                           levels = c('Y0', 'Y1', 'de', 'ie', 'te'), ordered = TRUE),
+        effect    = factor(c('Y0_1', 'Y0_2', 'Y1_1', 'Y1_2', 'de', 'ie', 'te', 'oe'),
+                           levels = c('Y0_1', 'Y0_2', 'Y1_1', 'Y1_2', 'de', 'ie', 'te', 'oe'), ordered = TRUE),
         alpha1    = alpha1,
         alpha2    = alpha2,
         estimate  = est,
@@ -80,12 +83,6 @@ cholera_results <- lapply(seq_along(results), function(i){
     bind_rows
 }) %>%
   bind_rows
-
-
-
-cholera_results
-
-
 
 
 
