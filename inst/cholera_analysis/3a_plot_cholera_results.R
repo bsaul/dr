@@ -15,7 +15,7 @@ color_vals <- c("ipw" = "#EFC583",
 
 
 p0 <- ggplot(
-  data = cholera_results %>% filter(effect %in% c('Y0', 'Y1')),
+  data = cholera_results %>% filter(effect %in% c('Y0_1', 'Y1_1')),
   aes(x = alpha2, 
       y = estimate,
       group = method,
@@ -60,14 +60,15 @@ p0 <- ggplot(
 p0
 
 labs <- labeller(
-  effect = c(de = "DE(~alpha~)", ie = 'Indirect Effect', te = 'Total Effect'),
+  effect = c(de = "DE(~alpha~)", ie = 'Indirect Effect', te = 'Total Effect', oe = 'Overall Effect'),
   label_parsed)
 
-cholera_results %>% filter(effect %in% c('de', 'ie', 'te')) %>%
+cholera_results %>% filter(effect %in% c('de', 'ie', 'te', 'oe')) %>%
   mutate(plot_label = case_when(
     .$effect == 'de' ~ "'DE('*alpha*')'",
     .$effect == 'ie' ~ "'IE(0.4,'~alpha*')'",
-    .$effect == 'te' ~ "'TE(0.4,'~alpha*')'")) -> plot_data
+    .$effect == 'te' ~ "'TE(0.4,'~alpha*')'",
+    .$effect == 'oe' ~ "'OE(0.4,'~alpha*')'")) -> plot_data
 
 
 p <- ggplot(
@@ -122,8 +123,7 @@ p <- ggplot(
     # strip.text.x = element_text(color = 'black'),
     strip.text = element_text(color = 'black'),
     strip.background = element_blank(),
-    axis.title.y = element_blank(),
-    legend.position = c(.75, .25)
+    axis.title.y = element_blank()
   )
 p
 

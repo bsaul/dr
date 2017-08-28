@@ -32,32 +32,37 @@ cholera_results <- lapply(seq_along(results), function(i){
       xxx <- xx[[m]]
 
       if(xxx$alpha[1] < 0.4){
-        C <- matrix(
-          c(1, 0, 0, 0,   # Y(0, alpha)
-            0, 0, 1, 0,   # Y(1, alpha)
-            1,  0, -1, 0, # Y(0, alpha') - Y(1, alpha')
-            -1, 1, 0, 0,  # Y(0, .4) - Y(0, alpha')
-            0, 1, -1, 0), # Y(0, .4) - Y(1, alpha')
-          byrow = TRUE, ncol = 4
-        )
-        
         alpha1  <- xxx$alpha[2]
         alpha2  <- xxx$alpha[1]
-      } else {
         C <- matrix(
-          c(1, 0, 0, 0,   # Y(0, alpha1)
-            0, 1, 0, 0,   # Y(0, alpha2)
-            0, 0, 1, 0,   # Y(1, alpha1)          
-            0, 0, 0, 1,   # Y(1, alpha2)
-            0, 1, 0, -1,
-            1, -1, 0, 0,
-            1, 0, 0, -1
+          c(1, 0, 0, 0,   # Y(0, alpha)
+            0, 1, 0, 0, 
+            0, 0, 1, 0,   # Y(1, alpha)
+            0, 0, 0, 1,
+            1,  0, -1, 0, # Y(0, alpha') - Y(1, alpha')
+            -1, 1, 0, 0,  # Y(0, .4) - Y(0, alpha')
+            0, 1, -1, 0, # Y(0, .4) - Y(1, alpha')
             (1 - alpha1), -(1- alpha2), alpha1, -alpha2),
           byrow = TRUE, ncol = 4
         )
         
+
+      } else {
         alpha1  <- xxx$alpha[1]
         alpha2  <- xxx$alpha[2]
+        
+        C <- matrix(
+          c(0, 1, 0, 0,   # Y(0, alpha1)
+            1, 0, 0, 0,   # Y(0, alpha2)
+            0, 0, 0, 1,   # Y(1, alpha1)          
+            0, 0, 1, 0,   # Y(1, alpha2)
+            0, 1, 0, -1,
+            1, -1, 0, 0,
+            1, 0, 0, -1,
+            (1 - alpha1), -(1- alpha2), alpha1, -alpha2),
+          byrow = TRUE, ncol = 4
+        )
+        
       }
       est <- as.numeric(C %*% xxx$estimate * 1000)
       
