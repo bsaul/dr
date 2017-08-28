@@ -16,48 +16,62 @@ registerDoMC(4)
 # library(geex)
 # alphas <- .45
  alphas <- lapply(seq(.3, .6, by = .02), function(x) sort(c(.4, x)))
- alphas <- list(c(.4))
-# alphas <- c(.4, .6)
+ # alphas <- lapply(seq(.3, .4, by = .02), function(x) sort(c(.4, x)))
+ # alphas <- list(c(.4, .3))
+#alphas <- c(.4, .6)
 
 load( pipe( 'ssh saulb@diamond.bios.unc.edu "cat /home/groups/projects/mhudgens/emch/data/R_data/emch_analysis_data.Rdata"' ))
 
 choleradt <- analysis_c %>%
   group_by(group) %>%
   mutate(fA = mean(A)) %>%
-  filter(n() < 1074) %>%
-  ungroup() 
-# %>%
-#   filter(group < 100)
+  #filter(n() < 1074) %>%
+  filter(n() < 150) %>%
+  # filter(!(group %in% c(121, 647, 252, 277))) %>%
+  ungroup()
 
 analysis_model_args <- list(
   t_model = 
     list(method = lme4::glmer,
-         formula = B ~ age + rivkm + age2 + rivkm2 + (1|group),
+         formula = B ~ age + rivkm + (1|group),
          options = list(family = binomial(link = 'logit'))),
   o_model =
     list(method  = geepack::geeglm,
-         formula = y_obs ~ A + fA + age + rivkm + age2 + rivkm2,
+         formula = y_obs ~ A + fA + age + rivkm,
          options = list(
            family  = binomial(link = 'logit'),
            id      = quote(group))),
-  wls_model_0 = 
+  # wls_model_0 = 
+  #   list(method = stats::glm,
+  #        formula = as.integer(y_obs) ~ fA + age + rivkm,
+  #        options = list(family = quasibinomial(link = 'logit'))),
+  # wls_model_1 = 
+  #   list(method = stats::glm,
+  #        formula = as.integer(y_obs) ~ fA + age + rivkm,
+  #        options = list(family = quasibinomial(link = 'logit'))),
+  wls_model_0 =
     list(method = stats::glm,
-         formula = as.integer(y_obs) ~ fA + age + rivkm + age2 + rivkm2,
-         options = list(family = quasibinomial(link = 'logit'))),
-  wls_model_1 = 
+         formula = as.integer(y_obs) ~ fA + age + rivkm,
+         options = list(family = gaussian(link = 'identity'))
+         # options = list(family = quasibinomial(link = 'logit'))
+         ),
+  wls_model_1 =
     list(method = stats::glm,
-         formula = as.integer(y_obs) ~ fA + age + rivkm + age2 + rivkm2,
-         options = list(family = quasibinomial(link = 'logit'))),
-  pcov_model_0 = list(
-    method  = stats::glm,
-    formula = y_obs ~ fA + age + rivkm + age2 + rivkm2 + ipw0,
-    options = list(family = binomial(link = 'logit'))
-  ),
-  pcov_model_1 = list(
-    method  = stats::glm,
-    formula = y_obs ~ fA + age + rivkm + age2 + rivkm2 + ipw1,
-    options = list(family = binomial(link = 'logit'))
-  )
+         formula = as.integer(y_obs) ~ fA + age + rivkm,
+         options = list(family = gaussian(link = 'identity'))
+         # options = list(family = quasibinomial(link = 'logit'))
+         )
+  # ,
+  # pcov_model_0 = list(
+  #   method  = stats::glm,
+  #   formula = y_obs ~ fA + age + rivkm + age2 + rivkm2 + ipw0,
+  #   options = list(family = binomial(link = 'logit'))
+  # ),
+  # pcov_model_1 = list(
+  #   method  = stats::glm,
+  #   formula = y_obs ~ fA + age + rivkm + age2 + rivkm2 + ipw1,
+  #   options = list(family = binomial(link = 'logit'))
+  # )
 )
 
 
@@ -90,30 +104,7 @@ results <- lapply(seq_along(alphas), function(i){
   }
 })
 
-results2 <- results
-
-# Method = "Richardson" & 2 target quantities
-sigma <- results2[[1]][[1]]$wls_dbr$vcov
-estimate <- results2[[1]][[1]]$wls_dbr$estimate * 1000
-C <- matrix(c(1, -1), byrow = TRUE, ncol = 2 )
-Cvcov   <- cbind(matrix(0, nrow = nrow(C), ncol = nrow(sigma)- 2), C)
-std_err <- as.numeric(sqrt(diag(Cvcov %*% sigma1 %*% t(Cvcov))) * 1000)
-
-de <- estimate1[1] - estimate1[2]
-de + 1.96 * std_err
-de - 1.96 * std_err
-
-# Method = "Simple" & 4 target quantities
-sigma <- results[[6]][[1]]$wls_dbr$vcov
-estimate <- results[[6]][[1]]$wls_dbr$estimate * 1000
-C <- matrix(c(1, 0, -1, 0), byrow = TRUE, ncol = 4 )
-Cvcov   <- cbind(matrix(0, nrow = nrow(C), ncol = nrow(sigma)- 4), C)
-std_err <- as.numeric(sqrt(diag(Cvcov %*% sigma %*% t(Cvcov))) * 1000)
-
-de <- estimate[1] - estimate[3]
-de + 1.96 * std_err
-de - 1.96 * std_err
 
 
-save(results, file = paste0('inst/cholera_analysis/cholera_results_dr_wls_', Sys.Date(),'.rda'))
+# save(results, file = paste0('inst/cholera_analysis/cholera_results_dr_wls_', Sys.Date(),'.rda'))
   
