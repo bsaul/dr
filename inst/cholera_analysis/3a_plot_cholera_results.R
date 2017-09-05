@@ -83,14 +83,14 @@ p <- ggplot(
     yintercept = 0
   ) + 
 
-  # geom_ribbon(
-  #   aes(ymin = conf_low,
-  #       ymax = conf_high,
-  #       # alpha = method,
-  #       fill  = method),
-  #   alpha = .5,
-  #   size = .2
-  # ) + 
+  geom_ribbon(
+    aes(ymin = conf_low,
+        ymax = conf_high,
+        # alpha = method,
+        fill  = method),
+    alpha = .5,
+    size = .2
+  ) +
   geom_line(size = 1) + 
   scale_color_manual(
     name = '',
