@@ -7,13 +7,13 @@
 
 library(dplyr)
 
-load('inst/cholera_analysis/cholera_results_dr_wls_2017-06-27.rda')
-results_wls <- results
-
-load('inst/cholera_analysis/cholera_results_dr_2017-06-25.rda')
-lapply(seq_along(results), function(i){
-  results[[i]][[1]]$wls_dbr <<- results_wls[[i]][[1]]$wls_dbr
-})
+load('inst/cholera_analysis/cholera_results_dr_wls_2017-09-04.rda')
+# results_wls <- results
+# 
+# load('inst/cholera_analysis/cholera_results_dr_2017-06-25.rda')
+# lapply(seq_along(results), function(i){
+#   results[[i]][[1]]$wls_dbr <<- results_wls[[i]][[1]]$wls_dbr
+# })
 
 # 
 # dr_results2 <- lapply(dr_results, function(x) x$dbr[[1]])
