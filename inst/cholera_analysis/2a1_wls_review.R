@@ -28,30 +28,6 @@ analysis_model_args1 <- list(
   wls_model_0 =
     list(method = stats::glm,
          formula = as.integer(y_obs) ~ fA + age + rivkm,
-         options = list(family = gaussian(link = 'identity'))
-    ),
-  wls_model_1 =
-    list(method = stats::glm,
-         formula = as.integer(y_obs) ~ fA + age + rivkm,
-         options = list(family = gaussian(link = 'identity'))
-    )
-)
-
-
-analysis_model_args2 <- list(
-  t_model = 
-    list(method = lme4::glmer,
-         formula = B ~ age + rivkm + (1|group),
-         options = list(family = binomial(link = 'logit'))),
-  o_model =
-    list(method  = geepack::geeglm,
-         formula = y_obs ~ A + fA + age + rivkm,
-         options = list(
-           family  = binomial(link = 'logit'),
-           id      = quote(group))),
-  wls_model_0 =
-    list(method = stats::glm,
-         formula = as.integer(y_obs) ~ fA + age + rivkm,
          options = list(family = quasibinomial(link = 'logit'))),
   wls_model_1 =
     list(method = stats::glm,
@@ -75,21 +51,13 @@ results1 <- lapply(seq_along(alphas), function(i){
   )
 })
 
-results2 <- lapply(seq_along(alphas), function(i){
-  estimate_cholera_parms_step2(
-    data        = choleradt,
-    allocations = alphas[i],
-    models      = models0,
-    model_args  = analysis_model_args2,
-    randomization  = 2/3,
-    compute_se  = TRUE
-  )
+
+# save(results1, file = paste0('inst/cholera_analysis/wls_testing1_', Sys.Date(),'.rda'))
+# save(results2, file = paste0('inst/cholera_analysis/wls_testing2_', Sys.Date(),'.rda'))
+
+lapply(seq_along(results2), function(i) {
+  results2[[i]][[1]]$wls_dbr <<- results1[[i]][[1]]$wls_dbr
 })
-
-
-save(results1, file = paste0('inst/cholera_analysis/wls_testing1_', Sys.Date(),'.rda'))
-save(results2, file = paste0('inst/cholera_analysis/wls_testing2_', Sys.Date(),'.rda'))
-
 
 methods <- names(results1[[1]][[1]])
 
@@ -134,6 +102,8 @@ munger <- function(results){
           )
           
         }
+        
+        print(xxx$estimate)
         est <- as.numeric(C %*% xxx$estimate * 1000)
         
         p <- ncol(xxx$vcov)
