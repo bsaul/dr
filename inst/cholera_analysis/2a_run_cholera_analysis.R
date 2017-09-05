@@ -25,8 +25,8 @@ load( pipe( 'ssh saulb@diamond.bios.unc.edu "cat /home/groups/projects/mhudgens/
 choleradt <- analysis_c %>%
   group_by(group) %>%
   mutate(fA = mean(A)) %>%
-  #filter(n() < 1074) %>%
-  filter(n() < 150) %>%
+  filter(n() < 1074) %>%
+  # filter(n() < 100) %>%
   # filter(!(group %in% c(121, 647, 252, 277))) %>%
   ungroup()
 
@@ -41,26 +41,14 @@ analysis_model_args <- list(
          options = list(
            family  = binomial(link = 'logit'),
            id      = quote(group))),
-  # wls_model_0 = 
-  #   list(method = stats::glm,
-  #        formula = as.integer(y_obs) ~ fA + age + rivkm,
-  #        options = list(family = quasibinomial(link = 'logit'))),
-  # wls_model_1 = 
-  #   list(method = stats::glm,
-  #        formula = as.integer(y_obs) ~ fA + age + rivkm,
-  #        options = list(family = quasibinomial(link = 'logit'))),
   wls_model_0 =
     list(method = stats::glm,
          formula = as.integer(y_obs) ~ fA + age + rivkm,
-         options = list(family = gaussian(link = 'identity'))
-         # options = list(family = quasibinomial(link = 'logit'))
-         ),
+         options = list(family = quasibinomial(link = 'logit'))),
   wls_model_1 =
     list(method = stats::glm,
          formula = as.integer(y_obs) ~ fA + age + rivkm,
-         options = list(family = gaussian(link = 'identity'))
-         # options = list(family = quasibinomial(link = 'logit'))
-         )
+         options = list(family = quasibinomial(link = 'logit')))
   # ,
   # pcov_model_0 = list(
   #   method  = stats::glm,
@@ -106,5 +94,5 @@ results <- lapply(seq_along(alphas), function(i){
 
 
 
-# save(results, file = paste0('inst/cholera_analysis/cholera_results_dr_wls_', Sys.Date(),'.rda'))
+save(results, file = paste0('inst/cholera_analysis/cholera_results_', Sys.Date(),'.rda'))
   
