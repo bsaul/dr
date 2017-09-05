@@ -29,7 +29,7 @@ estimate_cholera_parms_step1 <- function(data, models, model_args, allocations, 
                             group   = 'group', 
                             alpha   = allocations[k],
                             randomization = randomization)
-    
+
     # Add IP weights to dataset
     data <- data %>%
       mutate_(
@@ -72,6 +72,9 @@ estimate_cholera_parms_step1 <- function(data, models, model_args, allocations, 
                  unlist(lapply(m$wls_model_0, coef)),
                  unlist(lapply(m$wls_model_1, coef))) 
 
+  # theta_wls <- c(unlist(lapply(m$wls_model_0, function(x) c(theta_t, coef(x)))),
+  #                unlist(lapply(m$wls_model_1, function(x) c(theta_t, coef(x))))) 
+                        
   estimator_args <- list(
     ipw = list(type      = 'ipw',
                hajek     = FALSE,
@@ -175,7 +178,8 @@ estimate_cholera_parms_step2 <- function(data, allocations, models, model_args, 
           #   regression_type  = eargs$regtyp)
           # Sigma <- try(geex::compute_sigma(mats$A, mats$B), silent = TRUE)
           Sigma <- vcov(geexOut)
-
+          Ai     <- geexOut@sandwich_components@.A_i
+          Bi    <- geexOut@sandwich_components@.B_i
           print(Sigma)
           if(is(Sigma, 'try-error')){
             Sigma <- NA
@@ -189,6 +193,8 @@ estimate_cholera_parms_step2 <- function(data, allocations, models, model_args, 
         n_allocation <- length(allocation)
         target <- NA
         Sigma <- NA
+        Ai <- NA
+        Bi <- NA
       }
 
       ## END VCOV estimates ##
@@ -197,8 +203,8 @@ estimate_cholera_parms_step2 <- function(data, allocations, models, model_args, 
         alpha    = allocation,
         estimate = target,
         vcov     = Sigma,
-        Ai       = geexOut@sandwich_components@.A_i,
-        Bi       = geexOut@sandwich_components@.B_i
+        Ai       = Ai,
+        Bi       = Bi
       )
 
     }) # END lapply per estimator
