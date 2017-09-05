@@ -6,6 +6,13 @@
 \usage{
 est_step0(data, model_args, ...)
 }
+\arguments{
+\item{data}{dataset}
+
+\item{model_args}{list of model arguments}
+
+\item{...}{additional arguments}
+}
 \description{
 Creates treatment and outcome models
 }

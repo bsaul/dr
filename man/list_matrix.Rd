@@ -6,7 +6,7 @@
 #' Get the formula from a model object
 #' @export
 #------------------------------------------------------------------------------#
-get_fixed_formula <- function(model_object){
+grab_fixed_formula <- function(model_object){
   formula(model_object, fixed.only = TRUE)[-2]
 }}
 \usage{
@@ -17,7 +17,7 @@ list_matrix(this_list)
 #' Get a matrix of fixed effects from a model object
 #' @export
 #------------------------------------------------------------------------------#
-get_design_frame <- function(rhs_formula, data){
+grab_design_frame <- function(rhs_formula, data){
   as.data.frame(model.matrix(rhs_formula, data))
 }
 }
@@ -27,7 +27,7 @@ get_design_frame <- function(rhs_formula, data){
 #' @export
 #------------------------------------------------------------------------------#
 
-get_response <- function(formula, data){
+grab_response <- function(formula, data){
   model.response(model.frame(formula, data = data))
 }
 Converts a matrix to a list
