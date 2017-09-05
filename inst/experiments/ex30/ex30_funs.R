@@ -1,10 +1,10 @@
 
 est_step2 <- function(data, allocations, model_args, randomization, compute_se = TRUE, verbose = TRUE,...){  
-   models <- est_step0(data, model_args)
+   models <- dr::est_step0(data, model_args)
    geexList <- list(eeFUN = generic_eefun, splitdt = split(data, data$group))
   
    hold <- lapply(allocations, function(allocation){
-     temp <- est_step1(
+     temp <- dr::est_step1(
         data          = data, 
         step0         =  models, 
         model_args    = model_args, 
