@@ -2,10 +2,14 @@
 #' Step 0 of estimation
 #' 
 #' Creates treatment and outcome models
+#' 
+#' @param data dataset
+#' @param model_args list of model arguments
+#' @param ... additional arguments
 #' @export
 #------------------------------------------------------------------------------#
 
-est_step0 <-  function(data, model_args, ...){
+est_step0 <- function(data, model_args, ...){
   ## Component models
   m <- make_models(model_args = model_args[c('t_model', 'o_model')], 
                    data = data)
@@ -15,6 +19,7 @@ est_step0 <-  function(data, model_args, ...){
 #' Step 1 of estimation
 #' 
 #' Creates  estimator arguments and models
+#' 
 #' @export
 #------------------------------------------------------------------------------#
 
