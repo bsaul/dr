@@ -7,7 +7,7 @@
 
 library(dplyr)
 
-load('inst/cholera_analysis/cholera_results_dr_wls_2017-09-04.rda')
+load('inst/cholera_analysis/cholera_results_2017-09-04.rda')
 # results_wls <- results
 # 
 # load('inst/cholera_analysis/cholera_results_dr_2017-06-25.rda')
