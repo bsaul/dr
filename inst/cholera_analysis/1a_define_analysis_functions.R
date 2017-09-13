@@ -34,8 +34,8 @@ estimate_cholera_parms_step1 <- function(data, models, model_args, allocations, 
     data <- data %>%
       mutate_(
         ipw  =~ ipwv,
-        ipw0 =~ ipw * (A == 0),
-        ipw1 =~ ipw * (A == 1)
+        ipw0 =~ ipw * (A == 0)/(1 - allocations[k]),
+        ipw1 =~ ipw * (A == 1)/allocations[k]
       )
     ipw0 <- data[['ipw0']]
     ipw1 <- data[['ipw1']]
