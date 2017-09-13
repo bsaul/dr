@@ -17,12 +17,20 @@ wls_score_maker <- function(theta, X, Y, phi, ipw, A, a, family_link, invlnk){
   } else if(family_link %in% c('binomial_logit', 'quasibinomial_logit')){
     D <- apply(X, 2, function(x) x * exp(lp)/((1+exp(lp))^2) )
     V <- phi * diag(f * (1 - f), ncol = length(f) )/length(f)
+
+    
   }
   
   t(D) %*% solve(V) %*% diag(W, nrow = n, ncol = n) %*% (r)
+  # t(D) %*% diag(W, nrow = n, ncol = n) %*% (r)
 }
 
-make_eefun_wls <- function(models, data, randomization = 1){
+#------------------------------------------------------------------------------#
+#' Estimating equations for WLS scores
+#' @export
+#------------------------------------------------------------------------------#
+
+make_eefun_wls <- function(data, models, randomization = 1){
 
   # Treatment (IPW part)
   
@@ -78,8 +86,11 @@ make_eefun_wls <- function(models, data, randomization = 1){
   function(theta){
     scores_t <- score_fun_t(theta[index_tt])
     
+    
     scores_wls <- lapply(score_parts, function(x){
-      ipw <- ip_fun(theta = theta[index_tt], alpha = x$alpha)
+      denom <- (x$alpha^x$a) * (1- x$alpha)^(1-x$a)
+      ipw <- ip_fun(theta = theta[index_tt], alpha = x$alpha)/denom
+      
       wls_score_maker(
         theta = theta[x$index],
         X     = x$X,
