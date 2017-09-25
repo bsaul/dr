@@ -7,6 +7,8 @@
 
 library(ggplot2)
 
+plot_vers <- "V001"
+
 ## Color values
 color_vals <- c("ipw" = "#EFC583",
                 "otc" = rgb(86, 180, 233, max = 255),
@@ -83,14 +85,14 @@ p <- ggplot(
     yintercept = 0
   ) + 
 
-  geom_ribbon(
-    aes(ymin = conf_low,
-        ymax = conf_high,
-        # alpha = method,
-        fill  = method),
-    alpha = .5,
-    size = .2
-  ) +
+  # geom_ribbon(
+  #   aes(ymin = conf_low,
+  #       ymax = conf_high,
+  #       # alpha = method,
+  #       fill  = method),
+  #   alpha = .5,
+  #   size = .2
+  # ) +
   geom_line(size = 1) + 
   scale_color_manual(
     name = '',
@@ -127,5 +129,5 @@ p <- ggplot(
   )
 p
 
-ggsave(p, filename = 'inst/cholera_analysis/cholera_results.pdf',
+ggsave(p, filename = paste0('inst/cholera_analysis/figures/cholera_results_', plot_vers, '.pdf'),
        width = 6, height = 6 )
