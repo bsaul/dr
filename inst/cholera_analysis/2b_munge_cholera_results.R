@@ -7,15 +7,20 @@
 
 library(dplyr)
 
-load('inst/cholera_analysis/cholera_results_2017-09-04.rda')
-# results_wls <- results
-# 
-# load('inst/cholera_analysis/cholera_results_dr_2017-06-25.rda')
-# lapply(seq_along(results), function(i){
-#   results[[i]][[1]]$wls_dbr <<- results_wls[[i]][[1]]$wls_dbr
-# })
+load('inst/cholera_analysis/cholera_results_2017-09-20.rda')
+load('inst/cholera_analysis/cholera_results_wls_2017-09-22.rda')
 
-# 
+
+results <- results_nonwls
+lapply(seq_along(results_nonwls), function(i){
+  ## Subset estimates to target estimates in wls
+  p <- length(results_wls[[i]][[1]]$wls_dbr$estimate)
+  target_index <- (p -3):p
+  results_wls[[i]][[1]]$wls_dbr$estimate <<- results_wls[[i]][[1]]$wls_dbr$estimate[target_index]
+  results[[i]][[1]]$wls_dbr <<- results_wls[[i]][[1]]$wls_dbr[c('alpha', 'estimate', 'vcov')]
+})
+
+results_wls[[1]][[1]]$wls_dbr$
 # dr_results2 <- lapply(dr_results, function(x) x$dbr[[1]])
 # results$dbr <- dr_results2
 # results[[3]]
@@ -64,10 +69,13 @@ cholera_results <- lapply(seq_along(results), function(i){
         )
         
       }
+      
+      print(C)
       est <- as.numeric(C %*% xxx$estimate * 1000)
       
       p <- ncol(xxx$vcov)
       Cvcov <- cbind(matrix(0, nrow = nrow(C), ncol = p- 4), C)
+      print(Cvcov)
       print(sqrt(diag(Cvcov %*% xxx$vcov %*% t(Cvcov))))
       std_err <- as.numeric(sqrt(diag(Cvcov %*% xxx$vcov %*% t(Cvcov))) * 1000)
       # std_err <- NA
