@@ -10,26 +10,19 @@
 
 library(dplyr)
 library(dr)
-library(doMC)
 library(geex)
-registerDoMC(4)
-# library(geex)
-# alphas <- .45
- alphas <- lapply(seq(.3, .6, by = .02), function(x) sort(c(.4, x)))
- # alphas <- lapply(seq(.3, .4, by = .02), function(x) sort(c(.4, x)))
- # alphas <- list(c(.4, .3))
-#alphas <- c(.4, .6)
-
+alphas <- lapply(seq(.3, .6, by = .02), function(x) sort(c(.4, x)))
 load( pipe( 'ssh saulb@diamond.bios.unc.edu "cat /home/groups/projects/mhudgens/emch/data/R_data/emch_analysis_data.Rdata"' ))
 
+
+# Prepare data
 choleradt <- analysis_c %>%
   group_by(group) %>%
   mutate(fA = mean(A)) %>%
-  filter(n() < 1074) %>%
-  # filter(n() < 100) %>%
-  # filter(!(group %in% c(121, 647, 252, 277))) %>%
+  filter(n() < 100) %>% # for computational speed
   ungroup()
 
+# Component model arguments
 analysis_model_args <- list(
   t_model = 
     list(method = lme4::glmer,
@@ -49,34 +42,18 @@ analysis_model_args <- list(
     list(method = stats::glm,
          formula = as.integer(y_obs) ~ fA + age + rivkm,
          options = list(family = quasibinomial(link = 'logit')))
-  # ,
-  # pcov_model_0 = list(
-  #   method  = stats::glm,
-  #   formula = y_obs ~ fA + age + rivkm + age2 + rivkm2 + ipw0,
-  #   options = list(family = binomial(link = 'logit'))
-  # ),
-  # pcov_model_1 = list(
-  #   method  = stats::glm,
-  #   formula = y_obs ~ fA + age + rivkm + age2 + rivkm2 + ipw1,
-  #   options = list(family = binomial(link = 'logit'))
-  # )
 )
 
-
+# Treatment and outcome models
 models0 <- estimate_cholera_parms_step0(
   data        = choleradt,
   model_args  = analysis_model_args
 )
 
-# results <- estimate_cholera_parms_step2(
-#   data        = choleradt,
-#   allocations = list(alphas),
-#   models      = models0,
-#   model_args  = analysis_model_args,
-#   compute_se  = FALSE
-# )
-
-results <- lapply(seq_along(alphas), function(i){
+# Results for all but WLS ####
+# (setting skipit = TRUE for wls in estimator_args)
+source("inst/cholera_analysis/1a_define_analysis_functions.R")
+results_nonwls <- lapply(seq_along(alphas), function(i){
   attempt <- try(estimate_cholera_parms_step2(
     data        = choleradt,
     allocations = alphas[i],
@@ -92,7 +69,26 @@ results <- lapply(seq_along(alphas), function(i){
   }
 })
 
+save(results_nonwls, file = paste0('inst/cholera_analysis/cholera_results_', Sys.Date(),'.rda'))
 
+# Results for WLS ####
+# (setting skipit = FALSE for wls in estimator_args)
+source("inst/cholera_analysis/1a1_define_wls_analysis_functions.R")
+results_wls <- lapply(seq_along(alphas), function(i){
+  attempt <- try(estimate_cholera_parms_step2_wls(
+    data        = choleradt,
+    allocations = alphas[i],
+    models      = models0,
+    model_args  = analysis_model_args,
+    randomization  = 2/3,
+    compute_se  = TRUE
+  ))
+  if(is(attempt, 'try-error')){
+    NULL
+  } else{
+    attempt
+  }
+})
 
-save(results, file = paste0('inst/cholera_analysis/cholera_results_', Sys.Date(),'.rda'))
+save(results_wls, file = paste0('inst/cholera_analysis/cholera_results_wls_', Sys.Date(),'.rda'))
   
