@@ -2,7 +2,7 @@
 # estfUN
 
 
-wls_estFUN <- function(data, wls_formula, ipw_formula, invlnk, randomization){
+wls_estFUN <- function(data, wls_formula, ipw_formula, t_model, invlnk, randomization){
   
   L <- grab_design_matrix(data, wls_formula)
   L_ex <- expand_outcome_frame(data, geex::grab_fixed_formula(wls_formula))
@@ -15,19 +15,28 @@ wls_estFUN <- function(data, wls_formula, ipw_formula, invlnk, randomization){
   A <- grab_response(data, ipw_formula)
   n <- length(Y)
   p <- ncol(L)
+  p_t <- ncol(X) + 1
+  
+  score_fun_t <- geex::grab_psiFUN(
+    object = t_model, 
+    data = data, 
+    numderiv_opts = list(method = 'simple'))
   
   ipwFUN <- weight_estimator(
     A = A, 
     X = X, 
     randomization = randomization)
   
-  function(theta, alpha, ipw_theta){
+  function(theta, alpha){
     nalpha <- length(alpha)
-    index0 <- 1:p
-    index1 <- (p*nalpha + 1):(p*nalpha + p)
+    index0 <- (p_t + 1) + 1:p
+    index1 <- (p_t + 1) + (p*nalpha + 1):(p*nalpha + p)
+    
+    scores_t <- score_fun_t(theta[1:p_t])
+    
     
     wls0_ee <- lapply(alpha, function(x){
-      ipw <- ipwFUN(ipw_theta, alpha = x)/(1 - x)
+      ipw <- ipwFUN(theta[1:p_t], alpha = x)/(1 - x)
       W  <- diag(ipw * (A == 0), nrow = n, ncol = n)
       ee <- t(L) %*% W %*% (Y - invlnk(L %*% theta[index0]))
 
@@ -37,7 +46,7 @@ wls_estFUN <- function(data, wls_formula, ipw_formula, invlnk, randomization){
 
 
     wls1_ee <- lapply(alpha, function(x){
-      ipw <- ipwFUN(ipw_theta, alpha = x)/(x)
+      ipw <- ipwFUN(theta[1:p_t], alpha = x)/(x)
       W  <- diag(ipw * (A == 1), nrow = n, ncol = n)
       ee <- t(L) %*% W %*% (Y - invlnk(L %*% theta[index1]))
       index1 <<- index1 + p
@@ -84,7 +93,7 @@ wls_estFUN <- function(data, wls_formula, ipw_formula, invlnk, randomization){
     
     ntheta <- length(theta)
     
-    c(wls0_ee, wls1_ee, 
+    c(scores_t, wls0_ee, wls1_ee, 
       ce0 - theta[(ntheta - 2*nalpha + 1):(ntheta - nalpha)], 
       ce1 - theta[(ntheta - nalpha + 1):ntheta])
 
@@ -140,16 +149,17 @@ theta_t   <- unlist(getME(models0$t_model, c('beta', 'theta')))
 wls_start <- glm(y_obs ~ fA + age + rivkm, data = choleradt, 
                  family = binomial) %>% coef()
 
-# testfun <- wls_estFUN(data = choleradt %>% filter(group == 10),
-#                        y_obs ~ fA + age + rivkm,
-#                        B ~ age + rivkm,
-#                        invlnk = plogis,
-#                        randomization = 2/3)
+testfun <- wls_estFUN(data = choleradt %>% filter(group == 10),
+                       y_obs ~ fA + age + rivkm,
+                       B ~ age + rivkm,
+                       models0$t_model,
+                       invlnk = plogis,
+                       randomization = 2/3)
 # #
 # #
 # # 
-# testfun(theta = c(rep(wls_start, times = 3), rep(0, 8)),
-#         alpha = c(.3, .4), ipw_theta = theta_t)
+testfun(theta = c(theta_t, rep(wls_start, times = 4), rep(0, 4)),
+        alpha = c(.3, .4))
 
 ptm <- proc.time()
 mtest_wls <- m_estimate(
@@ -157,12 +167,12 @@ mtest_wls <- m_estimate(
   data   = choleradt,
   units  = 'group',
   compute_vcov = FALSE,
-  root_control = setup_root_control(start = c(rep(wls_start, times = 4), rep(0, 4))),
+  root_control = setup_root_control(start = c(theta_t, rep(wls_start, times = 4), rep(0, 4))),
   outer_args = list(wls_formula = y_obs ~ fA + age + rivkm,
                     ipw_formula = B ~ age + rivkm,
                     invlnk = plogis,
                     randomization = 2/3),
-  inner_args = list(alpha = c(.3, .4), ipw_theta = theta_t)
+  inner_args = list(alpha = c(.3, .4))
 )
 proc.time() - ptm
 roots(mtest_wls)
