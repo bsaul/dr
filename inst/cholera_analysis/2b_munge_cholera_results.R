@@ -20,7 +20,8 @@ lapply(seq_along(results_nonwls), function(i){
   results[[i]][[1]]$wls_dbr <<- results_wls[[i]][[1]]$wls_dbr[c('alpha', 'estimate', 'vcov')]
 })
 
-results_wls[[1]][[1]]$wls_dbr$
+# results[[1]][[1]]$wls_dbr$vcov
+# results_wls[[1]][[1]]$wls_dbr$
 # dr_results2 <- lapply(dr_results, function(x) x$dbr[[1]])
 # results$dbr <- dr_results2
 # results[[3]]
