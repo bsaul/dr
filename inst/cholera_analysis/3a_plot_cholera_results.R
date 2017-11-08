@@ -7,13 +7,13 @@
 
 library(ggplot2)
 
-plot_vers <- "V001"
+plot_vers <- "V002"
 
 ## Color values
-color_vals <- c("ipw" = "#EFC583",
-                "otc" = rgb(86, 180, 233, max = 255),
-                "dbr" = rgb(204, 121, 167, max = 255),
-                "wls_dbr" = rgb(213, 94, 0, max = 255))
+color_vals <- c("1ipw" = "#EFC583",
+                "2otc" = rgb(86, 180, 233, max = 255),
+                "3dbr" = rgb(204, 121, 167, max = 255),
+                "4wls_dbr" = rgb(213, 94, 0, max = 255))
 
 
 p0 <- ggplot(
@@ -70,7 +70,14 @@ cholera_results %>% filter(effect %in% c('de', 'ie', 'te', 'oe')) %>%
     .$effect == 'de' ~ "'DE('*alpha*')'",
     .$effect == 'ie' ~ "'IE(0.4,'~alpha*')'",
     .$effect == 'te' ~ "'TE(0.4,'~alpha*')'",
-    .$effect == 'oe' ~ "'OE(0.4,'~alpha*')'")) -> plot_data
+    .$effect == 'oe' ~ "'OE(0.4,'~alpha*')'")) %>%
+  # change order of methods
+  mutate(method = case_when(
+    method == "ipw" ~ "1ipw",
+    method == "otc" ~ "2otc",
+    method == "dbr" ~ "3dbr",
+    method == "wls_dbr" ~ "4wls_dbr"
+  )) -> plot_data
 
 
 p <- ggplot(
@@ -98,12 +105,12 @@ p <- ggplot(
     name = '',
     values = color_vals,
     # values = c('ipw' = "#658b83", 'otc' = "#a4044d", 'dbr'= "#359721", 'wls_dbr' = 'black'),
-    labels = c("ipw" = "IPW", "otc" = "OTC", "dbr" = "DBR", "wls_dbr" = "DBR(WLS)")
+    labels = c("1ipw" = "IPW", "2otc" = "REG", "3dbr" = "DR (BC)", "4wls_dbr" = "DR (WLS)")
   ) +
   scale_linetype_discrete(
     name = '',
     # values = c('ipw' = "#658b83", 'otc' = "#a4044d", 'dbr'= "#359721", 'wls_dbr' = 'black'),
-    labels = c("ipw" = "IPW", "otc" = "OTC", "dbr" = "DBR", "wls_dbr" = "DBR(WLS)")
+    labels = c("1ipw" = "IPW", "2otc" = "REG", "3dbr" = "DR (BC)", "4wls_dbr" = "DR (WLS)")
   ) +
   scale_fill_manual(
     values = color_vals

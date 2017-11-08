@@ -71,13 +71,13 @@ cholera_results <- lapply(seq_along(results), function(i){
         
       }
       
-      print(C)
+      # print(C)
       est <- as.numeric(C %*% xxx$estimate * 1000)
       
       p <- ncol(xxx$vcov)
       Cvcov <- cbind(matrix(0, nrow = nrow(C), ncol = p- 4), C)
-      print(Cvcov)
-      print(sqrt(diag(Cvcov %*% xxx$vcov %*% t(Cvcov))))
+      # print(Cvcov)
+      # print(sqrt(diag(Cvcov %*% xxx$vcov %*% t(Cvcov))))
       std_err <- as.numeric(sqrt(diag(Cvcov %*% xxx$vcov %*% t(Cvcov))) * 1000)
       # std_err <- NA
       
