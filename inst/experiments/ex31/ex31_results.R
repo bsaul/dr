@@ -71,16 +71,16 @@ plot_one <- function(.sid, .model_spec, .method, .alpha, .a, .axis_labels = FALS
   } else if(.method == 'otc'){
     # color <- "#a4044d"     
     color <- rgb(86, 180, 233, max = 255)
-    method_lab <- 'OTC'
+    method_lab <- 'REG'
   } else if(.method == 'dbr'){
     # color <- "#359721"
     # color <- rgb(0, 114, 178, max = 255)
     color <- rgb(204, 121, 167, max = 255)
-    method_lab <- 'DBR'
+    method_lab <- 'DR\n(BC)'
   } else if(.method =='wls_dbr'){
     # color <- "#94d3bc"
     color <- rgb(213, 94, 0, max = 255)
-    method_lab <- 'DBR\n(WLS)'
+    method_lab <- 'DR\n(WLS)'
   } 
   # else if(.method =='pcov_dbrpcov'){
   #   color <- "#0b5313"
@@ -341,7 +341,7 @@ plot_four <- function(.sid, .alpha, .a){
     .a             = .a,
     .model_spec   = 'tcor_ocor', 
     .method_labels = TRUE, 
-    .spec_label    = expression("(i) "*pi*": true"*" "*mu*": true"))
+    .spec_label    = expression("(i) "*"f"*": true"*" "*"m"*": true"))
     # .spec_label    =  'T: correct\nO: correct')
   p2 <- plot_three(
     .sid           = .sid,
@@ -349,21 +349,21 @@ plot_four <- function(.sid, .alpha, .a){
     .a             = .a,
     .model_spec   = 'tmis_ocor',
     .method_labels = FALSE, 
-    .spec_label    = expression("(ii) "*pi*": false"*" "*mu*": true"))
+    .spec_label    = expression("(ii) "*"f"*": false"*" "*"m"*": true"))
   p3 <- plot_three(
     .sid           = .sid,
     .alpha         = .alpha,
     .a             = .a,
     .model_spec   = 'tcor_omis', 
     .method_labels = FALSE, 
-    .spec_label    = expression("(iii) "*pi*": true"*" "*mu*": false"))
+    .spec_label    = expression("(iii) "*"f"*": true"*" "*"m"*": false"))
   p4 <- plot_three(
     .sid           = .sid,
     .alpha         = .alpha,
     .a             = .a,
     .model_spec   = 'tmis_omis', 
     .method_labels = FALSE, 
-    .spec_label    = expression("(iv) "*pi*": false"*" "*mu*": false"))
+    .spec_label    = expression("(iv) "*"f"*": false"*" "*"m"*": false"))
   arrangeGrob(
     axes_aligned, p1, p2, p3, p4,
     widths = unit(c(.8, rep(1.2 + .1, 4)), 'in'),
