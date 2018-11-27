@@ -25,6 +25,7 @@ estimates <- estimates %>% #select(-bias, -failed, -truth) %>%
 results <- estimates  %>%
   summarise(mean_est  = mean(estimate * !failed, na.rm = TRUE),
             mean_bias = mean(bias * !failed, na.rm = TRUE),
+            mean_lbias = mean(log10(abs(bias) * !failed), na.rm = TRUE),
             coverage  = mean(covered * !failed, na.rm = TRUE),
             failures  = sum(failed),
             ase       = mean(std_error),

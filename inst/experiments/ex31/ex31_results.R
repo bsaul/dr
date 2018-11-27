@@ -10,6 +10,8 @@ library(ggbeeswarm)
 library(grid)
 library(gridExtra)
 
+vers <- "V002"
+
 # load(file = 'inst/experiments/ex31/ex31_results.rda')
 
 # estimates <- estimates %>%
@@ -52,7 +54,8 @@ plot_one <- function(.sid, .model_spec, .method, .alpha, .a, .axis_labels = FALS
   
   summary_vals <- results %>% ungroup() %>%
     filter_(~ sid == .sid, ~ model_spec == .model_spec, ~method == .method, ~alpha == .alpha, ~a == .a) %>%
-    mutate(log10absbias = -log10(abs(mean_bias))) 
+    mutate(log10absbias = -mean_lbias)
+    # mutate(log10absbias = -log10(abs(mean_bias))) 
   
   # Plot prep  
   y_coverage <- round(summary_vals$coverage, 2)
@@ -101,7 +104,7 @@ plot_one <- function(.sid, .model_spec, .method, .alpha, .a, .axis_labels = FALS
       size = .25,
       color = 'grey50'
     ) +
-    geom_point(data = summary_vals) + 
+    geom_point(data = summary_vals) +
     scale_x_continuous(
       name = '',
       expand = c(0,.1)
@@ -388,7 +391,7 @@ y_1_5 <- arrangeGrob(
 grid.newpage()
 grid.draw(y_1_5)
 
-ggsave(filename = paste0('inst/experiments/ex31/figures/', 'y_1_5', '.pdf'),
+ggsave(filename = paste0('inst/experiments/ex31/figures/', 'y_1_5_', vers, '.pdf'),
        plot = y_1_5,
        width = 6.5, height = 3.6)
 
@@ -399,7 +402,7 @@ y_0_5 <- arrangeGrob(
   heights = unit(c(.5, 3.5), 'in')
 ) 
 
-ggsave(filename = paste0('inst/experiments/ex31/figures/', 'y_0_5', '.pdf'),
+ggsave(filename = paste0('inst/experiments/ex31/figures/', 'y_0_5_', vers, '.pdf'),
        plot = y_0_5,
        width = 8.5, height = 5)
 
